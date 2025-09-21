@@ -1,0 +1,2387 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário de Plantões</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6a40bf;
+            --secondary-color: #ff9e40;
+            --accent-color: #47b881;
+            --background-color: #f8f5ff;
+            --card-color: #ffffff;
+            --text-color: #2d2a32;
+            --light-text: #7c7a80;
+            --border-color: #e5e2ec;
+            
+            --sd-color: #6a40bf;
+            --sn-color: #4a6fa5;
+            --dn-color: #ff9e40;
+            --folga-color: #bdc3c7;
+            --extra-sd-color: #8e6cbf;
+            --extra-sn-color: #6b8cae;
+            --extra-dn-color: #ffb570;
+            --lefe-sd-color: #6a40bf;
+            --lefe-sn-color: #4a6fa5;
+            --lefe-dn-color: #ff6b40;
+            --today-color: #ffeb3b;
+            --today-text-color: #000;
+            
+            --tab-active: #6a40bf;
+            --tab-inactive: #e5e2ec;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 12px;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: var(--card-color);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        h1, h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+        }
+        
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        /* --- Controles --- */
+        .controles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .controles select, .controles button {
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background-color: var(--card-color);
+            font-size: 1rem;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            min-height: 44px;
+        }
+        
+        .controles select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236a40bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            padding-right: 35px;
+            appearance: none;
+        }
+        
+        .controles button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 500;
+            min-width: 120px;
+        }
+        
+        .controles button:active {
+            background-color: #5835a0;
+            transform: translateY(0);
+            box-shadow: 0 2px 5px rgba(106, 64, 191, 0.2);
+        }
+        
+        .selectors-container {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+        }
+        
+        .mes-selector {
+            flex: 70%;
+        }
+        
+        .ano-selector {
+            flex: 30%;
+        }
+        
+        /* --- Sistema de Abas --- */
+        .tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            background: var(--tab-inactive);
+            border-radius: 6px 6px 0 0;
+            margin-right: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            font-size: 0.95rem;
+            flex-shrink: 0;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .tab.active {
+            background: var(--tab-active);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 16px;
+            background: var(--card-color);
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* --- Cores dos Plantões --- */
+        .sd, .legenda .sd-bg { background-color: var(--sd-color); }
+        .sn, .legenda .sn-bg { background-color: var(--sn-color); }
+        .dn, .legenda .dn-bg { background-color: var(--dn-color); }
+        .folga, .legenda .folga-bg { background-color: var(--folga-color); }
+        .extra-sd, .legenda .extra-sd-bg { background-color: var(--extra-sd-color); }
+        .extra-sn, .legenda .extra-sn-bg { background-color: var(--extra-sn-color); }
+        .extra-dn, .legenda .extra-dn-bg { background-color: var(--extra-dn-color); }
+        .lefe-sd, .legenda .lefe-sd-bg { background-color: var(--lefe-sd-color); }
+        .lefe-sn, .legenda .lefe-sn-bg { background-color: var(--lefe-sn-color); }
+        .lefe-dn, .legenda .lefe-dn-bg { background-color: var(--lefe-dn-color); }
+        
+        /* Dia atual */
+        .today {
+            background-color: var(--today-color) !important;
+            color: var(--today-text-color) !important;
+        }
+        .today .day-number {
+            font-weight: bold;
+            color: #000;
+        }
+        
+        /* --- Tabela do Calendário --- */
+        .calendario-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -10px;
+            padding: 0 10px;
+        }
+        .calendario {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            min-width: 600px;
+        }
+        .calendario caption {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: var(--primary-color);
+            padding: 8px;
+        }
+        .calendario th, .calendario td {
+            border: 1px solid var(--border-color);
+            padding: 8px 4px;
+            text-align: center;
+            vertical-align: top;
+        }
+        .calendario th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+        }
+        .calendario td {
+            height: 70px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .calendario td:active {
+            background-color: rgba(106, 64, 191, 0.1);
+        }
+        .calendario .day-number {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+        .calendario .plantao-info {
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            padding: 3px;
+            border-radius: 4px;
+            display: block;
+            margin-bottom: 2px;
+        }
+        /* Células vazias ou de outros meses */
+        .calendario .other-month {
+            background-color: #fafafa;
+            color: #ccc;
+        }
+        .calendario .continuation {
+            font-style: italic;
+            font-size: 0.7rem;
+            color: #777;
+        }
+
+        /* --- Seção de Resumo --- */
+        #resumo {
+            background-color: #f9f9f9;
+            border-left: 4px solid var(--primary-color);
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        #resumo h2 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+        #resumo p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            padding: 8px;
+            background-color: rgba(106, 64, 191, 0.05);
+            border-radius: 6px;
+        }
+        #resumo .total-geral {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            text-align: center;
+            margin-top: 16px;
+            padding: 12px;
+            background-color: rgba(71, 184, 129, 0.1);
+            border-radius: 8px;
+        }
+        
+        /* --- Legenda --- */
+        .legenda {
+            margin-bottom: 20px;
+            padding: 16px;
+            background-color: var(--card-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .legenda h2 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+        }
+        .legenda ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+        .legenda li {
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            flex: 1 1 45%;
+            text-align: center;
+            padding: 8px;
+            background-color: rgba(106, 64, 191, 0.05);
+            border-radius: 6px;
+        }
+        .legenda li strong {
+            display: inline-block;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            margin-right: 6px;
+            min-width: 45px;
+        }
+        
+        /* Botão Flutuante */
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(106, 64, 191, 0.25);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+        }
+        
+        .floating-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 8px rgba(106, 64, 191, 0.35);
+        }
+        
+        .floating-menu {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            background-color: var(--card-color);
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+            padding: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 999;
+            width: 200px;
+        }
+        
+        .floating-menu button {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            min-height: 44px;
+        }
+        
+        .floating-menu button:active {
+            background-color: #5835a0;
+        }
+        
+        /* Modal para exportar/importar */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background-color: var(--card-color);
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 1.4rem;
+        }
+        
+        .modal textarea {
+            width: 100%;
+            height: 140px;
+            margin: 8px 0;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        
+        .modal-buttons button {
+            padding: 12px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            min-height: 44px;
+        }
+        
+        .modal-buttons button:first-child {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .modal-buttons button:last-child {
+            background-color: #e2e2e2;
+            color: var(--text-color);
+        }
+        
+        /* Modal de personalização de cores */
+        .color-picker {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .color-picker label {
+            width: 100px;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .color-picker input[type="color"] {
+            width: 50px;
+            height: 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        
+        .btn-cor-padrao {
+            padding: 8px 12px;
+            background-color: #e2e2e2;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            min-height: 40px;
+        }
+        
+        /* Modal de valores dos plantões */
+        .valor-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .valor-input label {
+            width: 150px;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .valor-input input {
+            width: 100px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-height: 40px;
+        }
+        
+        /* Modal de nomes dos plantões */
+        .nome-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .nome-input label {
+            width: 150px;
+            font-weight: bold;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .nome-input input {
+            width: 180px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            min-height: 40px;
+        }
+        
+        /* Lista de plantões no modal */
+        .plantao-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            background-color: rgba(106, 64, 191, 0.05);
+        }
+        
+        .plantao-item button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            min-height: 36px;
+        }
+        
+        /* Botões para adicionar plantão */
+        .btn-tipo-plantao {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            min-height: 44px;
+        }
+        
+        .btn-tipo-plantao:active {
+            background-color: #5835a0;
+        }
+        
+        /* Responsividade */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .legenda ul {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .legenda li {
+                flex: 1 1 100%;
+                margin-bottom: 6px;
+                font-size: 0.85rem;
+            }
+            
+            .legenda li strong {
+                min-width: 40px;
+                padding: 4px 8px;
+            }
+            
+            .calendario caption {
+                font-size: 1.2rem;
+            }
+            
+            .calendario th, .calendario td {
+                padding: 6px 3px;
+                font-size: 0.8rem;
+            }
+            
+            .calendario td {
+                height: 60px;
+            }
+            
+            .calendario .day-number {
+                font-size: 0.85rem;
+            }
+            
+            .calendario .plantao-info {
+                font-size: 0.65rem;
+                padding: 2px;
+            }
+            
+            #resumo p {
+                font-size: 0.85rem;
+            }
+            
+            #resumo .total-geral {
+                font-size: 1.1rem;
+            }
+            
+            .controles {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .selectors-container {
+                flex-direction: column;
+            }
+            
+            .mes-selector, .ano-selector {
+                flex: 100%;
+            }
+            
+            .floating-menu {
+                width: 180px;
+                right: 15px;
+                bottom: 80px;
+            }
+            
+            .floating-button {
+                width: 55px;
+                height: 55px;
+                right: 15px;
+                bottom: 15px;
+            }
+            
+            .tab {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-content {
+                padding: 15px;
+            }
+            
+            .modal h2 {
+                font-size: 1.3rem;
+            }
+            
+            .color-picker label,
+            .valor-input label,
+            .nome-input label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .color-picker input[type="color"] {
+                margin-right: 8px;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            .container {
+                padding: 12px;
+            }
+            
+            h1 {
+                font-size: 1.4rem;
+            }
+            
+            .calendario {
+                min-width: 320px;
+            }
+            
+            .calendario td {
+                height: 55px;
+            }
+            
+            .calendario .plantao-info {
+                font-size: 0.6rem;
+                padding: 1px;
+            }
+            
+            .floating-button {
+                bottom: 12px;
+                right: 12px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+            
+            .floating-menu {
+                bottom: 72px;
+                right: 12px;
+                width: 170px;
+                padding: 10px;
+            }
+            
+            .floating-menu button {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .tab {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+            }
+            
+            .modal-content {
+                padding: 12px;
+            }
+            
+            .modal h2 {
+                font-size: 1.2rem;
+            }
+            
+            .modal-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .modal-buttons button {
+                flex: 1;
+                justify-content: center;
+                margin-bottom: 5px;
+            }
+            
+            .nome-input input {
+                width: 100%;
+            }
+            
+            .controles select, .controles button {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1><i class="fas fa-calendar-alt"></i> Calendário de Plantões</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="calendario">Calendário</div>
+            <div class="tab" data-tab="legenda">Legenda</div>
+            <div class="tab" data-tab="resumo">Resumo</div>
+        </div>
+        
+        <div class="tab-content active" id="calendario-tab">
+            <div class="controles">
+                <div class="selectors-container">
+                    <select id="mes-selecionado" class="mes-selector">
+                        <option value="0">Janeiro</option>
+                        <option value="1">Fevereiro</option>
+                        <option value="2">Março</option>
+                        <option value="3">Abril</option>
+                        <option value="4">Maio</option>
+                        <option value="5" selected>Junho</option>
+                        <option value="6">Julho</option>
+                        <option value="7">Agosto</option>
+                        <option value="8">Setembro</option>
+                        <option value="9">Outubro</option>
+                        <option value="10">Novembro</option>
+                        <option value="11">Dezembro</option>
+                    </select>
+                    
+                    <select id="ano-selecionado" class="ano-selector">
+                        <option value="2024" selected>2024</option>
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                    </select>
+                </div>
+                
+                <button id="btn-gerar">Gerar Calendário <i class="fas fa-sync-alt"></i></button>
+            </div>
+
+            <section id="calendario-mes">
+                <!-- O calendário será gerado aqui pelo JavaScript -->
+            </section>
+        </div>
+        
+        <div class="tab-content" id="legenda-tab">
+            <section class="legenda">
+                <h2><i class="fas fa-info-circle"></i> Legenda dos Plantões</h2>
+                <ul>
+                    <li><strong class="sd-bg">SD</strong>: Plantão Diurno (12h) - R$ 100,00</li>
+                    <li><strong class="sn-bg">SN</strong>: Plantão Noturno (12h) - R$ 100,00</li>
+                    <li><strong class="dn-bg">DN</strong>: Plantão Dia/Noite (24h) - R$ 200,00</li>
+                    <li><strong class="extra-sd-bg">Extra SD</strong>: Plantão Extra Diurno - R$ 100,00</li>
+                    <li><strong class="extra-sn-bg">Extra SN</strong>: Plantão Extra Noturno - R$ 100,00</li>
+                    <li><strong class="extra-dn-bg">Extra DN</strong>: Plantão Extra Dia/Noite - R$ 200,00</li>
+                    <li><strong class="lefe-sd-bg">Lefe Dia</strong>: Plantão Lefe Diurno - R$ 100,00</li>
+                    <li><strong class="lefe-sn-bg">Lefe Noite</strong>: Plantão Lefe Noturno - R$ 100,00</li>
+                    <li><strong class="lefe-dn-bg">Lefe DN</strong>: Plantão Lefe Dia/Noite - R$ 250,00</li>
+                    <li><strong class="folga-bg">Folga</strong>: Dia sem plantão</li>
+                </ul>
+                <p style="margin-top: 20px; text-align: center; font-style: italic;">
+                    <i class="fas fa-mouse-pointer"></i> Clique em um dia para adicionar/remover plantões<br>
+                    <i class="fas fa-mouse-pointer"></i> Clique com o botão direito para limpar todos os plantões do dia
+                </p>
+            </section>
+        </div>
+        
+        <div class="tab-content" id="resumo-tab">
+            <section id="resumo">
+                <h2><i class="fas fa-calculator"></i> Resumo e Cálculo do Mês</h2>
+                <p id="total-sd">
+                    <strong>Total de Plantões SD:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-sn">
+                    <strong>Total de Plantões SN:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-dn">
+                    <strong>Total de Plantões DN:</strong> 0 &nbsp; (0 x R$ 200,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-extra-sd">
+                    <strong>Total de Plantões Extra SD:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-extra-sn">
+                    <strong>Total de Plantões Extra SN:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-extra-dn">
+                    <strong>Total de Plantões Extra DN:</strong> 0 &nbsp; (0 x R$ 200,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-lefe-sd">
+                    <strong>Total de Plantões Lefe Dia:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-lefe-sn">
+                    <strong>Total de Plantões Lefe Noite:</strong> 0 &nbsp; (0 x R$ 100,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <p id="total-lefe-dn">
+                    <strong>Total de Plantões Lefe DN:</strong> 0 &nbsp; (0 x R$ 250,00 = <strong>R$ 0,00</strong>)
+                </p>
+                <div class="total-geral" id="total-geral">
+                    <i class="fas fa-money-bill-wave"></i> Valor Total a Receber: R$ 0,00
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Botão Flutuante e Menu -->
+    <div class="floating-button" id="config-button">
+        <i class="fas fa-cog"></i>
+    </div>
+    
+    <div class="floating-menu" id="config-menu">
+        <button id="btn-exportar"><i class="fas fa-file-export"></i> Exportar Dados</button>
+        <button id="btn-importar"><i class="fas fa-file-import"></i> Importar Dados</button>
+        <button id="btn-cores"><i class="fas fa-palette"></i> Personalizar Cores</button>
+        <button id="btn-valores"><i class="fas fa-money-bill"></i> Alterar Valores</button>
+        <button id="btn-nomes"><i class="fas fa-font"></i> Alterar Nomes</button>
+    </div>
+    
+    <!-- Modal para exportar/importar -->
+    <div class="modal" id="modal-dados">
+        <div class="modal-content">
+            <h2 id="modal-titulo"><i class="fas fa-file-export"></i> Exportar Dados</h2>
+            <textarea id="dados-texto" placeholder="Dados de configuração aparecerão aqui..."></textarea>
+            <div class="modal-buttons">
+                <button id="btn-copiar"><i class="fas fa-copy"></i> Copiar</button>
+                <button id="btn-fechar-modal"><i class="fas fa-times"></i> Fechar</button>
+                <button id="btn-aplicar-dados" style="display:none;"><i class="fas fa-check"></i> Aplicar Dados</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para personalizar cores -->
+    <div class="modal" id="modal-cores">
+        <div class="modal-content">
+            <h2><i class="fas fa-palette"></i> Personalizar Cores dos Plantões</h2>
+            
+            <div class="color-picker">
+                <label for="cor-sd">Plantão SD:</label>
+                <input type="color" id="cor-sd" value="#6a40bf">
+                <button class="btn-cor-padrao" data-tipo="sd">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-sn">Plantão SN:</label>
+                <input type="color" id="cor-sn" value="#4a6fa5">
+                <button class="btn-cor-padrao" data-tipo="sn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-dn">Plantão DN:</label>
+                <input type="color" id="cor-dn" value="#ff9e40">
+                <button class="btn-cor-padrao" data-tipo="dn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-extra-sd">Extra SD:</label>
+                <input type="color" id="cor-extra-sd" value="#8e6cbf">
+                <button class="btn-cor-padrao" data-tipo="extra-sd">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-extra-sn">Extra SN:</label>
+                <input type="color" id="cor-extra-sn" value="#6b8cae">
+                <button class="btn-cor-padrao" data-tipo="extra-sn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-extra-dn">Extra DN:</label>
+                <input type="color" id="cor-extra-dn" value="#ffb570">
+                <button class="btn-cor-padrao" data-tipo="extra-dn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-lefe-sd">Lefe Dia:</label>
+                <input type="color" id="cor-lefe-sd" value="#6a40bf">
+                <button class="btn-cor-padrao" data-tipo="lefe-sd">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-lefe-sn">Lefe Noite:</label>
+                <input type="color" id="cor-lefe-sn" value="#4a6fa5">
+                <button class="btn-cor-padrao" data-tipo="lefe-sn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-lefe-dn">Lefe DN:</label>
+                <input type="color" id="cor-lefe-dn" value="#ff6b40">
+                <button class="btn-cor-padrao" data-tipo="lefe-dn">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-folga">Folga:</label>
+                <input type="color" id="cor-folga" value="#bdc3c7">
+                <button class="btn-cor-padrao" data-tipo="folga">Padrão</button>
+            </div>
+            
+            <div class="color-picker">
+                <label for="cor-hoje">Dia Atual:</label>
+                <input type="color" id="cor-hoje" value="#ffeb3b">
+                <button class="btn-cor-padrao" data-tipo="hoje">Padrão</button>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="btn-aplicar-cores"><i class="fas fa-check"></i> Aplicar Cores</button>
+                <button id="btn-fechar-cores"><i class="fas fa-times"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para alterar valores -->
+    <div class="modal" id="modal-valores">
+        <div class="modal-content">
+            <h2><i class="fas fa-money-bill"></i> Alterar Valores dos Plantões</h2>
+            
+            <div class="valor-input">
+                <label for="valor-sd">Plantão SD:</label>
+                <input type="number" id="valor-sd" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-sn">Plantão SN:</label>
+                <input type="number" id="valor-sn" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-dn">Plantão DN:</label>
+                <input type="number" id="valor-dn" value="200" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-extra-sd">Extra SD:</label>
+                <input type="number" id="valor-extra-sd" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-extra-sn">Extra SN:</label>
+                <input type="number" id="valor-extra-sn" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-extra-dn">Extra DN:</label>
+                <input type="number" id="valor-extra-dn" value="200" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-lefe-sd">Lefe Dia:</label>
+                <input type="number" id="valor-lefe-sd" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-lefe-sn">Lefe Noite:</label>
+                <input type="number" id="valor-lefe-sn" value="100" min="0" step="10">
+            </div>
+            
+            <div class="valor-input">
+                <label for="valor-lefe-dn">Lefe DN:</label>
+                <input type="number" id="valor-lefe-dn" value="250" min="0" step="10">
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="btn-aplicar-valores"><i class="fas fa-check"></i> Aplicar Valores</button>
+                <button id="btn-fechar-valores"><i class="fas fa-times"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para alterar nomes -->
+    <div class="modal" id="modal-nomes">
+        <div class="modal-content">
+            <h2><i class="fas fa-font"></i> Alterar Nomes dos Plantões</h2>
+            
+            <div class="nome-input">
+                <label for="nome-sd">Plantão SD:</label>
+                <input type="text" id="nome-sd" value="SD" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-sn">Plantão SN:</label>
+                <input type="text" id="nome-sn" value="SN" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-dn">Plantão DN:</label>
+                <input type="text" id="nome-dn" value="DN" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-extra-sd">Extra SD:</label>
+                <input type="text" id="nome-extra-sd" value="Extra SD" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-extra-sn">Extra SN:</label>
+                <input type="text" id="nome-extra-sn" value="Extra SN" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-extra-dn">Extra DN:</label>
+                <input type="text" id="nome-extra-dn" value="Extra DN" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-lefe-sd">Lefe Dia:</label>
+                <input type="text" id="nome-lefe-sd" value="Lefe Dia" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-lefe-sn">Lefe Noite:</label>
+                <input type="text" id="nome-lefe-sn" value="Lefe Noite" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-lefe-dn">Lefe DN:</label>
+                <input type="text" id="nome-lefe-dn" value="Lefe DN" maxlength="20">
+            </div>
+            
+            <div class="nome-input">
+                <label for="nome-folga">Folga:</label>
+                <input type="text" id="nome-folga" value="Folga" maxlength="20">
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="btn-aplicar-nomes"><i class="fas fa-check"></i> Aplicar Nomes</button>
+                <button id="btn-fechar-nomes"><i class="fas fa-times"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal para adicionar/remover plantões -->
+    <div class="modal" id="modal-plantao">
+        <div class="modal-content">
+            <h2 id="modal-plantao-titulo"><i class="fas fa-calendar-plus"></i> Plantões do Dia <span id="dia-selecionado"></span></h2>
+            
+            <div id="plantoes-existente">
+                <h3><i class="fas fa-list"></i> Plantões Atuais</h3>
+                <div id="lista-plantoes"></div>
+            </div>
+            
+            <div id="adicionar-plantao">
+                <h3><i class="fas fa-plus-circle"></i> Adicionar Plantão</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin: 12px 0;">
+                    <button class="btn-tipo-plantao" data-tipo="sd">Plantão Diurno (<span class="nome-sd">SD</span>) - R$ <span class="valor-sd">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="sn">Plantão Noturno (<span class="nome-sn">SN</span>) - R$ <span class="valor-sn">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="dn">Plantão Dia/Noite (<span class="nome-dn">DN</span>) - R$ <span class="valor-dn">200,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="extra-sd">Extra Dia (<span class="nome-extra-sd">Extra SD</span>) - R$ <span class="valor-extra-sd">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="extra-sn">Extra Noite (<span class="nome-extra-sn">Extra SN</span>) - R$ <span class="valor-extra-sn">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="extra-dn">Extra Dia/Noite (<span class="nome-extra-dn">Extra DN</span>) - R$ <span class="valor-extra-dn">200,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="lefe-sd">Lefe Dia (<span class="nome-lefe-sd">Lefe Dia</span>) - R$ <span class="valor-lefe-sd">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="lefe-sn">Lefe Noite (<span class="nome-lefe-sn">Lefe Noite</span>) - R$ <span class="valor-lefe-sn">100,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="lefe-dn">Lefe Dia/Noite (<span class="nome-lefe-dn">Lefe DN</span>) - R$ <span class="valor-lefe-dn">250,00</span></button>
+                    <button class="btn-tipo-plantao" data-tipo="folga">Folga (sem plantão)</button>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="btn-limpar-tudo" style="background-color: #e74c3c;"><i class="fas fa-trash"></i> Limpar Todos os Plantões</button>
+                <button id="btn-fechar-plantao"><i class="fas fa-times"></i> Fechar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    // Função de depuração
+    function debugLog(message) {
+        console.log(`[DEBUG] ${message}`);
+    }
+
+    // Dados globais
+    let calendarioData = {};
+    const tiposPlantao = ['sd', 'sn', 'dn', 'extra-sd', 'extra-sn', 'extra-dn', 'folga', 'lefe-sd', 'lefe-sn', 'lefe-dn'];
+    let labelsPlantao = {
+        'sd': 'SD',
+        'sn': 'SN',
+        'dn': 'DN',
+        'extra-sd': 'Extra SD',
+        'extra-sn': 'Extra SN',
+        'extra-dn': 'Extra DN',
+        'folga': 'Folga',
+        'lefe-sd': 'Lefe Dia',
+        'lefe-sn': 'Lefe Noite',
+        'lefe-dn': 'Lefe DN'
+    };
+    let valoresPlantao = {
+        'sd': 100,
+        'sn': 100,
+        'dn': 200,
+        'extra-sd': 100,
+        'extra-sn': 100,
+        'extra-dn': 200,
+        'folga': 0,
+        'lefe-sd': 100,
+        'lefe-sn': 100,
+        'lefe-dn': 250
+    };
+    
+    // Variáveis para controle do dia selecionado
+    let diaSelecionado = null;
+    let mesSelecionado = null;
+    let anoSelecionado = null;
+    
+    // Data atual
+    const dataAtual = new Date();
+    const diaAtual = dataAtual.getDate();
+    const mesAtual = dataAtual.getMonth();
+    const anoAtual = dataAtual.getFullYear();
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        debugLog("Iniciando aplicação");
+        
+        try {
+            // Configurar o mês e ano atual
+            document.getElementById('mes-selecionado').value = mesAtual;
+            document.getElementById('ano-selecionado').value = anoAtual;
+            
+            // Carregar dados salvos se existirem
+            carregarDadosSalvos();
+            
+            // Carregar cores personalizadas se existirem
+            carregarCoresPersonalizadas();
+            
+            // Carregar valores personalizados se existirem
+            carregarValoresPersonalizados();
+            
+            // Carregar nomes personalizados se existirem
+            carregarNomesPersonalizados();
+            
+            // Gerar calendário inicial
+            gerarCalendario(mesAtual, anoAtual);
+            
+            // Configurar event listeners para abas
+            configurarAbas();
+            
+            // Configurar todos os event listeners
+            configurarEventListeners();
+            
+            // Atualizar os valores exibidos nos botões
+            atualizarValoresExibidos();
+            atualizarNomesExibidos();
+            
+            debugLog("Aplicação inicializada com sucesso");
+        } catch (error) {
+            console.error("Erro durante a inicialização:", error);
+        }
+    });
+    
+    // Função para configurar as abas
+    function configurarAbas() {
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remover a classe active de todas as abas
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Adicionar a classe active à aba clicada
+                this.classList.add('active');
+                
+                // Esconder todos os conteúdos de abas
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Mostrar o conteúdo da aba clicada
+                const tabId = this.getAttribute('data-tab');
+                const tabContent = document.getElementById(`${tabId}-tab`);
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                } else {
+                    debugLog(`Aba ${tabId} não encontrada`);
+                }
+            });
+        });
+    }
+    
+    // Função para configurar todos os event listeners
+    function configurarEventListeners() {
+        // Botão Gerar Calendário
+        const btnGerar = document.getElementById('btn-gerar');
+        if (btnGerar) {
+            btnGerar.addEventListener('click', function(e) {
+                e.preventDefault();
+                const mes = parseInt(document.getElementById('mes-selecionado').value);
+                const ano = parseInt(document.getElementById('ano-selecionado').value);
+                gerarCalendario(mes, ano);
+            });
+        }
+        
+        // Botão flutuante de configuração
+        const configButton = document.getElementById('config-button');
+        if (configButton) {
+            configButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                const menu = document.getElementById('config-menu');
+                if (menu) {
+                    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+                }
+            });
+        }
+        
+        // Botões do menu flutuante
+        const btnExportar = document.getElementById('btn-exportar');
+        if (btnExportar) {
+            btnExportar.addEventListener('click', exportarDados);
+        }
+        
+        const btnImportar = document.getElementById('btn-importar');
+        if (btnImportar) {
+            btnImportar.addEventListener('click', importarDados);
+        }
+        
+        const btnCores = document.getElementById('btn-cores');
+        if (btnCores) {
+            btnCores.addEventListener('click', personalizarCores);
+        }
+        
+        const btnValores = document.getElementById('btn-valores');
+        if (btnValores) {
+            btnValores.addEventListener('click', personalizarValores);
+        }
+        
+        const btnNomes = document.getElementById('btn-nomes');
+        if (btnNomes) {
+            btnNomes.addEventListener('click', personalizarNomes);
+        }
+        
+        // Botões dos modais
+        const btnCopiar = document.getElementById('btn-copiar');
+        if (btnCopiar) {
+            btnCopiar.addEventListener('click', copiarTexto);
+        }
+        
+        const btnFecharModal = document.getElementById('btn-fechar-modal');
+        if (btnFecharModal) {
+            btnFecharModal.addEventListener('click', fecharModal);
+        }
+        
+        const btnAplicarDados = document.getElementById('btn-aplicar-dados');
+        if (btnAplicarDados) {
+            btnAplicarDados.addEventListener('click', aplicarDadosImportados);
+        }
+        
+        // Event listeners para modal de cores
+        const btnAplicarCores = document.getElementById('btn-aplicar-cores');
+        if (btnAplicarCores) {
+            btnAplicarCores.addEventListener('click', aplicarCoresPersonalizadas);
+        }
+        
+        const btnFecharCores = document.getElementById('btn-fechar-cores');
+        if (btnFecharCores) {
+            btnFecharCores.addEventListener('click', function() {
+                document.getElementById('modal-cores').style.display = 'none';
+            });
+        }
+        
+        // Event listeners para modal de valores
+        const btnAplicarValores = document.getElementById('btn-aplicar-valores');
+        if (btnAplicarValores) {
+            btnAplicarValores.addEventListener('click', aplicarValoresPersonalizados);
+        }
+        
+        const btnFecharValores = document.getElementById('btn-fechar-valores');
+        if (btnFecharValores) {
+            btnFecharValores.addEventListener('click', function() {
+                document.getElementById('modal-valores').style.display = 'none';
+            });
+        }
+        
+        // Event listeners para modal de nomes
+        const btnAplicarNomes = document.getElementById('btn-aplicar-nomes');
+        if (btnAplicarNomes) {
+            btnAplicarNomes.addEventListener('click', aplicarNomesPersonalizados);
+        }
+        
+        const btnFecharNomes = document.getElementById('btn-fechar-nomes');
+        if (btnFecharNomes) {
+            btnFecharNomes.addEventListener('click', function() {
+                document.getElementById('modal-nomes').style.display = 'none';
+            });
+        }
+        
+        // Event listeners para botões de cor padrão
+        document.querySelectorAll('.btn-cor-padrao').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const tipo = this.getAttribute('data-tipo');
+                const corPadrao = {
+                    'sd': '#6a40bf',
+                    'sn': '#4a6fa5',
+                    'dn': '#ff9e40',
+                    'extra-sd': '#8e6cbf',
+                    'extra-sn': '#6b8cae',
+                    'extra-dn': '#ffb570',
+                    'lefe-sd': '#6a40bf',
+                    'lefe-sn': '#4a6fa5',
+                    'lefe-dn': '#ff6b40',
+                    'folga': '#bdc3c7',
+                    'hoje': '#ffeb3b'
+                }[tipo];
+                
+                const inputCor = document.getElementById(`cor-${tipo}`);
+                if (inputCor) {
+                    inputCor.value = corPadrao;
+                }
+            });
+        });
+        
+        // Botão limpar tudo
+        const btnLimparTudo = document.getElementById('btn-limpar-tudo');
+        if (btnLimparTudo) {
+            btnLimparTudo.addEventListener('click', limparPlantoesDia);
+        }
+        
+        // Botão fechar plantão
+        const btnFecharPlantao = document.getElementById('btn-fechar-plantao');
+        if (btnFecharPlantao) {
+            btnFecharPlantao.addEventListener('click', function() {
+                document.getElementById('modal-plantao').style.display = 'none';
+            });
+        }
+        
+        // Fechar menu flutuante ao clicar fora dele
+        document.addEventListener('click', function(e) {
+            const configButton = document.getElementById('config-button');
+            const configMenu = document.getElementById('config-menu');
+            
+            if (configButton && configMenu && !configButton.contains(e.target) && !configMenu.contains(e.target)) {
+                configMenu.style.display = 'none';
+            }
+        });
+        
+        // Fechar modais ao clicar fora deles
+        document.addEventListener('click', function(e) {
+            const modais = document.querySelectorAll('.modal');
+            modais.forEach(modal => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
+        // Event listeners para botões de adicionar plantão (usando delegação)
+        document.addEventListener('click', function(e) {
+            // Botões de adicionar plantão
+            if (e.target.classList.contains('btn-tipo-plantao') || e.target.closest('.btn-tipo-plantao')) {
+                e.preventDefault();
+                const btn = e.target.classList.contains('btn-tipo-plantao') ? e.target : e.target.closest('.btn-tipo-plantao');
+                const tipo = btn.getAttribute('data-tipo');
+                adicionarPlantao(tipo);
+            }
+            
+            // Botões de remover plantão (gerados dinamicamente)
+            if (e.target.classList.contains('btn-remover-plantao') || e.target.closest('.btn-remover-plantao')) {
+                e.preventDefault();
+                const btn = e.target.classList.contains('btn-remover-plantao') ? e.target : e.target.closest('.btn-remover-plantao');
+                const index = parseInt(btn.getAttribute('data-index'));
+                removerPlantao(index);
+            }
+        });
+    }
+    
+    // Função para gerar o calendário
+    function gerarCalendario(mes, ano) {
+        debugLog(`Gerando calendário para ${mes}/${ano}`);
+        mesSelecionado = mes;
+        anoSelecionado = ano;
+        
+        const sectionCalendario = document.getElementById('calendario-mes');
+        if (!sectionCalendario) {
+            console.error("Elemento calendario-mes não encontrado!");
+            return;
+        }
+        
+        const primeiroDia = new Date(ano, mes, 1);
+        const ultimoDia = new Date(ano, mes + 1, 0);
+        const diasNoMes = ultimoDia.getDate();
+        const primeiroDiaSemana = primeiroDia.getDay();
+        
+        const nomesMeses = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+        
+        // Inicializar a chave para este mês/ano se não existir
+        const chaveMes = `${mes}-${ano}`;
+        if (!calendarioData[chaveMes]) {
+            calendarioData[chaveMes] = {};
+            debugLog(`Criando nova entrada para ${chaveMes}`);
+        }
+        
+        let tabelaHTML = `
+            <div class="calendario-container">
+                <table class="calendario">
+                    <caption>${nomesMeses[mes]} ${ano}</caption>
+                    <thead>
+                        <tr>
+                            <th>DOM</th>
+                            <th>SEG</th>
+                            <th>TER</th>
+                            <th>QUA</th>
+                            <th>QUI</th>
+                            <th>SEX</th>
+                            <th>SÁB</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+        
+        let dia = 1;
+        
+        // Gerar as semanas
+        for (let i = 0; i < 6; i++) {
+            if (dia > diasNoMes) break;
+            
+            tabelaHTML += '<tr>';
+            
+            for (let j = 0; j < 7; j++) {
+                if ((i === 0 && j < primeiroDiaSemana) || dia > diasNoMes) {
+                    tabelaHTML += '<td class="other-month"></td>';
+                } else {
+                    const diaInfo = calendarioData[chaveMes][dia] || { tipo: [] };
+                    const tipos = diaInfo.tipo || [];
+                    
+                    const isToday = (dia === diaAtual && mes === mesAtual && ano === anoAtual);
+                    const todayClass = isToday ? ' today' : '';
+                    
+                    tabelaHTML += `
+                        <td data-dia="${dia}" data-mes="${mes}" data-ano="${ano}" class="${todayClass}">
+                            <div class="day-number">${dia}</div>`;
+                    
+                    // Adicionar os plantões do dia
+                    tipos.forEach(tipo => {
+                        if (tipo >= 0 && tipo < tiposPlantao.length) {
+                            const classe = tiposPlantao[tipo];
+                            const label = labelsPlantao[tiposPlantao[tipo]];
+                            tabelaHTML += `<span class="plantao-info ${classe}">${label}</span>`;
+                        }
+                    });
+                    
+                    tabelaHTML += `</td>`;
+                    dia++;
+                }
+            }
+            
+            tabelaHTML += '</tr>';
+        }
+        
+        tabelaHTML += `
+                    </tbody>
+                </table>
+            </div>`;
+        
+        sectionCalendario.innerHTML = tabelaHTML;
+        debugLog("Calendário gerado com sucesso");
+        
+        // Adicionar event listeners para os dias
+        const diasCalendario = sectionCalendario.querySelectorAll('td[data-dia]');
+        diasCalendario.forEach(celula => {
+            celula.addEventListener('click', function() {
+                const dia = parseInt(this.getAttribute('data-dia'));
+                const mes = parseInt(this.getAttribute('data-mes'));
+                const ano = parseInt(this.getAttribute('data-ano'));
+                debugLog(`Clique no dia ${dia}/${mes+1}/${ano}`);
+                abrirModalPlantao(dia, mes, ano);
+            });
+            
+            celula.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                const dia = parseInt(this.getAttribute('data-dia'));
+                const mes = parseInt(this.getAttribute('data-mes'));
+                const ano = parseInt(this.getAttribute('data-ano'));
+                debugLog(`Clique direito no dia ${dia}/${mes+1}/${ano}`);
+                
+                const chave = `${mes}-${ano}`;
+                if (calendarioData[chave] && calendarioData[chave][dia]) {
+                    calendarioData[chave][dia].tipo = [];
+                    salvarDados();
+                    gerarCalendario(mes, ano);
+                    calcularTotais(mes, ano);
+                }
+            });
+        });
+        
+        // Atualizar resumo
+        const resumoH2 = document.querySelector('#resumo h2');
+        if (resumoH2) {
+            resumoH2.textContent = `Resumo e Cálculo do Mês (${nomesMeses[mes]} ${ano})`;
+        }
+        calcularTotais(mes, ano);
+        
+        // Aplicar cores personalizadas
+        aplicarCoresCSS();
+    }
+    
+    // Função para abrir modal de plantão
+    function abrirModalPlantao(dia, mes, ano) {
+        debugLog(`Abrindo modal para o dia ${dia}/${mes+1}/${ano}`);
+        diaSelecionado = dia;
+        mesSelecionado = mes;
+        anoSelecionado = ano;
+        
+        const diaSelecionadoElement = document.getElementById('dia-selecionado');
+        if (diaSelecionadoElement) {
+            diaSelecionadoElement.textContent = `${dia}/${mes + 1}/${ano}`;
+        }
+        
+        // Preencher a lista de plantões existentes
+        const listaPlantoes = document.getElementById('lista-plantoes');
+        if (!listaPlantoes) {
+            debugLog("Elemento lista-plantoes não encontrado");
+            return;
+        }
+        
+        listaPlantoes.innerHTML = '';
+        
+        const chave = `${mes}-${ano}`;
+        const diaInfo = calendarioData[chave] && calendarioData[chave][dia];
+        const tipos = diaInfo ? diaInfo.tipo : [];
+        
+        if (tipos.length > 0) {
+            tipos.forEach((tipoIndex, index) => {
+                if (tipoIndex >= 0 && tipoIndex < tiposPlantao.length) {
+                    const tipo = tiposPlantao[tipoIndex];
+                    const label = labelsPlantao[tipo];
+                    
+                    const plantaoItem = document.createElement('div');
+                    plantaoItem.className = 'plantao-item';
+                    plantaoItem.innerHTML = `
+                        <span>${label}</span>
+                        <button class="btn-remover-plantao" data-index="${index}"><i class="fas fa-trash"></i> Remover</button>
+                    `;
+                    listaPlantoes.appendChild(plantaoItem);
+                }
+            });
+        } else {
+            listaPlantoes.innerHTML = '<p>Nenhum plantão cadastrado para este dia.</p>';
+        }
+        
+        const modalPlantao = document.getElementById('modal-plantao');
+        if (modalPlantao) {
+            modalPlantao.style.display = 'flex';
+        }
+    }
+    
+    // Função para adicionar plantão
+    function adicionarPlantao(tipo) {
+        if (diaSelecionado === null) {
+            debugLog("Nenhum dia selecionado");
+            return;
+        }
+        
+        debugLog(`Adicionando plantão do tipo ${tipo}`);
+        const chave = `${mesSelecionado}-${anoSelecionado}`;
+        const tipoIndex = tiposPlantao.indexOf(tipo);
+        
+        if (tipoIndex === -1) {
+            debugLog(`Tipo de plantão inválido: ${tipo}`);
+            return;
+        }
+        
+        if (!calendarioData[chave]) {
+            calendarioData[chave] = {};
+        }
+        
+        if (!calendarioData[chave][diaSelecionado]) {
+            calendarioData[chave][diaSelecionado] = { tipo: [] };
+        }
+        
+        // Adicionar o tipo se não existir
+        if (!calendarioData[chave][diaSelecionado].tipo.includes(tipoIndex)) {
+            calendarioData[chave][diaSelecionado].tipo.push(tipoIndex);
+            salvarDados();
+            gerarCalendario(mesSelecionado, anoSelecionado);
+            calcularTotais(mesSelecionado, anoSelecionado);
+            
+            const modalPlantao = document.getElementById('modal-plantao');
+            if (modalPlantao) {
+                modalPlantao.style.display = 'none';
+            }
+        } else {
+            debugLog(`Plantão do tipo ${tipo} já existe neste dia`);
+        }
+    }
+    
+    // Função para remover um plantão específico
+    function removerPlantao(index) {
+        if (diaSelecionado === null) return;
+        
+        const chave = `${mesSelecionado}-${anoSelecionado}`;
+        if (calendarioData[chave] && calendarioData[chave][diaSelecionado]) {
+            calendarioData[chave][diaSelecionado].tipo.splice(index, 1);
+            salvarDados();
+            
+            // Atualizar a lista de plantões no modal
+            abrirModalPlantao(diaSelecionado, mesSelecionado, anoSelecionado);
+            
+            // Atualizar o calendário and totais
+            gerarCalendario(mesSelecionado, anoSelecionado);
+            calcularTotais(mesSelecionado, anoSelecionado);
+        }
+    }
+    
+    // Função para limpar todos os plantões de um dia
+    function limparPlantoesDia() {
+        if (diaSelecionado === null) return;
+        
+        const chave = `${mesSelecionado}-${anoSelecionado}`;
+        if (calendarioData[chave] && calendarioData[chave][diaSelecionado]) {
+            calendarioData[chave][diaSelecionado].tipo = [];
+            salvarDados();
+            gerarCalendario(mesSelecionado, anoSelecionado);
+            calcularTotais(mesSelecionado, anoSelecionado);
+            
+            const modalPlantao = document.getElementById('modal-plantao');
+            if (modalPlantao) {
+                modalPlantao.style.display = 'none';
+            }
+        }
+    }
+    
+    // Função para calcular totais
+    function calcularTotais(mes, ano) {
+        debugLog(`Calculando totais para ${mes}/${ano}`);
+        const chaveMes = `${mes}-${ano}`;
+        const dadosMes = calendarioData[chaveMes] || {};
+        
+        // Contadores
+        let countSD = 0;
+        let countSN = 0;
+        let countDN = 0;
+        let countExtraSD = 0;
+        let countExtraSN = 0;
+        let countExtraDN = 0;
+        let countLefeSD = 0;
+        let countLefeSN = 0;
+        let countLefeDN = 0;
+        
+        // Contar plantões
+        Object.keys(dadosMes).forEach(dia => {
+            const tipos = dadosMes[dia].tipo || [];
+            
+            tipos.forEach(tipo => {
+                if (tipo === 0) countSD++;           
+                else if (tipo === 1) countSN++;      
+                else if (tipo === 2) countDN++;      
+                else if (tipo === 3) countExtraSD++; 
+                else if (tipo === 4) countExtraSN++; 
+                else if (tipo === 5) countExtraDN++; 
+                else if (tipo === 7) countLefeSD++;  
+                else if (tipo === 8) countLefeSN++;  
+                else if (tipo === 9) countLefeDN++;  
+            });
+        });
+        
+        // Calcula valores
+        const valorSD = countSD * valoresPlantao.sd;
+        const valorSN = countSN * valoresPlantao.sn;
+        const valorDN = countDN * valoresPlantao.dn;
+        const valorExtraSD = countExtraSD * valoresPlantao['extra-sd'];
+        const valorExtraSN = countExtraSN * valoresPlantao['extra-sn'];
+        const valorExtraDN = countExtraDN * valoresPlantao['extra-dn'];
+        const valorLefeSD = countLefeSD * valoresPlantao['lefe-sd'];
+        const valorLefeSN = countLefeSN * valoresPlantao['lefe-sn'];
+        const valorLefeDN = countLefeDN * valoresPlantao['lefe-dn'];
+        const totalGeral = valorSD + valorSN + valorDN + valorExtraSD + valorExtraSN + valorExtraDN + valorLefeSD + valorLefeSN + valorLefeDN;
+        
+        // Atualiza o HTML do resumo
+        const totalSdElement = document.getElementById('total-sd');
+        if (totalSdElement) {
+            totalSdElement.innerHTML = 
+                `<strong>Total de Plantões SD:</strong> ${countSD} &nbsp; (${countSD} x R$ ${valoresPlantao.sd.toFixed(2).replace('.', ',')} = <strong>R$ ${valorSD.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalSnElement = document.getElementById('total-sn');
+        if (totalSnElement) {
+            totalSnElement.innerHTML = 
+                `<strong>Total de Plantões SN:</strong> ${countSN} &nbsp; (${countSN} x R$ ${valoresPlantao.sn.toFixed(2).replace('.', ',')} = <strong>R$ ${valorSN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalDnElement = document.getElementById('total-dn');
+        if (totalDnElement) {
+            totalDnElement.innerHTML = 
+                `<strong>Total de Plantões DN:</strong> ${countDN} &nbsp; (${countDN} x R$ ${valoresPlantao.dn.toFixed(2).replace('.', ',')} = <strong>R$ ${valorDN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalExtraSdElement = document.getElementById('total-extra-sd');
+        if (totalExtraSdElement) {
+            totalExtraSdElement.innerHTML = 
+                `<strong>Total de Plantões Extra SD:</strong> ${countExtraSD} &nbsp; (${countExtraSD} x R$ ${valoresPlantao['extra-sd'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorExtraSD.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalExtraSnElement = document.getElementById('total-extra-sn');
+        if (totalExtraSnElement) {
+            totalExtraSnElement.innerHTML = 
+                `<strong>Total de Plantões Extra SN:</strong> ${countExtraSN} &nbsp; (${countExtraSN} x R$ ${valoresPlantao['extra-sn'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorExtraSN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalExtraDnElement = document.getElementById('total-extra-dn');
+        if (totalExtraDnElement) {
+            totalExtraDnElement.innerHTML = 
+                `<strong>Total de Plantões Extra DN:</strong> ${countExtraDN} &nbsp; (${countExtraDN} x R$ ${valoresPlantao['extra-dn'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorExtraDN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalLefeSdElement = document.getElementById('total-lefe-sd');
+        if (totalLefeSdElement) {
+            totalLefeSdElement.innerHTML = 
+                `<strong>Total de Plantões Lefe Dia:</strong> ${countLefeSD} &nbsp; (${countLefeSD} x R$ ${valoresPlantao['lefe-sd'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorLefeSD.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalLefeSnElement = document.getElementById('total-lefe-sn');
+        if (totalLefeSnElement) {
+            totalLefeSnElement.innerHTML = 
+                `<strong>Total de Plantões Lefe Noite:</strong> ${countLefeSN} &nbsp; (${countLefeSN} x R$ ${valoresPlantao['lefe-sn'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorLefeSN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalLefeDnElement = document.getElementById('total-lefe-dn');
+        if (totalLefeDnElement) {
+            totalLefeDnElement.innerHTML = 
+                `<strong>Total de Plantões Lefe DN:</strong> ${countLefeDN} &nbsp; (${countLefeDN} x R$ ${valoresPlantao['lefe-dn'].toFixed(2).replace('.', ',')} = <strong>R$ ${valorLefeDN.toFixed(2).replace('.', ',')}</strong>)`;
+        }
+        
+        const totalGeralElement = document.getElementById('total-geral');
+        if (totalGeralElement) {
+            totalGeralElement.innerHTML = 
+                `<i class="fas fa-money-bill-wave"></i> Valor Total a Receber: R$ ${totalGeral.toFixed(2).replace('.', ',')}`;
+        }
+        
+        debugLog("Totais calculados com sucesso");
+    }
+    
+    // Funções para salvar e carregar dados
+    function salvarDados() {
+        try {
+            const dadosCompletos = {
+                calendario: calendarioData,
+                valores: valoresPlantao,
+                nomes: labelsPlantao
+            };
+            localStorage.setItem('calendarioPlantao', JSON.stringify(dadosCompletos));
+            debugLog("Dados salvos com sucesso");
+        } catch (error) {
+            console.error("Erro ao salvar dados:", error);
+        }
+    }
+    
+    function carregarDadosSalvos() {
+        try {
+            const dados = localStorage.getItem('calendarioPlantao');
+            if (dados) {
+                const dadosCompletos = JSON.parse(dados);
+                calendarioData = dadosCompletos.calendario || {};
+                
+                if (dadosCompletos.valores) {
+                    valoresPlantao = dadosCompletos.valores;
+                }
+                
+                if (dadosCompletos.nomes) {
+                    labelsPlantao = dadosCompletos.nomes;
+                }
+                debugLog("Dados carregados com sucesso");
+            }
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
+        }
+    }
+    
+    // Funções para personalizar cores
+    function personalizarCores() {
+        // Preencher os valores atuais
+        const corSd = document.getElementById('cor-sd');
+        if (corSd) corSd.value = getComputedStyle(document.documentElement).getPropertyValue('--sd-color').trim();
+        
+        const corSn = document.getElementById('cor-sn');
+        if (corSn) corSn.value = getComputedStyle(document.documentElement).getPropertyValue('--sn-color').trim();
+        
+        const corDn = document.getElementById('cor-dn');
+        if (corDn) corDn.value = getComputedStyle(document.documentElement).getPropertyValue('--dn-color').trim();
+        
+        const corExtraSd = document.getElementById('cor-extra-sd');
+        if (corExtraSd) corExtraSd.value = getComputedStyle(document.documentElement).getPropertyValue('--extra-sd-color').trim();
+        
+        const corExtraSn = document.getElementById('cor-extra-sn');
+        if (corExtraSn) corExtraSn.value = getComputedStyle(document.documentElement).getPropertyValue('--extra-sn-color').trim();
+        
+        const corExtraDn = document.getElementById('cor-extra-dn');
+        if (corExtraDn) corExtraDn.value = getComputedStyle(document.documentElement).getPropertyValue('--extra-dn-color').trim();
+        
+        const corLefeSd = document.getElementById('cor-lefe-sd');
+        if (corLefeSd) corLefeSd.value = getComputedStyle(document.documentElement).getPropertyValue('--lefe-sd-color').trim();
+        
+        const corLefeSn = document.getElementById('cor-lefe-sn');
+        if (corLefeSn) corLefeSn.value = getComputedStyle(document.documentElement).getPropertyValue('--lefe-sn-color').trim();
+        
+        const corLefeDn = document.getElementById('cor-lefe-dn');
+        if (corLefeDn) corLefeDn.value = getComputedStyle(document.documentElement).getPropertyValue('--lefe-dn-color').trim();
+        
+        const corFolga = document.getElementById('cor-folga');
+        if (corFolga) corFolga.value = getComputedStyle(document.documentElement).getPropertyValue('--folga-color').trim();
+        
+        const corHoje = document.getElementById('cor-hoje');
+        if (corHoje) corHoje.value = getComputedStyle(document.documentElement).getPropertyValue('--today-color').trim();
+        
+        const modalCores = document.getElementById('modal-cores');
+        if (modalCores) {
+            modalCores.style.display = 'flex';
+        }
+    }
+    
+    function aplicarCoresPersonalizadas() {
+        const corSD = document.getElementById('cor-sd')?.value;
+        const corSN = document.getElementById('cor-sn')?.value;
+        const corDN = document.getElementById('cor-dn')?.value;
+        const corExtraSD = document.getElementById('cor-extra-sd')?.value;
+        const corExtraSN = document.getElementById('cor-extra-sn')?.value;
+        const corExtraDN = document.getElementById('cor-extra-dn')?.value;
+        const corLefeSD = document.getElementById('cor-lefe-sd')?.value;
+        const corLefeSN = document.getElementById('cor-lefe-sn')?.value;
+        const corLefeDN = document.getElementById('cor-lefe-dn')?.value;
+        const corFolga = document.getElementById('cor-folga')?.value;
+        const corHoje = document.getElementById('cor-hoje')?.value;
+        
+        // Salvar cores no localStorage
+        try {
+            localStorage.setItem('coresPlantao', JSON.stringify({
+                sd: corSD,
+                sn: corSN,
+                dn: corDN,
+                'extra-sd': corExtraSD,
+                'extra-sn': corExtraSN,
+                'extra-dn': corExtraDN,
+                'lefe-sd': corLefeSD,
+                'lefe-sn': corLefeSN,
+                'lefe-dn': corLefeDN,
+                folga: corFolga,
+                hoje: corHoje
+            }));
+            debugLog("Cores salvas com sucesso");
+        } catch (error) {
+            console.error("Erro ao salvar cores:", error);
+        }
+        
+        // Aplicar cores
+        aplicarCoresCSS();
+        
+        const modalCores = document.getElementById('modal-cores');
+        if (modalCores) {
+            modalCores.style.display = 'none';
+        }
+    }
+    
+    function carregarCoresPersonalizadas() {
+        try {
+            const coresSalvas = localStorage.getItem('coresPlantao');
+            if (coresSalvas) {
+                const cores = JSON.parse(coresSalvas);
+                if (cores.sd) document.documentElement.style.setProperty('--sd-color', cores.sd);
+                if (cores.sn) document.documentElement.style.setProperty('--sn-color', cores.sn);
+                if (cores.dn) document.documentElement.style.setProperty('--dn-color', cores.dn);
+                if (cores['extra-sd']) document.documentElement.style.setProperty('--extra-sd-color', cores['extra-sd']);
+                if (cores['extra-sn']) document.documentElement.style.setProperty('--extra-sn-color', cores['extra-sn']);
+                if (cores['extra-dn']) document.documentElement.style.setProperty('--extra-dn-color', cores['extra-dn']);
+                if (cores['lefe-sd']) document.documentElement.style.setProperty('--lefe-sd-color', cores['lefe-sd']);
+                if (cores['lefe-sn']) document.documentElement.style.setProperty('--lefe-sn-color', cores['lefe-sn']);
+                if (cores['lefe-dn']) document.documentElement.style.setProperty('--lefe-dn-color', cores['lefe-dn']);
+                if (cores.folga) document.documentElement.style.setProperty('--folga-color', cores.folga);
+                if (cores.hoje) document.documentElement.style.setProperty('--today-color', cores.hoje);
+                debugLog("Cores carregadas com sucesso");
+            }
+        } catch (error) {
+            console.error("Erro ao carregar cores:", error);
+        }
+    }
+    
+    function aplicarCoresCSS() {
+        // Aplicar as cores CSS personalizadas a todos os elementos
+        const styles = `
+            .sd, .legenda .sd-bg { background-color: var(--sd-color) !important; }
+            .sn, .legenda .sn-bg { background-color: var(--sn-color) !important; }
+            .dn, .legenda .dn-bg { background-color: var(--dn-color) !important; }
+            .extra-sd, .legenda .extra-sd-bg { background-color: var(--extra-sd-color) !important; }
+            .extra-sn, .legenda .extra-sn-bg { background-color: var(--extra-sn-color) !important; }
+            .extra-dn, .legenda .extra-dn-bg { background-color: var(--extra-dn-color) !important; }
+            .lefe-sd, .legenda .lefe-sd-bg { background-color: var(--lefe-sd-color) !important; }
+            .lefe-sn, .legenda .lefe-sn-bg { background-color: var(--lefe-sn-color) !important; }
+            .lefe-dn, .legenda .lefe-dn-bg { background-color: var(--lefe-dn-color) !important; }
+            .folga, .legenda .folga-bg { background-color: var(--folga-color) !important; }
+            .today { background-color: var(--today-color) !important; color: var(--today-text-color) !important; }
+        `;
+        
+        let styleSheet = document.getElementById('dynamic-styles');
+        if (!styleSheet) {
+            styleSheet = document.createElement('style');
+            styleSheet.id = 'dynamic-styles';
+            document.head.appendChild(styleSheet);
+        }
+        styleSheet.textContent = styles;
+    }
+    
+    // Funções para personalizar valores
+    function personalizarValores() {
+        // Preencher os valores atuais
+        const valorSd = document.getElementById('valor-sd');
+        if (valorSd) valorSd.value = valoresPlantao.sd;
+        
+        const valorSn = document.getElementById('valor-sn');
+        if (valorSn) valorSn.value = valoresPlantao.sn;
+        
+        const valorDn = document.getElementById('valor-dn');
+        if (valorDn) valorDn.value = valoresPlantao.dn;
+        
+        const valorExtraSd = document.getElementById('valor-extra-sd');
+        if (valorExtraSd) valorExtraSd.value = valoresPlantao['extra-sd'];
+        
+        const valorExtraSn = document.getElementById('valor-extra-sn');
+        if (valorExtraSn) valorExtraSn.value = valoresPlantao['extra-sn'];
+        
+        const valorExtraDn = document.getElementById('valor-extra-dn');
+        if (valorExtraDn) valorExtraDn.value = valoresPlantao['extra-dn'];
+        
+        const valorLefeSd = document.getElementById('valor-lefe-sd');
+        if (valorLefeSd) valorLefeSd.value = valoresPlantao['lefe-sd'];
+        
+        const valorLefeSn = document.getElementById('valor-lefe-sn');
+        if (valorLefeSn) valorLefeSn.value = valoresPlantao['lefe-sn'];
+        
+        const valorLefeDn = document.getElementById('valor-lefe-dn');
+        if (valorLefeDn) valorLefeDn.value = valoresPlantao['lefe-dn'];
+        
+        const modalValores = document.getElementById('modal-valores');
+        if (modalValores) {
+            modalValores.style.display = 'flex';
+        }
+    }
+    
+    function aplicarValoresPersonalizados() {
+        const valorSd = document.getElementById('valor-sd');
+        if (valorSd) valoresPlantao.sd = parseFloat(valorSd.value) || 100;
+        
+        const valorSn = document.getElementById('valor-sn');
+        if (valorSn) valoresPlantao.sn = parseFloat(valorSn.value) || 100;
+        
+        const valorDn = document.getElementById('valor-dn');
+        if (valorDn) valoresPlantao.dn = parseFloat(valorDn.value) || 200;
+        
+        const valorExtraSd = document.getElementById('valor-extra-sd');
+        if (valorExtraSd) valoresPlantao['extra-sd'] = parseFloat(valorExtraSd.value) || 100;
+        
+        const valorExtraSn = document.getElementById('valor-extra-sn');
+        if (valorExtraSn) valoresPlantao['extra-sn'] = parseFloat(valorExtraSn.value) || 100;
+        
+        const valorExtraDn = document.getElementById('valor-extra-dn');
+        if (valorExtraDn) valoresPlantao['extra-dn'] = parseFloat(valorExtraDn.value) || 200;
+        
+        const valorLefeSd = document.getElementById('valor-lefe-sd');
+        if (valorLefeSd) valoresPlantao['lefe-sd'] = parseFloat(valorLefeSd.value) || 100;
+        
+        const valorLefeSn = document.getElementById('valor-lefe-sn');
+        if (valorLefeSn) valoresPlantao['lefe-sn'] = parseFloat(valorLefeSn.value) || 100;
+        
+        const valorLefeDn = document.getElementById('valor-lefe-dn');
+        if (valorLefeDn) valoresPlantao['lefe-dn'] = parseFloat(valorLefeDn.value) || 250;
+        
+        // Salvar dados
+        salvarDados();
+        
+        // Atualizar valores exibidos
+        atualizarValoresExibidos();
+        
+        // Recalcular totais
+        calcularTotais(mesSelecionado, anoSelecionado);
+        
+        const modalValores = document.getElementById('modal-valores');
+        if (modalValores) {
+            modalValores.style.display = 'none';
+        }
+    }
+    
+    function carregarValoresPersonalizados() {
+        // Os valores já são carregados pelo carregarDadosSalvos()
+    }
+    
+    // Funções para personalizar nomes
+    function personalizarNomes() {
+        // Preencher os valores atuais
+        const nomeSd = document.getElementById('nome-sd');
+        if (nomeSd) nomeSd.value = labelsPlantao.sd;
+        
+        const nomeSn = document.getElementById('nome-sn');
+        if (nomeSn) nomeSn.value = labelsPlantao.sn;
+        
+        const nomeDn = document.getElementById('nome-dn');
+        if (nomeDn) nomeDn.value = labelsPlantao.dn;
+        
+        const nomeExtraSd = document.getElementById('nome-extra-sd');
+        if (nomeExtraSd) nomeExtraSd.value = labelsPlantao['extra-sd'];
+        
+        const nomeExtraSn = document.getElementById('nome-extra-sn');
+        if (nomeExtraSn) nomeExtraSn.value = labelsPlantao['extra-sn'];
+        
+        const nomeExtraDn = document.getElementById('nome-extra-dn');
+        if (nomeExtraDn) nomeExtraDn.value = labelsPlantao['extra-dn'];
+        
+        const nomeLefeSd = document.getElementById('nome-lefe-sd');
+        if (nomeLefeSd) nomeLefeSd.value = labelsPlantao['lefe-sd'];
+        
+        const nomeLefeSn = document.getElementById('nome-lefe-sn');
+        if (nomeLefeSn) nomeLefeSn.value = labelsPlantao['lefe-sn'];
+        
+        const nomeLefeDn = document.getElementById('nome-lefe-dn');
+        if (nomeLefeDn) nomeLefeDn.value = labelsPlantao['lefe-dn'];
+        
+        const nomeFolga = document.getElementById('nome-folga');
+        if (nomeFolga) nomeFolga.value = labelsPlantao.folga;
+        
+        const modalNomes = document.getElementById('modal-nomes');
+        if (modalNomes) {
+            modalNomes.style.display = 'flex';
+        }
+    }
+    
+    function aplicarNomesPersonalizados() {
+        const nomeSd = document.getElementById('nome-sd');
+        if (nomeSd) labelsPlantao.sd = nomeSd.value || 'SD';
+        
+        const nomeSn = document.getElementById('nome-sn');
+        if (nomeSn) labelsPlantao.sn = nomeSn.value || 'SN';
+        
+        const nomeDn = document.getElementById('nome-dn');
+        if (nomeDn) labelsPlantao.dn = nomeDn.value || 'DN';
+        
+        const nomeExtraSd = document.getElementById('nome-extra-sd');
+        if (nomeExtraSd) labelsPlantao['extra-sd'] = nomeExtraSd.value || 'Extra SD';
+        
+        const nomeExtraSn = document.getElementById('nome-extra-sn');
+        if (nomeExtraSn) labelsPlantao['extra-sn'] = nomeExtraSn.value || 'Extra SN';
+        
+        const nomeExtraDn = document.getElementById('nome-extra-dn');
+        if (nomeExtraDn) labelsPlantao['extra-dn'] = nomeExtraDn.value || 'Extra DN';
+        
+        const nomeLefeSd = document.getElementById('nome-lefe-sd');
+        if (nomeLefeSd) labelsPlantao['lefe-sd'] = nomeLefeSd.value || 'Lefe Dia';
+        
+        const nomeLefeSn = document.getElementById('nome-lefe-sn');
+        if (nomeLefeSn) labelsPlantao['lefe-sn'] = nomeLefeSn.value || 'Lefe Noite';
+        
+        const nomeLefeDn = document.getElementById('nome-lefe-dn');
+        if (nomeLefeDn) labelsPlantao['lefe-dn'] = nomeLefeDn.value || 'Lefe DN';
+        
+        const nomeFolga = document.getElementById('nome-folga');
+        if (nomeFolga) labelsPlantao.folga = nomeFolga.value || 'Folga';
+        
+        // Salvar dados
+        salvarDados();
+        
+        // Atualizar nomes exibidos
+        atualizarNomesExibidos();
+        
+        // Atualizar calendário
+        gerarCalendario(mesSelecionado, anoSelecionado);
+        
+        const modalNomes = document.getElementById('modal-nomes');
+        if (modalNomes) {
+            modalNomes.style.display = 'none';
+        }
+    }
+    
+    function carregarNomesPersonalizados() {
+        // Os nomes já são carregados pelo carregarDadosSalvos()
+    }
+    
+    function atualizarValoresExibidos() {
+        // Atualizar os valores exibidos nos botões do modal de plantão
+        document.querySelectorAll('.valor-sd').forEach(el => {
+            el.textContent = valoresPlantao.sd.toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-sn').forEach(el => {
+            el.textContent = valoresPlantao.sn.toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-dn').forEach(el => {
+            el.textContent = valoresPlantao.dn.toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-extra-sd').forEach(el => {
+            el.textContent = valoresPlantao['extra-sd'].toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-extra-sn').forEach(el => {
+            el.textContent = valoresPlantao['extra-sn'].toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-extra-dn').forEach(el => {
+            el.textContent = valoresPlantao['extra-dn'].toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-lefe-sd').forEach(el => {
+            el.textContent = valoresPlantao['lefe-sd'].toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-lefe-sn').forEach(el => {
+            el.textContent = valoresPlantao['lefe-sn'].toFixed(2).replace('.', ',');
+        });
+        document.querySelectorAll('.valor-lefe-dn').forEach(el => {
+            el.textContent = valoresPlantao['lefe-dn'].toFixed(2).replace('.', ',');
+        });
+        
+        // Atualizar a legenda
+        const legendaItems = document.querySelectorAll('.legenda li');
+        if (legendaItems.length >= 10) {
+            legendaItems[0].innerHTML = 
+                `<strong class="sd-bg">${labelsPlantao.sd}</strong>: Plantão Diurno (12h) - R$ ${valoresPlantao.sd.toFixed(2).replace('.', ',')}`;
+            legendaItems[1].innerHTML = 
+                `<strong class="sn-bg">${labelsPlantao.sn}</strong>: Plantão Noturno (12h) - R$ ${valoresPlantao.sn.toFixed(2).replace('.', ',')}`;
+            legendaItems[2].innerHTML = 
+                `<strong class="dn-bg">${labelsPlantao.dn}</strong>: Plantão Dia/Noite (24h) - R$ ${valoresPlantao.dn.toFixed(2).replace('.', ',')}`;
+            legendaItems[3].innerHTML = 
+                `<strong class="extra-sd-bg">${labelsPlantao['extra-sd']}</strong>: Plantão Extra Diurno - R$ ${valoresPlantao['extra-sd'].toFixed(2).replace('.', ',')}`;
+            legendaItems[4].innerHTML = 
+                `<strong class="extra-sn-bg">${labelsPlantao['extra-sn']}</strong>: Plantão Extra Noturno - R$ ${valoresPlantao['extra-sn'].toFixed(2).replace('.', ',')}`;
+            legendaItems[5].innerHTML = 
+                `<strong class="extra-dn-bg">${labelsPlantao['extra-dn']}</strong>: Plantão Extra Dia/Noite - R$ ${valoresPlantao['extra-dn'].toFixed(2).replace('.', ',')}`;
+            legendaItems[6].innerHTML = 
+                `<strong class="lefe-sd-bg">${labelsPlantao['lefe-sd']}</strong>: Plantão Lefe Diurno - R$ ${valoresPlantao['lefe-sd'].toFixed(2).replace('.', ',')}`;
+            legendaItems[7].innerHTML = 
+                `<strong class="lefe-sn-bg">${labelsPlantao['lefe-sn']}</strong>: Plantão Lefe Noturno - R$ ${valoresPlantao['lefe-sn'].toFixed(2).replace('.', ',')}`;
+            legendaItems[8].innerHTML = 
+                `<strong class="lefe-dn-bg">${labelsPlantao['lefe-dn']}</strong>: Plantão Lefe Dia/Noite - R$ ${valoresPlantao['lefe-dn'].toFixed(2).replace('.', ',')}`;
+        }
+    }
+    
+    function atualizarNomesExibidos() {
+        // Atualizar os nomes exibidos nos botões do modal de plantão
+        document.querySelectorAll('.nome-sd').forEach(el => {
+            el.textContent = labelsPlantao.sd;
+        });
+        document.querySelectorAll('.nome-sn').forEach(el => {
+            el.textContent = labelsPlantao.sn;
+        });
+        document.querySelectorAll('.nome-dn').forEach(el => {
+            el.textContent = labelsPlantao.dn;
+        });
+        document.querySelectorAll('.nome-extra-sd').forEach(el => {
+            el.textContent = labelsPlantao['extra-sd'];
+        });
+        document.querySelectorAll('.nome-extra-sn').forEach(el => {
+            el.textContent = labelsPlantao['extra-sn'];
+        });
+        document.querySelectorAll('.nome-extra-dn').forEach(el => {
+            el.textContent = labelsPlantao['extra-dn'];
+        });
+        document.querySelectorAll('.nome-lefe-sd').forEach(el => {
+            el.textContent = labelsPlantao['lefe-sd'];
+        });
+        document.querySelectorAll('.nome-lefe-sn').forEach(el => {
+            el.textContent = labelsPlantao['lefe-sn'];
+        });
+        document.querySelectorAll('.nome-lefe-dn').forEach(el => {
+            el.textContent = labelsPlantao['lefe-dn'];
+        });
+    }
+    
+    // Funções para exportar e importar dados
+    function exportarDados() {
+        try {
+            const dadosTexto = JSON.stringify({
+                calendario: calendarioData,
+                valores: valoresPlantao,
+                nomes: labelsPlantao,
+                cores: {
+                    sd: getComputedStyle(document.documentElement).getPropertyValue('--sd-color').trim(),
+                    sn: getComputedStyle(document.documentElement).getPropertyValue('--sn-color').trim(),
+                    dn: getComputedStyle(document.documentElement).getPropertyValue('--dn-color').trim(),
+                    'extra-sd': getComputedStyle(document.documentElement).getPropertyValue('--extra-sd-color').trim(),
+                    'extra-sn': getComputedStyle(document.documentElement).getPropertyValue('--extra-sn-color').trim(),
+                    'extra-dn': getComputedStyle(document.documentElement).getPropertyValue('--extra-dn-color').trim(),
+                    'lefe-sd': getComputedStyle(document.documentElement).getPropertyValue('--lefe-sd-color').trim(),
+                    'lefe-sn': getComputedStyle(document.documentElement).getPropertyValue('--lefe-sn-color').trim(),
+                    'lefe-dn': getComputedStyle(document.documentElement).getPropertyValue('--lefe-dn-color').trim(),
+                    folga: getComputedStyle(document.documentElement).getPropertyValue('--folga-color').trim(),
+                    hoje: getComputedStyle(document.documentElement).getPropertyValue('--today-color').trim()
+                }
+            });
+            
+            const modalTitulo = document.getElementById('modal-titulo');
+            if (modalTitulo) {
+                modalTitulo.innerHTML = '<i class="fas fa-file-export"></i> Exportar Dados';
+            }
+            
+            const dadosTextoElement = document.getElementById('dados-texto');
+            if (dadosTextoElement) {
+                dadosTextoElement.value = dadosTexto;
+            }
+            
+            const btnAplicarDados = document.getElementById('btn-aplicar-dados');
+            if (btnAplicarDados) {
+                btnAplicarDados.style.display = 'none';
+            }
+            
+            const btnCopiar = document.getElementById('btn-copiar');
+            if (btnCopiar) {
+                btnCopiar.style.display = 'block';
+            }
+            
+            const modalDados = document.getElementById('modal-dados');
+            if (modalDados) {
+                modalDados.style.display = 'flex';
+            }
+        } catch (error) {
+            console.error("Erro ao exportar dados:", error);
+        }
+    }
+    
+    function importarDados() {
+        const modalTitulo = document.getElementById('modal-titulo');
+        if (modalTitulo) {
+            modalTitulo.innerHTML = '<i class="fas fa-file-import"></i> Importar Dados';
+        }
+        
+        const dadosTextoElement = document.getElementById('dados-texto');
+        if (dadosTextoElement) {
+            dadosTextoElement.value = '';
+        }
+        
+        const btnAplicarDados = document.getElementById('btn-aplicar-dados');
+        if (btnAplicarDados) {
+            btnAplicarDados.style.display = 'block';
+        }
+        
+        const btnCopiar = document.getElementById('btn-copiar');
+        if (btnCopiar) {
+            btnCopiar.style.display = 'none';
+        }
+        
+        const modalDados = document.getElementById('modal-dados');
+        if (modalDados) {
+            modalDados.style.display = 'flex';
+        }
+    }
+    
+    function aplicarDadosImportados() {
+        try {
+            const dadosTextoElement = document.getElementById('dados-texto');
+            if (!dadosTextoElement) {
+                throw new Error("Elemento dados-texto não encontrado");
+            }
+            
+            const dados = JSON.parse(dadosTextoElement.value);
+            
+            if (dados.calendario) {
+                calendarioData = dados.calendario;
+            }
+            
+            if (dados.valores) {
+                valoresPlantao = dados.valores;
+                atualizarValoresExibidos();
+            }
+            
+            if (dados.nomes) {
+                labelsPlantao = dados.nomes;
+                atualizarNomesExibidos();
+            }
+            
+            if (dados.cores) {
+                localStorage.setItem('coresPlantao', JSON.stringify(dados.cores));
+                carregarCoresPersonalizadas();
+                aplicarCoresCSS();
+            }
+            
+            // Salvar dados
+            salvarDados();
+            
+            // Recarregar o calendário atual
+            const mes = parseInt(document.getElementById('mes-selecionado')?.value || mesAtual);
+            const ano = parseInt(document.getElementById('ano-selecionado')?.value || anoAtual);
+            gerarCalendario(mes, ano);
+            
+            fecharModal();
+        } catch (e) {
+            console.error("Erro ao aplicar dados importados:", e);
+            alert('Dados inválidos. Por favor, verifique o formato.');
+        }
+    }
+    
+    function copiarTexto() {
+        try {
+            const dadosTextoElement = document.getElementById('dados-texto');
+            if (!dadosTextoElement) {
+                throw new Error("Elemento dados-texto não encontrado");
+            }
+            
+            dadosTextoElement.select();
+            document.execCommand('copy');
+            alert('Dados copiados para a área de transferência!');
+        } catch (error) {
+            console.error("Erro ao copiar texto:", error);
+        }
+    }
+    
+    function fecharModal() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+
+</script>
+</body>
+</html>
