@@ -3,1456 +3,338 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folha de Ponto - Sistema de Controle de Frequência</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Bibliotecas para geração de PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <title>Gerador de Folha de Ponto</title>
+    
     <style>
-        :root {
-            --primary-color: #1976d2;
-            --secondary-color: #2196f3;
-            --accent-color: #ff5722;
-            --text-color: #333;
-            --light-gray: #f5f5f5;
-            --medium-gray: #e0e0e0;
-            --dark-gray: #757575;
-            --white: #ffffff;
-            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            --border-radius: 8px;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            font-family: 'Roboto', Arial, sans-serif;
-            color: var(--text-color);
-            line-height: 1.6;
-            background-color: #f9f9f9;
+            font-family: 'Calibri', 'Aptos Narrow', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
             padding: 20px;
+            color: #333;
         }
-
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        .header {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 15px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-weight: 500;
-            margin-bottom: 5px;
-        }
-
-        .header p {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
-
-        .company-info {
-            background-color: var(--white);
-            padding: 15px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-
-        .company-info h2 {
-            color: var(--primary-color);
-            font-size: 1.4em;
-            margin-bottom: 8px;
-            font-weight: 500;
-            text-align: center;
-        }
-
-        .company-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .company-table td {
-            padding: 5px;
-            font-size: 0.9em;
-            vertical-align: top;
-        }
-
-        .company-table td:first-child {
-            text-align: center;
-            width: 70%;
-        }
-
-        .company-table td:last-child {
-            text-align: right;
-            width: 30%;
-        }
-
-        .employee-info {
-            background-color: var(--light-gray);
-            padding: 15px;
-            border-bottom: 1px solid var(--medium-gray);
-        }
-
-        .employee-table-modern {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             background: white;
-            margin-bottom: 15px;
-            table-layout: fixed;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        .employee-table-modern thead {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-        }
-
-        .employee-table-modern th {
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 500;
-            font-size: 0.95em;
-        }
-
-        .employee-table-modern tbody tr {
-            transition: background-color 0.2s;
-            min-height: 50px;
-        }
-
-        .employee-table-modern tbody tr:nth-child(even) {
-            background-color: rgba(33, 150, 243, 0.05);
-        }
-
-        .employee-table-modern tbody tr:hover {
-            background-color: rgba(33, 150, 243, 0.1);
-        }
-
-        .employee-table-modern td {
-            padding: 12px 15px;
-            border-top: 1px solid #f0f0f0;
-            vertical-align: middle;
-            line-height: 1.6;
-        }
-
-        .employee-table-modern .field-group {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .employee-table-modern .field-label {
-            font-weight: 500;
-            color: var(--dark-gray);
-            display: flex;
-            align-items: center;
-            margin-right: 8px;
-            font-size: 0.9em;
-            min-width: 100px;
-            min-height: 24px;
-        }
-
-        .employee-table-modern .field-label i {
-            margin-right: 8px;
-            color: var(--secondary-color);
-            width: 16px;
+        .header {
             text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
         }
-
-        .employee-table-modern .field-value {
-            font-family: 'Roboto', sans-serif;
-            flex-grow: 1;
-            min-width: 0;
-            min-height: 24px;
+        .header h1 { margin: 0; font-size: 18px; text-transform: uppercase; }
+        .header p { margin: 5px 0 0; font-size: 12px; }
+        
+        .info-row {
             display: flex;
-            align-items: center;
-        }
-
-        .employee-table-modern input {
-            width: 100%;
-            border: none;
-            background: transparent;
-            font-family: inherit;
-            font-size: inherit;
-            color: inherit;
-            padding: 4px 0;
-            border-bottom: 1px solid transparent;
-            transition: border-bottom 0.3s;
-        }
-
-        .employee-table-modern input:focus {
-            outline: none;
-            border-bottom: 1px solid var(--secondary-color);
-        }
-
-        .employee-table-modern input.error {
-            border-bottom: 1px solid red;
-        }
-
-        .period-display {
-            font-weight: 500;
-            font-size: 0.9em;
-            color: var(--primary-color);
-            margin-left: auto;
-            white-space: nowrap;
-            background-color: rgba(255, 255, 255, 0.7);
-            padding: 6px 10px;
-            border-radius: 4px;
-            border: 1px solid var(--medium-gray);
-        }
-
-        .period-selector {
-            padding: 12px 15px;
-            background-color: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             flex-wrap: wrap;
             gap: 10px;
+            margin-bottom: 5px;
+            font-size: 11px;
         }
-
-        .period-selector label {
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            font-size: 0.9em;
-        }
-
-        .period-selector select {
-            padding: 6px 10px;
-            border: 1px solid var(--medium-gray);
-            border-radius: 4px;
-            background-color: var(--white);
-            font-family: inherit;
-            margin-left: 8px;
-        }
-
-        .btn {
-            background-color: var(--secondary-color);
-            color: var(--white);
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            font-size: 0.9em;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-color);
-        }
-
-        .btn i {
-            margin-right: 5px;
-        }
-
-        .btn-generate {
-            background-color: var(--accent-color);
-        }
-
-        .btn-generate:hover {
-            background-color: #e64a19;
-        }
-
-        .btn-pdf {
-            background-color: #4CAF50;
-        }
-
-        .btn-pdf:hover {
-            background-color: #45a049;
-        }
-
-        .table-container {
-            overflow-x: auto;
+        .info-group { display: flex; gap: 5px; }
+        .info-label { font-weight: bold; }
+        
+        .config-panel {
+            background: #e9e9e9;
             padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
         }
-
+        
+        label { display: block; font-weight: bold; font-size: 12px; margin-bottom: 3px; }
+        input, select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            font-size: 10px;
         }
-
         th, td {
-            padding: 8px 6px;
+            border: 1px solid #000;
+            padding: 4px 2px;
             text-align: center;
-            border: 1px solid var(--medium-gray);
-            font-size: 0.9em;
         }
-
-        th {
-            background-color: var(--primary-color);
-            color: var(--white);
-            font-weight: 500;
-            position: sticky;
-            top: 0;
-        }
-
-        tr:nth-child(even) {
-            background-color: var(--light-gray);
-        }
-
-        /* Estilos para Sábado - Azul */
-        .saturday {
-            background-color: rgba(33, 150, 243, 0.1) !important;
-        }
-
-        .saturday td {
-            color: #1976d2 !important;
-            font-weight: 500 !important;
-        }
-
-        /* Estilos para Domingo - Vermelho */
-        .sunday {
-            background-color: rgba(244, 67, 54, 0.1) !important;
-        }
-
-        .sunday td {
-            color: #d32f2f !important;
-            font-weight: 500 !important;
-        }
-
-        /* Estilos para plantão diurno */
-        .day-shift {
-            background-color: rgba(76, 175, 80, 0.1) !important;
-        }
-
-        .day-shift td {
-            color: #2e7d32 !important;
-            font-weight: 500 !important;
-        }
-
-        /* Estilos para plantão noturno */
-        .night-shift {
-            background-color: rgba(33, 150, 243, 0.1) !important;
-        }
-
-        .night-shift td {
-            color: #0d47a1 !important;
-            font-weight: 500 !important;
-        }
-
-        /* Estilos para folga */
-        .day-off {
-            background-color: rgba(255, 193, 7, 0.1) !important;
-        }
-
-        .day-off td {
-            color: #ff6f00 !important;
-            font-weight: 500 !important;
-        }
-
-        .signature-section {
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .signature-row {
+        th { background-color: #f2f2f2; }
+        
+        .work-day { background-color: #e6f7ff; }
+        .exit-day { background-color: #fff0e6; }
+        
+        .signature-block {
+            margin-top: 30px;
+            font-size: 11px;
             display: flex;
-            align-items: center;
-            margin-bottom: 15px;
+            justify-content: space-between;
         }
-
-        .signature-label {
-            font-weight: 500;
-            margin-right: 10px;
-            white-space: nowrap;
-        }
-
-        .signature-input {
-            display: flex;
-            align-items: center;
-        }
-
-        .signature-input input {
-            width: 35px;
-            text-align: center;
-            margin: 0 3px;
-            padding: 4px;
+        
+        .btn-action {
+            background-color: #004080;
+            color: white;
             border: none;
-            border-bottom: 1px solid var(--dark-gray);
-            border-radius: 0;
-            background-color: transparent;
-            font-size: 1.1em;
-            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
         }
-        
-        .signature-input input:nth-child(3) {
-            width: 35px;
-        }
-        
-        .signature-input input:nth-child(5) {
-            width: 55px;
+        .btn-action:hover { background-color: #003366; }
+
+        .actions-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
         }
 
-        .signature-line {
-            border-bottom: 1px solid var(--dark-gray);
-            width: 360px;
-            height: 20px;
-            margin-left: 10px;
-            flex-grow: 0;
-        }
-
-        .empty-line {
-            height: 20px;
-            margin-bottom: 15px;
-        }
-
-        .double-space {
-            height: 40px;
-            margin-bottom: 15px;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--accent-color);
-            color: var(--white);
-            padding: 12px 18px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-            display: none;
-            z-index: 1000;
-            font-size: 0.9em;
-        }
-
-        .notification.show {
-            display: block;
-            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
-        }
-
-        .notification.success {
-            background-color: #4CAF50;
-        }
-
-        /* Estilos para otimizar PDF */
-        .pdf-optimized {
-            font-size: 0.85em;
-            line-height: 1.4;
-        }
-        
-        .pdf-optimized .company-info,
-        .pdf-optimized .employee-info,
-        .pdf-optimized .period-info,
-        .pdf-optimized .table-container,
-        .pdf-optimized .signature-section {
-            padding: 10px;
-            margin-bottom: 8px;
-        }
-        
-        .pdf-optimized .employee-table-modern th,
-        .pdf-optimized .employee-table-modern td {
-            padding: 14px 10px;
-        }
-        
-        .pdf-optimized .field-group {
-            margin-bottom: 12px;
-        }
-        
-        .pdf-optimized .field-label {
-            font-size: 0.85em;
-            min-width: 90px;
-            min-height: 24px;
-        }
-        
-        .pdf-optimized .field-value {
-            min-height: 24px;
-        }
-        
-        .pdf-optimized table th,
-        .pdf-optimized table td {
-            padding: 10px 4px;
-            height: auto;
-            min-height: 30px;
-            line-height: 1.4;
-        }
-        
-        .pdf-optimized .signature-row {
-            margin-bottom: 10px;
-        }
-        
-        .pdf-optimized .double-space {
-            height: 30px;
-            margin-bottom: 10px;
-        }
-        
-        .pdf-optimized .signature-input input {
-            font-size: 1.1em;
-            font-weight: 500;
-        }
-        
-        .pdf-optimized .signature-input input:nth-child(1) {
-            width: 35px;
-        }
-        
-        .pdf-optimized .signature-input input:nth-child(3) {
-            width: 35px;
-        }
-        
-        .pdf-optimized .signature-input input:nth-child(5) {
-            width: 55px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-20px); }
-        }
-
-        @media (max-width: 768px) {
-            .company-table td {
-                display: block;
+        /* REGRA PARA IMPRESSÃO / PDF */
+        @media print {
+            body { background: none; margin: 0; padding: 0; }
+            .container { 
+                box-shadow: none; 
+                width: 100%; 
+                max-width: 100%; 
+                padding: 0; 
+                margin: 0;
+            }
+            /* Esconde tudo que não deve ir para o PDF */
+            .config-panel, 
+            .actions-bar {
+                display: none !important;
+            }
+            
+            /* Garante que a tabela ocupe a página */
+            #area-impressao {
                 width: 100%;
-                text-align: center !important;
-            }
-            
-            .employee-table-modern {
-                font-size: 0.8em;
-            }
-            
-            .employee-table-modern th, .employee-table-modern td {
-                padding: 8px 10px;
-            }
-            
-            .employee-table-modern .field-group {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .employee-table-modern .field-label {
-                margin-bottom: 5px;
-                min-width: auto;
-            }
-            
-            .employee-table-modern .field-value {
-                width: 100%;
-            }
-            
-            .period-display {
-                margin-left: 0;
-                margin-top: 5px;
-                width: 100%;
-                text-align: center;
-            }
-            
-            .period-selector {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .signature-row {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .signature-line {
-                width: 100%;
-                margin-left: 0;
-                margin-top: 5px;
-            }
-            
-            .signature-input input:nth-child(5) {
-                width: 50px;
-            }
-            
-            .table-container {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            table {
-                min-width: 600px;
-            }
-            
-            th, td {
-                padding: 6px 4px;
-                font-size: 0.8em;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="timesheetContainer">
-        <div class="header" id="mainHeader">
-            <h1><i class="fas fa-clipboard-list"></i>&nbsp; Folha de Ponto Eletrônica</h1>
-            <p>Sistema de Controle de Frequência - LEFE EMERGENCIAS MEDICAS LTDA</p>
-        </div>
-        <div class="period-selector" id="periodSelector">
-            <label>
-                <i class="fas fa-calendar-alt"></i> &nbsp;Selecione o período:
-                <select id="monthSelect">
-                    <option value="0">Janeiro</option>
-                    <option value="1">Fevereiro</option>
-                    <option value="2">Março</option>
-                    <option value="3">Abril</option>
-                    <option value="4">Maio</option>
-                    <option value="5">Junho</option>
-                    <option value="6">Julho</option>
-                    <option value="7">Agosto</option>
-                    <option value="8">Setembro</option>
-                    <option value="9" selected>Outubro</option>
-                    <option value="10">Novembro</option>
-                    <option value="11">Dezembro</option>
-                </select>
-                <select id="yearSelect">
-                    <option value="2025">2025</option>
-                    <option value="2026" selected>2026</option>
-                    <option value="2027">2027</option>
-                </select>
-            </label>
-            <label>
-                <i class="fas fa-calendar-day"></i> &nbsp;Dia de trabalho:
-                <select id="workDaySelect">
-                    <option value="1" selected>Dia 01</option>
-                    <option value="2">Dia 02</option>
-                    <option value="3">Dia 03</option>
-                    <option value="4">Dia 04</option>
-                </select>
-            </label>
-            <label>
-                <i class="fas fa-clock"></i> &nbsp;Escala:
-                <select id="scaleSelect">
-                    <option value="24x72" selected>24x72</option>
-                    <option value="12x36">12x36</option>
-                    <option value="12x24+">12x24+</option>
-                    <option value="8x16">8x16</option>
-                    <option value="6x1">6x1</option>
-                    <option value="12x24">12x24</option>
-                    <option value="12x12">12x12</option>
-                </select>
-            </label>
-            <label id="shiftLabel" style="display: none;">
-                <i class="fas fa-sun"></i> &nbsp;Turno:
-                <select id="shiftSelect">
-                    <option value="day" selected>Diurno</option>
-                    <option value="night">Noturno</option>
-                </select>
-            </label>
-            <div style="display: flex; gap: 5px;">
-                <button class="btn btn-generate" id="generateBtn">
-                    <i class="fas fa-sync-alt"></i> Gerar Folha
-                </button>
-                <button class="btn btn-pdf" id="pdfBtn">
-                    <i class="fas fa-file-pdf"></i> Exportar PDF
-                </button>
-            </div>
-        </div>
 
-        <div class="company-info">
-            <table class="company-table">
-                <tr>
-                    <td>
-                        <h2>LEFE EMERGENCIAS MEDICAS LTDA</h2>
-                    </td>
-                    <td>
-                        <p><i class="fas fa-id-card"></i>&nbsp; CNPJ: 11.204.117/0001-03</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <p><i class="fas fa-map-marker-alt"></i>&nbsp; RUA GENERAL ANDRADE NEVES, 306 - SAO DOMINGOS - CEP 24.210-000</p>
-                    </td>
-                    <td>
-                        <p><i class="fas fa-folder"></i>&nbsp; PASTA: MARANHAO</p>
-                    </td>
-                </tr>
-            </table>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1>LEFE EMERGENCIAS MEDICAS LTDA</h1>
+        <p>CNPJ: 11.204.117/0001-03</p>
+        <p>RUA GENERAL ANDRADE NEVES, 306 - SAO DOMINGOS - CEP 24.210-000</p>
+    </div>
 
-        <div class="employee-info">
-            <table class="employee-table-modern">
-                <thead>
-                    <tr>
-                        <th colspan="7">DADOS DO FUNCIONÁRIO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td colspan="3" style="width: 45%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-user"></i> Nome:</div>
-                                <div class="field-value"><input type="text" id="employeeName" value="ANDERSON MARTINS DE OLIVEIRA"></div>
-                            </div>
-                        </td>
-                        <td colspan="2" style="width: 10%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-id-badge"></i> Matrícula:</div>
-                                <div class="field-value"><input type="text" id="employeeMat" value="252"></div>
-                            </div>
-                        </td>
-                        <td colspan="2" style="width: 25%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-calendar-check"></i> Admissão:</div>
-                                <div class="field-value"><input type="text" id="admissionDate" value="08/05/2020"></div>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td colspan="4" style="width: 65%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-briefcase"></i> Cargo:</div>
-                                <div class="field-value"><input type="text" id="position" value="CONDUTOR DE AMBULANCIA MARANHAO"></div>
-                            </div>
-                        </td>
-                        <td colspan="3" style="width: 35%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-sitemap"></i> Divisão:</div>
-                                <div class="field-value"><input type="text" id="division" value="INVISA - RAIMUNDO LIMA"></div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="4" style="width: 65%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-building"></i> Departamento:</div>
-                                <div class="field-value"><input type="text" id="department" value="SECRETARIA DO ESTADO DE SAUDE - MARANHAO"></div>
-                            </div>
-                        </td>
-                        <td colspan="3" style="width: 35%">
-                            <div class="field-group">
-                                <div class="field-label"><i class="fas fa-clock"></i> Escala:</div>
-                                <div class="field-value"><input type="text" id="workScale" value="12 X 24+ - DIURNO/NOTURNO"></div>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="period-display" id="periodDisplay" style="display: none;">
-                <i class="fas fa-calendar-alt"></i> OUTUBRO/2025
-            </div>
+    <!-- Painel de Configuração -->
+    <div class="config-panel">
+        <div>
+            <label>Mês/Ano:</label>
+            <input type="month" id="inputMesAno" value="2025-12">
+        </div>
+        <div>
+            <label>Primeiro Dia de Trabalho:</label>
+            <select id="inputDiaInicio"></select>
+        </div>
+        <div>
+            <label>Horário Entrada:</label>
+            <input type="time" id="inputEntrada" value="07:00">
+        </div>
+        <div>
+            <label>Horário Saída:</label>
+            <input type="time" id="inputSaida" value="07:00">
+        </div>
+        <div>
+            <label>Início Intervalo:</label>
+            <input type="time" id="inputIntInicio" value="12:00">
+        </div>
+        <div>
+            <label>Fim Intervalo:</label>
+            <input type="time" id="inputIntFim" value="13:00">
+        </div>
+        <div>
+            <label>Variação (+/- min):</label>
+            <input type="number" id="inputVariacao" value="15" min="0" max="59">
         </div>
         
-
-        <div class="period-info">
-            <p style="text-align: center;"><br><strong>PERÍODO:</strong> <span id="periodText">OUTUBRO – 01/10/2025 à 31/10/2025</span></p>
+        <div class="actions-bar">
+            <button class="btn-action" onclick="gerarFolha()">Gerar Folha</button>
+            <!-- Botão alterado para usar window.print() -->
+            <button class="btn-action" style="background-color: #b30000;" onclick="window.print()">Salvar em PDF</button>
         </div>
-        <div class="table-container">
-            <table id="timesheetTable">
-                <thead>
-                    <tr>
-                       <th colspan="2">Dia</th>
-                        <th>Entrada</th>
-                        <th>Início Almoço</th>
-                        <th>Fim Almoço</th>
-                        <th>Início Jantar</th>
-                        <th>Fim Jantar</th>
-                        <th>Saída</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- As linhas serão geradas dinamicamente -->
-                </tbody>
-            </table>
-        </div>
-
-        <div class="signature-section">
-            <div class="signature-row">
-                <div class="signature-label">DATA:</div>
-                <div class="signature-input">
-                    <input type="text" id="signatureDay" placeholder="DD" maxlength="2" value="02">
-                    <span>/</span>
-                    <input type="text" id="signatureMonth" placeholder="MM" maxlength="2" value="09">
-                    <span>/</span>
-                    <input type="text" id="signatureYear" placeholder="AAAA" maxlength="4" value="2026">
+    </div>
+    
+    <!-- Área que será impressa no PDF -->
+    <div id="area-impressao">
+        <!-- Dados do Funcionário -->
+        <div style="font-size: 11px; margin-bottom: 15px;">
+            <div class="info-row">
+                <div class="info-group">
+                    <span class="info-label">NOME:</span>
+                    <span>ANDERSON MARTINS DE OLIVEIRA – MATª 252</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">ADMISSÃO:</span>
+                    <span>08/05/2020</span>
                 </div>
             </div>
-            
-            <div class="signature-row">
-                <div class="signature-label">ASSINATURA DO FUNCIONÁRIO:</div>
-                <div class="signature-line"></div>
+
+            <div class="info-row">
+                <div class="info-group">
+                    <span class="info-label">CARGO:</span>
+                    <span>CONDUTOR DE AMBULANCIA MARANHAO</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">ESCALA:</span>
+                    <span>24 X 72</span>
+                </div>
             </div>
-            
-            <div class="double-space"></div> <!-- Duas linhas em branco entre as assinaturas -->
-            
-            <div class="signature-row">
-                <div class="signature-label">ASSINATURA DO SUPERIOR:</div>
-                <div class="signature-line"></div>
+
+            <div class="info-row">
+                <div class="info-group">
+                    <span class="info-label">DEPARTAMENTO:</span>
+                    <span>SECRETARIA DO ESTADO DE SAUDE - MARANHAO</span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-group">
+                    <span class="info-label">DIVISÃO:</span>
+                    <span>INVISA - RAIMUNDO LIMA</span>
+                </div>
+                <div class="info-group">
+                    <span class="info-label">PASTA:</span>
+                    <span>MARANHAO</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="notification" id="notification">
-        Folha de ponto atualizada com sucesso!
-    </div>
+        <!-- Tabela da Folha -->
+        <table id="tabelaFolha">
+            <thead>
+                <tr>
+                    <th>Dia</th>
+                    <th>Entrada</th>
+                    <th>Início Intervalo</th>
+                    <th>Fim Intervalo</th>
+                    <th>Saída</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const monthSelect = document.getElementById('monthSelect');
-            const yearSelect = document.getElementById('yearSelect');
-            const workDaySelect = document.getElementById('workDaySelect');
-            const scaleSelect = document.getElementById('scaleSelect');
-            const shiftSelect = document.getElementById('shiftSelect');
-            const shiftLabel = document.getElementById('shiftLabel');
-            const generateBtn = document.getElementById('generateBtn');
-            const pdfBtn = document.getElementById('pdfBtn');
-            const tableBody = document.getElementById('tableBody');
-            const periodText = document.getElementById('periodText');
-            const periodDisplay = document.getElementById('periodDisplay');
-            const notification = document.getElementById('notification');
-            const periodSelector = document.getElementById('periodSelector');
-            const mainHeader = document.getElementById('mainHeader');
+        <div class="signature-block">
+            <div>DATA: _____/_____/_____ ASSINATURA DO FUNCIONÁRIO: ____________________</div>
+            <div>ASSINATURA DO SUPERIOR: ____________________</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Popula o seletor de dias
+    const selectDia = document.getElementById('inputDiaInicio');
+    for(let i=1; i<=31; i++) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.text = i;
+        selectDia.appendChild(opt);
+    }
+
+    function variarHorario(horaBase, variacaoMax) {
+        if (!horaBase) return "-";
+        let minVariar = Math.floor(Math.random() * (variacaoMax * 2 + 1)) - variacaoMax;
+        let [horas, minutos] = horaBase.split(':').map(Number);
+        let totalMinutos = horas * 60 + minutos;
+        totalMinutos += minVariar;
+        
+        if (totalMinutos < 0) totalMinutos += 1440;
+        if (totalMinutos >= 1440) totalMinutos -= 1440;
+        
+        let novasHoras = Math.floor(totalMinutos / 60);
+        let novosMinutos = totalMinutos % 60;
+        return String(novasHoras).padStart(2, '0') + ':' + String(novosMinutos).padStart(2, '0');
+    }
+
+    function gerarFolha() {
+        const mesAno = document.getElementById('inputMesAno').value;
+        if(!mesAno) { alert("Selecione o Mês e Ano."); return; }
+
+        const [ano, mes] = mesAno.split('-').map(Number);
+        const diaInicio = parseInt(document.getElementById('inputDiaInicio').value);
+        
+        const horaEntradaBase = document.getElementById('inputEntrada').value;
+        const horaSaidaBase = document.getElementById('inputSaida').value;
+        const horaIntInicioBase = document.getElementById('inputIntInicio').value;
+        const horaIntFimBase = document.getElementById('inputIntFim').value;
+        
+        const variacao = parseInt(document.getElementById('inputVariacao').value) || 0;
+
+        const diasNoMes = new Date(ano, mes, 0).getDate();
+        const tbody = document.querySelector('#tabelaFolha tbody');
+        tbody.innerHTML = '';
+
+        // Lógica da Escala 24x72
+        let diasTrabalho = new Array(diasNoMes + 1).fill(0); 
+        let cicloDia = diaInicio;
+        
+        while(cicloDia <= diasNoMes) {
+            if(cicloDia <= diasNoMes) diasTrabalho[cicloDia] = 1; 
+            if((cicloDia + 1) <= diasNoMes) diasTrabalho[cicloDia + 1] = 2; 
+            cicloDia += 4; 
+        }
+
+        const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+        for (let dia = 1; dia <= diasNoMes; dia++) {
+            const data = new Date(ano, mes - 1, dia);
+            const diaSemana = diasSemana[data.getDay()];
+            const tipoDia = diasTrabalho[dia];
+
+            const tr = document.createElement('tr');
             
-            // Elementos do formulário do funcionário
-            const employeeName = document.getElementById('employeeName');
-            const employeeMat = document.getElementById('employeeMat');
-            const admissionDate = document.getElementById('admissionDate');
-            const position = document.getElementById('position');
-            const workScale = document.getElementById('workScale');
-            const department = document.getElementById('department');
-            const division = document.getElementById('division');
-            
-            // Elementos de data da assinatura
-            const signatureDay = document.getElementById('signatureDay');
-            const signatureMonth = document.getElementById('signatureMonth');
-            const signatureYear = document.getElementById('signatureYear');
-            
-            // Array com nomes dos meses
-            const monthNames = [
-                'JANEIRO', 'FEVEREIRO', 'MARÇO', 'ABRIL', 'MAIO', 'JUNHO',
-                'JULHO', 'AGOSTO', 'SETEMBRO', 'OUTUBRO', 'NOVEMBRO', 'DEZEMBRO'
-            ];
-            
-            // Array com nomes dos dias da semana
-            const weekDays = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
-            
-            // Função para salvar dados do funcionário no localStorage
-            function saveEmployeeData() {
-                const employeeData = {
-                    name: employeeName.value,
-                    mat: employeeMat.value,
-                    admissionDate: admissionDate.value,
-                    position: position.value,
-                    workScale: workScale.value,
-                    department: department.value,
-                    division: division.value,
-                    month: monthSelect.value,
-                    year: yearSelect.value,
-                    workDay: workDaySelect.value,
-                    scale: scaleSelect.value,
-                    shift: shiftSelect.value
-                };
-                localStorage.setItem('employeeData', JSON.stringify(employeeData));
+            const tdDia = document.createElement('td');
+            tdDia.innerText = `${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')}/${ano} (${diaSemana})`;
+            tr.appendChild(tdDia);
+
+            if (tipoDia === 1) {
+                tr.classList.add('work-day');
+                let hEntrada = variacao > 0 ? variarHorario(horaEntradaBase, variacao) : horaEntradaBase;
+                let hIntInicio = variacao > 0 ? variarHorario(horaIntInicioBase, variacao) : horaIntInicioBase;
+                let hIntFim = variacao > 0 ? variarHorario(horaIntFimBase, variacao) : horaIntFimBase;
+                
+                tr.innerHTML += `<td><strong>${hEntrada}</strong></td>`;
+                tr.innerHTML += `<td>${hIntInicio}</td>`;
+                tr.innerHTML += `<td>${hIntFim}</td>`;
+                tr.innerHTML += `<td>-</td>`;
+                
+            } else if (tipoDia === 2) {
+                tr.classList.add('exit-day');
+                let hSaida = variacao > 0 ? variarHorario(horaSaidaBase, variacao) : horaSaidaBase;
+                
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td><strong>${hSaida}</strong></td>`;
+                
+            } else {
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td>-</td>`;
+                tr.innerHTML += `<td>-</td>`;
             }
-            
-            // Função para carregar dados do funcionário do localStorage
-            function loadEmployeeData() {
-                const savedData = localStorage.getItem('employeeData');
-                if (savedData) {
-                    const employeeData = JSON.parse(savedData);
-                    employeeName.value = employeeData.name || '';
-                    employeeMat.value = employeeData.mat || '';
-                    admissionDate.value = employeeData.admissionDate || '';
-                    position.value = employeeData.position || '';
-                    workScale.value = employeeData.workScale || '';
-                    department.value = employeeData.department || '';
-                    division.value = employeeData.division || '';
-                    
-                    // Carregar seletores se existirem nos dados salvos
-                    if (employeeData.month !== undefined) {
-                        monthSelect.value = employeeData.month;
-                    }
-                    if (employeeData.year !== undefined) {
-                        yearSelect.value = employeeData.year;
-                    }
-                    if (employeeData.workDay !== undefined) {
-                        workDaySelect.value = employeeData.workDay;
-                    }
-                    if (employeeData.scale !== undefined) {
-                        scaleSelect.value = employeeData.scale;
-                    }
-                    if (employeeData.shift !== undefined) {
-                        shiftSelect.value = employeeData.shift;
-                    }
-                    
-                    // Atualizar a exibição com base nos dados carregados
-                    updateWorkScale();
-                    updatePeriodDisplay();
-                }
-            }
-            
-            // Função para atualizar o período exibido
-            function updatePeriodDisplay() {
-                const month = parseInt(monthSelect.value);
-                const year = parseInt(yearSelect.value);
-                periodDisplay.innerHTML = `<i class="fas fa-calendar-alt"></i> ${monthNames[month]}/${year}`;
-                
-                // Atualizar os campos de data da assinatura com o mês e ano selecionados
-                signatureMonth.value = (month + 1).toString().padStart(2, '0');
-                signatureYear.value = year.toString();
-            }
-            
-            // Função para atualizar o campo de escala de trabalho
-            function updateWorkScale() {
-                const scale = scaleSelect.value;
-                const workDay = parseInt(workDaySelect.value);
-                
-                // Mostrar/ocultar o seletor de turno para a escala 12x36 e 12x24+
-                if (scale === '12x36' || scale === '12x24+') {
-                    shiftLabel.style.display = 'flex';
-                } else {
-                    shiftLabel.style.display = 'none';
-                }
-                
-                // Mapear as diferentes escalas para os horários correspondentes
-                const scaleMap = {
-                    '24x72': '24 X 72 - 07:00-07:00',
-                    '12x36': '12 X 36 - ALTERNADO',
-                    '12x24+': '12 X 24+ - DIURNO/NOTURNO',
-                    '8x16': '8 X 16 - 07:00-15:00',
-                    '6x1': '6 X 1 - 07:00-13:00',
-                    '12x24': '12 X 24 - 07:00-19:00',
-                    '12x12': '12 X 12 - 07:00-19:00'
-                };
-                
-                // Atualizar o valor do campo de escala
-                workScale.value = scaleMap[scale] || '24 X 72 - 07:00-07:00';
-                
-                // Salvar os dados atualizados
-                saveEmployeeData();
-            }
-            
-            // Função para gerar horários consistentes usando o dia como semente
-            function generateConsistentTime(baseHour, baseMinute, variationMinutes, day) {
-                // Usar o dia como semente para garantir consistência
-                const seed = day * 1000 + baseHour * 100 + baseMinute;
-                const random = Math.sin(seed) * 10000;
-                const variation = Math.floor(random) % (2 * variationMinutes + 1) - variationMinutes;
-                
-                let totalMinutes = baseHour * 60 + baseMinute + variation;
-                
-                // Normalizar para o formato 24h
-                if (totalMinutes < 0) {
-                    totalMinutes += 24 * 60;
-                } else if (totalMinutes >= 24 * 60) {
-                    totalMinutes -= 24 * 60;
-                }
-                
-                const hour = Math.floor(totalMinutes / 60);
-                const minute = totalMinutes % 60;
-                
-                return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-            }
-            
-            // Função para gerar horários com variação
-            function generateTime(baseHour, baseMinute, variationMinutes, day) {
-                return generateConsistentTime(baseHour, baseMinute, variationMinutes, day);
-            }
-            
-            // Função para determinar os dias de trabalho com base na escala
-            function getWorkDays(scale, workDay) {
-                const daysInMonth = new Date(parseInt(yearSelect.value), parseInt(monthSelect.value) + 1, 0).getDate();
-                const isStartWorkDay = new Array(daysInMonth + 1).fill(false);
-                const isEndWorkDay = new Array(daysInMonth + 1).fill(false);
-                const isDayShift = new Array(daysInMonth + 1).fill(false); // True = diurno, False = noturno
-                const isDayOff = new Array(daysInMonth + 1).fill(false); // True = dia de folga
-                
-                // Determinar os dias de trabalho com base na escala selecionada
-                switch(scale) {
-                    case '24x72':
-                        // Plantão de 24 horas a cada 72 horas (3 dias)
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            if ((day - workDay) % 4 === 0) {
-                                isStartWorkDay[day] = true;
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case '12x36':
-                        // Plantão de 12 horas a cada 36 horas (1.5 dias)
-                        // O ciclo é de 3 dias: 12h trabalho + 36h descanso = 48h = 2 dias
-                        // Portanto, a cada 3 dias, o funcionário trabalha 12 horas em um dia
-                        // Vamos alternar entre diurno e noturno a cada ciclo
-                        let cycleCount = 0;
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            // Verificar se é dia de trabalho (a cada 3 dias a partir do workDay)
-                            if ((day - workDay) % 3 === 0) {
-                                // Determinar se é diurno ou noturno com base no ciclo
-                                isDayShift[day] = cycleCount % 2 === 0; // Ciclo par: diurno, ímpar: noturno
-                                
-                                isStartWorkDay[day] = true;
-                                // Para plantão noturno, a saída é no dia seguinte
-                                if (!isDayShift[day] && day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                            // Incrementar o contador de ciclos no dia workDay+2, workDay+5, etc.
-                            if ((day - workDay - 2) % 3 === 0) {
-                                cycleCount++;
-                            }
-                        }
-                        break;
-                        
-                    case '12x24+':
-                        // Nova escala: 4 dias por ciclo: diurno, noturno, folga, folga
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            // Calcular posição no ciclo de 4 dias
-                            const cyclePosition = ((day - workDay) % 4 + 4) % 4; // Garante resultado positivo
-                            
-                            if (cyclePosition === 0) {
-                                // Dia 1: Plantão diurno
-                                isDayShift[day] = true;
-                                isStartWorkDay[day] = true;
-                                isDayOff[day] = false;
-                            } else if (cyclePosition === 1) {
-                                // Dia 2: Plantão noturno
-                                isDayShift[day] = false;
-                                isStartWorkDay[day] = true;
-                                isDayOff[day] = false;
-                                // A saída será no dia seguinte (dia 3)
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            } else if (cyclePosition === 2 || cyclePosition === 3) {
-                                // Dias 3 e 4: Folgas
-                                isDayOff[day] = true;
-                            }
-                        }
-                        break;
-                        
-                    case '8x16':
-                        // Plantão de 8 horas a cada 16 horas
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            if ((day - workDay) % 2 === 0) {
-                                isStartWorkDay[day] = true;
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case '6x1':
-                        // Plantão de 6 horas por dia
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            if ((day - workDay) % 7 === 0) {
-                                isStartWorkDay[day] = true;
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case '12x24':
-                        // Plantão de 12 horas a cada 24 horas
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            if ((day - workDay) % 2 === 0) {
-                                isStartWorkDay[day] = true;
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                        }
-                        break;
-                        
-                    case '12x12':
-                        // Plantão de 12 horas a cada 12 horas
-                        for (let day = 1; day <= daysInMonth; day++) {
-                            if ((day - workDay) % 1 === 0) {
-                                isStartWorkDay[day] = true;
-                                if (day + 1 <= daysInMonth) {
-                                    isEndWorkDay[day + 1] = true;
-                                }
-                            }
-                        }
-                        break;
-                }
-                
-                return { isStartWorkDay, isEndWorkDay, isDayShift, isDayOff };
-            }
-            
-            // Função para gerar a folha de ponto
-            function generateTimesheet() {
-                const month = parseInt(monthSelect.value);
-                const year = parseInt(yearSelect.value);
-                const workDay = parseInt(workDaySelect.value);
-                const scale = scaleSelect.value;
-                
-                // Salva os dados do funcionário antes de gerar
-                saveEmployeeData();
-                
-                // Atualiza o período exibido
-                updatePeriodDisplay();
-                
-                // Limpa o corpo da tabela
-                tableBody.innerHTML = '';
-                
-                // Obtém o número de dias no mês
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                
-                // Atualiza o texto do período
-                const firstDay = `01/${(month + 1).toString().padStart(2, '0')}/${year}`;
-                const lastDay = `${daysInMonth}/${(month + 1).toString().padStart(2, '0')}/${year}`;
-                periodText.textContent = `${monthNames[month]} – ${firstDay} à ${lastDay}`;
-                
-                // Obter os dias de trabalho com base na escala
-                const { isStartWorkDay, isEndWorkDay, isDayShift, isDayOff } = getWorkDays(scale, workDay);
-                
-                // Gera as linhas da tabela
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(year, month, day);
-                    const weekDay = weekDays[date.getDay()];
-                    
-                    // Cria a linha da tabela
-                    const row = document.createElement('tr');
-                    
-                    // Adiciona classes específicas para sábado e domingo
-                    if (date.getDay() === 6) { // Sábado
-                        row.classList.add('saturday');
-                    } else if (date.getDay() === 0) { // Domingo
-                        row.classList.add('sunday');
-                    }
-                    
-                    // Adiciona classes específicas para plantões diurnos, noturnos e folgas
-                    if (scale === '12x36' || scale === '12x24+') {
-                        if (isDayOff[day]) {
-                            row.classList.add('day-off');
-                        } else if (isStartWorkDay[day]) {
-                            if (isDayShift[day]) {
-                                row.classList.add('day-shift');
-                            } else {
-                                row.classList.add('night-shift');
-                            }
-                        }
-                    }
-                    
-                    // Formata a data
-                    const formattedDate = `${day.toString().padStart(2, '0')}/${(month + 1).toString().padStart(2, '0')}/${year.toString().substring(2)}`;
-                    
-                    let entryTime = '';
-                    let lunchStartTime = '';
-                    let lunchEndTime = '';
-                    let dinnerStartTime = '';
-                    let dinnerEndTime = '';
-                    let exitTime = '';
-                    
-                    // Se é dia de início de plantão
-                    if (isStartWorkDay[day]) {
-                        // Gera horários com base na escala
-                        switch(scale) {
-                            case '24x72':
-                                entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                dinnerStartTime = generateTime(20, 30, 15, day); // 20:30 com variação de 15 minutos
-                                dinnerEndTime = generateTime(21, 30, 30, day); // 21:30 com variação de 30 minutos
-                                // Saída fica em branco porque é no dia seguinte
-                                break;
-                                
-                            case '12x36':
-                                if (isDayShift[day]) {
-                                    entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                    lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                    lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                    dinnerStartTime = ''; // Não há jantar nesse caso
-                                    dinnerEndTime = ''; // Não há jantar nesse caso
-                                    exitTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                } else { // noturno
-                                    entryTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                    lunchStartTime = ''; // Não há almoço noturno
-                                    lunchEndTime = ''; // Não há almoço noturno
-                                    dinnerStartTime = generateTime(23, 0, 15, day); // 23:00 com variação de 15 minutos
-                                    dinnerEndTime = generateTime(0, 0, 30, day); // 00:00 com variação de 30 minutos (do dia seguinte)
-                                    // A saída será preenchida no dia seguinte (se for dia de fim de plantão)
-                                    exitTime = ''; // Não preenchemos a saída aqui, será preenchida no dia seguinte
-                                }
-                                break;
-                                
-                            case '12x24+':
-                                if (isDayShift[day]) {
-                                    // Plantão diurno
-                                    entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                    lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                    lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                    dinnerStartTime = ''; // Não há jantar nesse caso
-                                    dinnerEndTime = ''; // Não há jantar nesse caso
-                                    exitTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                } else {
-                                    // Plantão noturno
-                                    entryTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                    lunchStartTime = ''; // Não há almoço noturno
-                                    lunchEndTime = ''; // Não há almoço noturno
-                                    // Jantar: 20:30 com variação de 30 minutos total (15 antes e 15 depois)
-                                    dinnerStartTime = generateTime(20, 30, 15, day); // 20:15 a 20:45
-                                    dinnerEndTime = generateTime(21, 30, 15, day); // 21:15 a 21:45
-                                    // A saída será preenchida no dia seguinte (dia de folga)
-                                    exitTime = ''; // Não preenchemos a saída aqui, será preenchida no dia seguinte
-                                }
-                                break;
-                                
-                            case '8x16':
-                                entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                dinnerStartTime = ''; // Não há jantar nesse caso
-                                dinnerEndTime = ''; // Não há jantar nesse caso
-                                exitTime = generateTime(15, 0, 15, day); // 15:00 com variação de 15 minutos
-                                break;
-                                
-                            case '6x1':
-                                entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                dinnerStartTime = ''; // Não há jantar nesse caso
-                                dinnerEndTime = ''; // Não há jantar nesse caso
-                                exitTime = generateTime(13, 0, 15, day); // 13:00 com variação de 15 minutos
-                                break;
-                                
-                            case '12x24':
-                                entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                dinnerStartTime = ''; // Não há jantar nesse caso
-                                dinnerEndTime = ''; // Não há jantar nesse caso
-                                exitTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                break;
-                                
-                            case '12x12':
-                                entryTime = generateTime(7, 0, 15, day); // 07:00 com variação de 15 minutos
-                                lunchStartTime = generateTime(12, 0, 15, day); // 12:00 com variação de 15 minutos
-                                lunchEndTime = generateTime(13, 0, 30, day); // 13:00 com variação de 30 minutos
-                                dinnerStartTime = ''; // Não há jantar nesse caso
-                                dinnerEndTime = ''; // Não há jantar nesse caso
-                                exitTime = generateTime(19, 0, 15, day); // 19:00 com variação de 15 minutos
-                                break;
-                        }
-                    }
-                    // Se é dia de fim de plantão
-                    else if (isEndWorkDay[day]) {
-                        // Para escalas de 24 horas ou plantão noturno de 12x36 ou 12x24+, a saída é no dia seguinte
-                        if (scale === '24x72' || 
-                            (scale === '12x36' && !isDayShift[day-1]) || 
-                            (scale === '12x24+' && !isDayShift[day-1])) {
-                            exitTime = generateTime(7, 0, 15, day); // 07:00 do dia seguinte com variação de 15 minutos
-                        }
-                    }
-                    
-                    // Preenche as células
-                    row.innerHTML = `
-                        <td>${formattedDate}</td>
-                        <td>${weekDay}</td>
-                        <td>${entryTime}</td>
-                        <td>${lunchStartTime}</td>
-                        <td>${lunchEndTime}</td>
-                        <td>${dinnerStartTime}</td>
-                        <td>${dinnerEndTime}</td>
-                        <td>${exitTime}</td>
-                    `;
-                    
-                    tableBody.appendChild(row);
-                }
-                
-                // Exibe notificação
-                showNotification();
-            }
-            
-            // Função para exibir notificação
-            function showNotification(message = 'Folha de ponto atualizada com sucesso!', isSuccess = false) {
-                notification.textContent = message;
-                if (isSuccess) {
-                    notification.classList.add('success');
-                } else {
-                    notification.classList.remove('success');
-                }
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 3000);
-            }
-            
-            // Função para gerar PDF - Versão otimizada para uma página
-            function generatePDF() {
-                // Verificar se as bibliotecas estão carregadas
-                if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
-                    showNotification('Erro: Bibliotecas não carregadas. Recarregue a página.', false);
-                    return;
-                }
-                
-                const { jsPDF } = window.jspdf;
-                
-                // Mostrar notificação de processamento
-                showNotification('Gerando PDF, aguarde...', false);
-                
-                // Esconder elementos indesejados
-                mainHeader.style.display = 'none';
-                periodSelector.style.display = 'none';
-                
-                // Adicionar classe de otimização para PDF
-                document.getElementById('timesheetContainer').classList.add('pdf-optimized');
-                
-                // Forçar recálculo das alturas das linhas
-                const employeeRows = document.querySelectorAll('.employee-table-modern tbody tr');
-                employeeRows.forEach(row => {
-                    row.style.minHeight = '50px';
-                });
-                
-                // Usar html2canvas com configurações otimizadas
-                html2canvas(document.getElementById('timesheetContainer'), {
-                    scale: 1.2,
-                    logging: false,
-                    useCORS: true,
-                    allowTaint: true,
-                    backgroundColor: '#ffffff',
-                    width: document.getElementById('timesheetContainer').scrollWidth,
-                    height: document.getElementById('timesheetContainer').scrollHeight,
-                    onclone: function(clonedDoc) {
-                        const clonedRows = clonedDoc.querySelectorAll('.employee-table-modern tbody tr');
-                        clonedRows.forEach(row => {
-                            row.style.minHeight = '50px';
-                        });
-                    }
-                }).then(canvas => {
-                    // Restaurar elementos escondidos e remover classe de otimização
-                    mainHeader.style.display = '';
-                    periodSelector.style.display = '';
-                    document.getElementById('timesheetContainer').classList.remove('pdf-optimized');
-                    
-                    const imgData = canvas.toDataURL('image/png');
-                    const pdf = new jsPDF('p', 'mm', 'a4');
-                    
-                    // Calcular dimensões para caber em uma página
-                    const pageWidth = 210; // Largura A4 em mm
-                    const pageHeight = 297; // Altura A4 em mm
-                    const margin = 10; // Margem em mm
-                    const imgWidth = pageWidth - (2 * margin);
-                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    
-                    // Verificar se a altura excede a página
-                    if (imgHeight > pageHeight - (2 * margin)) {
-                        // Ajustar a escala para caber em uma página
-                        const scale = (pageHeight - (2 * margin)) / imgHeight;
-                        const scaledWidth = imgWidth * scale;
-                        const offsetX = (pageWidth - scaledWidth) / 2;
-                        
-                        pdf.addImage(imgData, 'PNG', offsetX, margin, scaledWidth, pageHeight - (2 * margin));
-                    } else {
-                        // Centralizar horizontalmente
-                        const offsetX = (pageWidth - imgWidth) / 2;
-                        pdf.addImage(imgData, 'PNG', offsetX, margin, imgWidth, imgHeight);
-                    }
-                    
-                    // Obter dados do funcionário para nomear o arquivo
-                    const empName = employeeName.value.replace(/\s+/g, '_');
-                    const month = monthNames[parseInt(monthSelect.value)];
-                    const year = yearSelect.value;
-                    
-                    // Salvar o PDF
-                    pdf.save(`Folha_Ponto_${empName}_${month}_${year}.pdf`);
-                    
-                    // Mostrar notificação de sucesso
-                    showNotification('PDF gerado com sucesso em uma página!', true);
-                }).catch(error => {
-                    // Restaurar elementos escondidos e remover classe de otimização em caso de erro
-                    mainHeader.style.display = '';
-                    periodSelector.style.display = '';
-                    document.getElementById('timesheetContainer').classList.remove('pdf-optimized');
-                    
-                    console.error('Erro ao gerar PDF:', error);
-                    showNotification('Erro ao gerar PDF. Verifique o console.', false);
-                });
-            }
-            
-            // Função para validar datas
-            function validateDate(input) {
-                const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
-                if (!dateRegex.test(input.value)) {
-                    input.classList.add('error');
-                    return false;
-                }
-                
-                const [, day, month, year] = input.value.match(dateRegex);
-                const date = new Date(year, month - 1, day);
-                
-                if (date.getFullYear() != year || date.getMonth() != month - 1 || date.getDate() != day) {
-                    input.classList.add('error');
-                    return false;
-                }
-                
-                input.classList.remove('error');
-                return true;
-            }
-            
-            // Event listeners
-            generateBtn.addEventListener('click', generateTimesheet);
-            pdfBtn.addEventListener('click', generatePDF);
-            scaleSelect.addEventListener('change', updateWorkScale);
-            
-            // Event listeners para salvar dados do funcionário quando os campos forem alterados
-            employeeName.addEventListener('blur', saveEmployeeData);
-            employeeMat.addEventListener('blur', saveEmployeeData);
-            admissionDate.addEventListener('blur', function() {
-                validateDate(this);
-                saveEmployeeData();
-            });
-            position.addEventListener('blur', saveEmployeeData);
-            workScale.addEventListener('blur', saveEmployeeData);
-            department.addEventListener('blur', saveEmployeeData);
-            division.addEventListener('blur', saveEmployeeData);
-            
-            // Event listeners para atualizar o período quando os seletores mudarem
-            monthSelect.addEventListener('change', updatePeriodDisplay);
-            yearSelect.addEventListener('change', updatePeriodDisplay);
-            
-            // Validação dos campos de data da assinatura
-            signatureDay.addEventListener('blur', function() {
-                if (this.value && this.value.length === 2) {
-                    this.classList.remove('error');
-                } else {
-                    this.classList.add('error');
-                }
-            });
-            
-            signatureMonth.addEventListener('blur', function() {
-                if (this.value && this.value.length === 2) {
-                    this.classList.remove('error');
-                } else {
-                    this.classList.add('error');
-                }
-            });
-            
-            signatureYear.addEventListener('blur', function() {
-                if (this.value && this.value.length === 4) {
-                    this.classList.remove('error');
-                } else {
-                    this.classList.add('error');
-                }
-            });
-            
-            // Carrega os dados do funcionário ao iniciar
-            loadEmployeeData();
-            
-            // Atualiza o período exibido ao iniciar
-            updatePeriodDisplay();
-            
-            // Gera a folha de ponto inicial
-            generateTimesheet();
-        });
-    </script>
+
+            tbody.appendChild(tr);
+        }
+    }
+
+    // Inicializa a tabela ao carregar a página
+    gerarFolha();
+</script>
+
 </body>
 </html>
