@@ -3,27 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Marlift Empilhadeiras - OS Profissional v9.3</title>
+  <title>Marlift Empilhadeiras - OS Profissional v9.4</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
+    /* (mesmo CSS do original, sem alterações - apenas copie o mesmo estilo para evitar erro) */
     * { -webkit-tap-highlight-color: transparent; }
-    :root {
-      --bg: #0c0f12;
-      --bg-secondary: #141a21;
-      --fg: #e8eaed;
-      --muted: #6b7280;
-      --accent: #f97316;
-      --accent-light: #fb923c;
-      --card: #1a2129;
-      --border: #2a3441;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #3b82f6;
-      --purple: #8b5cf6;
-    }
+    :root { --bg: #0c0f12; --bg-secondary: #141a21; --fg: #e8eaed; --muted: #6b7280; --accent: #f97316; --accent-light: #fb923c; --card: #1a2129; --border: #2a3441; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --purple: #8b5cf6; }
     * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
     body { background: var(--bg); color: var(--fg); min-height: 100vh; margin: 0; }
     .font-display { font-family: 'Bebas Neue', sans-serif; }
@@ -100,7 +87,6 @@
     .permission-item { background:var(--bg-secondary); border-radius:12px; padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border); }
     .permission-item label { cursor:pointer; font-weight:500; display:flex; align-items:center; gap:10px; }
     .permission-item input { width:20px; height:20px; accent-color:var(--accent); cursor:pointer; }
-    .permission-category { background:var(--card); border-radius:16px; padding:20px; margin-bottom:20px; border-left:4px solid var(--accent); }
     .journey-step { background:var(--bg-secondary); border-radius:16px; padding:20px; margin-bottom:20px; border-left:4px solid var(--accent); }
     .journey-step.completed { border-left-color: var(--success); opacity:0.8; }
     .journey-step h3 { color:var(--accent); margin-bottom:15px; display:flex; align-items:center; gap:10px; }
@@ -136,7 +122,7 @@
 <div id="appContainer" style="display:none;">
   <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3">
-      <div class="top-bar"><div class="flex items-center gap-3"><div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div><div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.3</p></div></div><div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border])"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div></div>
+      <div class="top-bar"><div class="flex items-center gap-3"><div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div><div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.4</p></div></div><div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border])"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div></div>
       <div class="toolbar"><button onclick="App.gerarPreviaPDF()" id="btnPreviaPDF" class="btn btn-primary text-sm" disabled><i class="fas fa-file-pdf"></i> PDF</button><button onclick="App.enviarEmailComResumo()" id="btnEnviarEmail" class="btn btn-secondary text-sm" disabled><i class="fas fa-envelope"></i> E-mail</button><button onclick="App.sendWhatsAppMessage()" id="btnWhatsApp" class="btn btn-secondary text-sm"><i class="fab fa-whatsapp text-green-500"></i> WhatsApp</button><button onclick="App.novaOS()" id="btnNovaOS" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button><button onclick="GoogleSheetsSync.fullSync()" id="btnSync" class="btn btn-sync text-sm"><i class="fas fa-cloud-upload-alt"></i> Sincronizar</button><button onclick="GoogleSheetsSync.fetchFromSheet()" id="btnDownload" class="btn btn-secondary text-sm"><i class="fas fa-cloud-download-alt"></i> Baixar</button></div>
     </div>
   </header>
@@ -178,7 +164,7 @@
     <div id="tab-clientes" class="tab-content"><div class="stats-grid no-print" id="clientesStats"><div class="stat-card"><div class="stat-value" id="statTotalClientes">0</div><div class="stat-label">Total Clientes</div></div><div class="stat-card"><div class="stat-value" id="statTotalMarcas">0</div><div class="stat-label">Total Marcas</div></div><div class="stat-card"><div class="stat-value" id="statClientesComOS">0</div><div class="stat-label">Clientes c/ OS</div></div><div class="stat-card"><div class="stat-value" id="statTotalOSClientes">0</div><div class="stat-label">Total OS</div></div><div class="stat-card"><div class="stat-value" id="statOSAbertasCliente">0</div><div class="stat-label">OS em Aberto</div></div><div class="stat-card"><div class="stat-value" id="statOSAprovadasCliente">0</div><div class="stat-label">OS Aprovadas</div></div></div><div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-3">Cadastro de Cliente</h2><div class="grid md:grid-cols-2 gap-3"><input type="text" id="cad_nome" placeholder="Nome*" class="form-input"><input type="text" id="cad_cnpj" placeholder="CNPJ" class="form-input"><input type="text" id="cad_endereco" placeholder="Endereço" class="form-input"><input type="text" id="cad_cidade" placeholder="Cidade" class="form-input"><input type="text" id="cad_telefone" placeholder="Telefone" class="form-input"><input type="text" id="cad_whatsapp" placeholder="WhatsApp" class="form-input"><input type="email" id="cad_email" placeholder="E-mail" class="form-input"><input type="text" id="cad_responsavel_nome" placeholder="Responsável (Nome)" class="form-input"><input type="text" id="cad_responsavel_telefone" placeholder="Telefone do Responsável" class="form-input"></div><div class="mt-4"><label class="font-semibold text-sm">Equipamentos do Cliente</label><div id="equipamentosList"></div><button type="button" onclick="Clientes.addEquipField()" id="btnAddEquip" class="btn btn-secondary text-sm mt-2"><i class="fas fa-plus"></i> Adicionar Equipamento</button></div><div class="flex gap-3 mt-5 flex-wrap"><button class="btn btn-primary" onclick="Clientes.save()" id="btnSalvarCliente"><i class="fas fa-save"></i> Salvar Cliente</button><button id="cad_btnCancelar" class="btn btn-secondary" style="display:none;" onclick="Clientes.cancelEdit()">Cancelar</button><button class="btn btn-secondary" onclick="Clientes.exportCSV()" id="btnExportClientes"><i class="fas fa-file-csv"></i> Exportar CSV</button><button class="btn btn-secondary" onclick="Clientes.importCSV()" id="btnImportClientes"><i class="fas fa-upload"></i> Importar CSV</button></div></div><div class="mt-5"><input type="text" id="cad_searchInput" placeholder="Buscar cliente..." class="form-input w-full md:w-64 mb-3"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2 md:p-3 text-left">Nome</th><th class="p-2 md:p-3 text-left">Cidade</th><th class="p-2 md:p-3 text-left">Marcas</th><th class="p-2 md:p-3 text-left">Ações</th></tr></thead><tbody id="cad_tableBody"></tbody></table></div></div></div>
 
     <!-- TAB HISTÓRICO -->
-    <div id="tab-historico" class="tab-content"><div class="stats-grid no-print"><div class="stat-card"><div class="stat-value" id="statTotalOS">0</div><div class="stat-label">Total de OS</div></div><div class="stat-card"><div class="stat-value text-[#60a5fa]" id="statStatusAbertura">0</div><div class="stat-label">Em Abertura</div></div><div class="stat-card"><div class="stat-value text-[#fbbf24]" id="statStatusExecucao">0</div><div class="stat-label">Em Execução</div></div><div class="stat-card"><div class="stat-value text-[#34d399]" id="statStatusFinalizacao">0</div><div class="stat-label">Finalizando</div></div><div class="stat-card"><div class="stat-value text-[#a78bfa]" id="statStatusFechada">0</div><div class="stat-label">Fechadas</div></div><div class="stat-card"><div class="stat-value text-[#4ade80]" id="statStatusAprovada">0</div><div class="stat-label">Aprovadas</div></div><div class="stat-card"><div class="stat-value text-[#f97316]" id="statTipoEmergencial">0</div><div class="stat-label">Emergenciais</div></div><div class="stat-card"><div class="stat-value text-[#10b981]" id="statTipoPreventiva">0</div><div class="stat-label">Preventivas</div></div><div class="stat-card"><div class="stat-value text-[#ef4444]" id="statTipoCorretiva">0</div><div class="stat-label">Corretivas</div></div><div class="stat-card"><div class="stat-value text-[#8b5cf6]" id="statTipoGarantia">0</div><div class="stat-label">Garantia</div></div><div class="stat-card"><div class="stat-value text-[#06b6d4]" id="statTipoNormal">0</div><div class="stat-label">Normal</div></div><div class="stat-card"><div class="stat-value text-[#ec4899]" id="statTipoAvaliacao">0</div><div class="stat-label">Avaliações</div></div><div class="stat-card"><div class="stat-value text-[#f59e0b]" id="statTipoOrcamento">0</div><div class="stat-label">Orçamentos</div></div><div class="stat-card"><div class="stat-value" id="statEsteMes">0</div><div class="stat-label">OS este Mês</div></div></div><div class="checklist-card p-4 md:p-5"><h2 class="font-display text-xl mb-3">Histórico de O.S</h2><div class="flex flex-wrap gap-3 mb-4"><input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48"><select id="historicoFiltroTipo" class="form-input w-36"><option value="">Todos os Tipos</option><option value="emergencial">Emergencial</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option><option value="garantia">Garantia</option><option value="normal">Normal</option><option value="avaliacao">Avaliação</option><option value="orcamento">Orçamento</option></select><select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos Status</option><option value="abertura">Abertura</option><option value="execucao">Execução</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select><button onclick="Historico.exportCSV()" id="btnExportHistorico" class="btn btn-secondary text-sm"><i class="fas fa-file-csv"></i> Exportar</button><button onclick="Historico.importCSV()" id="btnImportHistorico" class="btn btn-secondary text-sm"><i class="fas fa-upload"></i> Importar</button><button onclick="Historico.clear()" id="btnLimparHistorico" class="btn btn-secondary text-sm text-red-400"><i class="fas fa-trash"></i> Limpar</button></div><div class="overflow-x-auto"><table class="table-os"><thead><tr><th>O.S</th><th>Data</th><th>Cliente</th><th>Status</th><th>Horas</th><th>Ações</th></tr></thead><tbody id="historicoTableBody"></tbody>｜DSML｜</div><div id="historicoEmpty" class="text-center py-8 text-[var(--muted)] hidden">Nenhuma O.S encontrada</div></div></div>
+    <div id="tab-historico" class="tab-content"><div class="stats-grid no-print"><div class="stat-card"><div class="stat-value" id="statTotalOS">0</div><div class="stat-label">Total de OS</div></div><div class="stat-card"><div class="stat-value text-[#60a5fa]" id="statStatusAbertura">0</div><div class="stat-label">Em Abertura</div></div><div class="stat-card"><div class="stat-value text-[#fbbf24]" id="statStatusExecucao">0</div><div class="stat-label">Em Execução</div></div><div class="stat-card"><div class="stat-value text-[#34d399]" id="statStatusFinalizacao">0</div><div class="stat-label">Finalizando</div></div><div class="stat-card"><div class="stat-value text-[#a78bfa]" id="statStatusFechada">0</div><div class="stat-label">Fechadas</div></div><div class="stat-card"><div class="stat-value text-[#4ade80]" id="statStatusAprovada">0</div><div class="stat-label">Aprovadas</div></div><div class="stat-card"><div class="stat-value text-[#f97316]" id="statTipoEmergencial">0</div><div class="stat-label">Emergenciais</div></div><div class="stat-card"><div class="stat-value text-[#10b981]" id="statTipoPreventiva">0</div><div class="stat-label">Preventivas</div></div><div class="stat-card"><div class="stat-value text-[#ef4444]" id="statTipoCorretiva">0</div><div class="stat-label">Corretivas</div></div><div class="stat-card"><div class="stat-value text-[#8b5cf6]" id="statTipoGarantia">0</div><div class="stat-label">Garantia</div></div><div class="stat-card"><div class="stat-value text-[#06b6d4]" id="statTipoNormal">0</div><div class="stat-label">Normal</div></div><div class="stat-card"><div class="stat-value text-[#ec4899]" id="statTipoAvaliacao">0</div><div class="stat-label">Avaliações</div></div><div class="stat-card"><div class="stat-value text-[#f59e0b]" id="statTipoOrcamento">0</div><div class="stat-label">Orçamentos</div></div><div class="stat-card"><div class="stat-value" id="statEsteMes">0</div><div class="stat-label">OS este Mês</div></div></div><div class="checklist-card p-4 md:p-5"><h2 class="font-display text-xl mb-3">Histórico de O.S</h2><div class="flex flex-wrap gap-3 mb-4"><input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48"><select id="historicoFiltroTipo" class="form-input w-36"><option value="">Todos os Tipos</option><option value="emergencial">Emergencial</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option><option value="garantia">Garantia</option><option value="normal">Normal</option><option value="avaliacao">Avaliação</option><option value="orcamento">Orçamento</option></select><select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos Status</option><option value="abertura">Abertura</option><option value="execucao">Execução</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select><button onclick="Historico.exportCSV()" id="btnExportHistorico" class="btn btn-secondary text-sm"><i class="fas fa-file-csv"></i> Exportar</button><button onclick="Historico.importCSV()" id="btnImportHistorico" class="btn btn-secondary text-sm"><i class="fas fa-upload"></i> Importar</button><button onclick="Historico.clear()" id="btnLimparHistorico" class="btn btn-secondary text-sm text-red-400"><i class="fas fa-trash"></i> Limpar</button></div><div class="overflow-x-auto"><table class="table-os"><thead><tr><th>O.S</th><th>Data</th><th>Cliente</th><th>Status</th><th>Horas</th><th>Ações</th></tr></thead><tbody id="historicoTableBody"></tbody></table></div><div id="historicoEmpty" class="text-center py-8 text-[var(--muted)] hidden">Nenhuma O.S encontrada</div></div></div>
 
     <!-- TAB AGENDAMENTOS (Admin) -->
     <div id="tab-agendamentos" class="tab-content"><div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-3"><i class="fas fa-calendar-alt"></i> Gerenciar Agendamentos de OS</h2><div class="grid md:grid-cols-2 gap-4 mb-4"><div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="ag_cliente" class="form-input" list="clientesList" placeholder="Selecione ou digite"><datalist id="clientesList"></datalist></div><div><label class="block text-xs text-[var(--muted)] mb-1">Equipamento</label><input type="text" id="ag_equipamento" class="form-input" placeholder="Marca/Modelo"></div><div><label class="block text-xs text-[var(--muted)] mb-1">Data</label><input type="date" id="ag_data" class="form-input"></div><div><label class="block text-xs text-[var(--muted)] mb-1">Horário</label><input type="time" id="ag_horario" class="form-input"></div><div><label class="block text-xs text-[var(--muted)] mb-1">Técnico Responsável</label><select id="ag_tecnico" class="form-input"><option value="">Selecione</option></select></div><div><label class="block text-xs text-[var(--muted)] mb-1">Descrição do Serviço</label><textarea id="ag_descricao" class="form-input" rows="2" placeholder="Descrição resumida..."></textarea></div></div><div class="flex gap-3 flex-wrap"><button onclick="Agendamentos.salvar()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Agendamento</button><button onclick="Agendamentos.limparForm()" class="btn btn-secondary">Limpar</button></div></div><div class="checklist-card p-4 md:p-5"><h3 class="font-display text-lg mb-3">Agendamentos Pendentes</h3><div id="agendamentosLista"></div></div></div>
@@ -395,7 +381,7 @@ var Fotos = {
   }
 };
 
-// ==================== GOOGLE SHEETS SYNC (ATUALIZADO) ====================
+// ==================== GOOGLE SHEETS SYNC (CORRIGIDO COM MAPEAMENTO COMPLETO) ====================
 const GoogleSheetsSync = {
   webAppUrl: 'https://script.google.com/macros/s/AKfycbzl7j5zMiasbV0IlVzwmp9pZYUAG6RwpyUYFQa67ewzqYHfYbVJ9etMHG_7DkRxUidy/exec',
   setStatus: function(msg, success) { var st=document.getElementById('syncStatusText'); if(st) st.textContent=msg; },
@@ -437,67 +423,120 @@ const GoogleSheetsSync = {
       this.setStatus('Baixando dados...');
       const response = await fetch(this.webAppUrl);
       const data = await response.json();
-      console.log('Resposta da planilha:', data);
+      console.log('Resposta da planilha (detalhada):', data);
+      
       if (data.success) {
-        if (data.clientes) {
-          State.clients = data.clientes.map(cliente => ({
-            id: cliente.ID || cliente.id,
-            nome: cliente.NOME || cliente.nome || '',
-            cnpj: cliente.CNPJ || cliente.cnpj || '',
-            endereco: cliente.ENDERECO || cliente.endereco || '',
-            cidade: cliente.CIDADE || cliente.cidade || '',
-            telefone: cliente.TELEFONE || cliente.telefone || '',
-            whatsapp: cliente.WHATSAPP || cliente.whatsapp || '',
-            email: cliente.EMAIL || cliente.email || '',
-            responsavel_nome: cliente.RESPONSAVEL_NOME || cliente.responsavel_nome || '',
-            responsavel_telefone: cliente.RESPONSAVEL_TELEFONE || cliente.responsavel_telefone || '',
-            equipamentos: (() => {
-              try {
-                const equipamentosStr = cliente.EQUIPAMENTOS || cliente.equipamentos;
-                if (equipamentosStr && typeof equipamentosStr === 'string') {
-                  return JSON.parse(equipamentosStr).map(eq => ({
-                    marca: eq.marca || eq.Marca || '',
-                    modelo: eq.modelo || eq.Modelo || '',
-                    serie: eq.serie || eq.Serie || '',
-                    qtd: eq.qtd || 1,
-                    combustivel: eq.combustivel || eq.Combustivel || ''
-                  }));
-                } else if (Array.isArray(equipamentosStr)) {
-                  return equipamentosStr;
-                }
-              } catch (e) { console.error('Erro ao parsear EQUIPAMENTOS:', e); }
-              return [];
-            })()
-          }));
+        // ========== CLIENTES ==========
+        if (data.clientes && Array.isArray(data.clientes)) {
+          State.clients = data.clientes.map(cliente => {
+            // Mapeia campos em maiúsculo/minúsculo
+            return {
+              id: cliente.id || cliente.ID || Date.now(),
+              nome: cliente.nome || cliente.NOME || '',
+              cnpj: cliente.cnpj || cliente.CNPJ || '',
+              endereco: cliente.endereco || cliente.ENDERECO || '',
+              cidade: cliente.cidade || cliente.CIDADE || '',
+              telefone: cliente.telefone || cliente.TELEFONE || '',
+              whatsapp: cliente.whatsapp || cliente.WHATSAPP || '',
+              email: cliente.email || cliente.EMAIL || '',
+              responsavel_nome: cliente.responsavel_nome || cliente.RESPONSAVEL_NOME || '',
+              responsavel_telefone: cliente.responsavel_telefone || cliente.RESPONSAVEL_TELEFONE || '',
+              equipamentos: (() => {
+                try {
+                  let eqStr = cliente.equipamentos || cliente.EQUIPAMENTOS;
+                  if (typeof eqStr === 'string') {
+                    return JSON.parse(eqStr).map(eq => ({
+                      marca: eq.marca || eq.Marca || '',
+                      modelo: eq.modelo || eq.Modelo || '',
+                      serie: eq.serie || eq.Serie || '',
+                      qtd: eq.qtd || 1,
+                      combustivel: eq.combustivel || eq.Combustivel || ''
+                    }));
+                  } else if (Array.isArray(eqStr)) {
+                    return eqStr;
+                  }
+                } catch(e) { console.error('Erro parse equipamentos:', e); }
+                return [];
+              })()
+            };
+          });
           Storage.saveClients();
           if (Clientes.renderTable) Clientes.renderTable();
           if (Clientes.updateStats) Clientes.updateStats();
         }
-        if (data.os) {
-          State.osHistory = data.os;
+        
+        // ========== OS (HISTÓRICO) ==========
+        if (data.os && Array.isArray(data.os)) {
+          State.osHistory = data.os.map(os => ({
+            numeroOS: os.numeroOS || os.NUMEROOS || os.NUMERO_OS || '',
+            dataOS: os.dataOS || os.DATAOS || os.DATA_OS || '',
+            cliente: os.cliente || os.CLIENTE || '',
+            status: (os.status || os.STATUS || 'abertura').toLowerCase(),
+            tipoChamado: os.tipoChamado || os.TIPOCHAMADO || 'normal',
+            horasTotais: os.horasTotais || os.HORASTOTAIS || '0h',
+            totalGeral: os.totalGeral || os.TOTALGERAL || '00:00',
+            descricaoServico: os.descricaoServico || os.DESCRICAOSERVICO || '',
+            pecasAplicadas: os.pecasAplicadas || os.PECASAPLICADAS || '',
+            pendencias: os.pendencias || os.PENDENCIAS || '',
+            relatoCliente: os.relatoCliente || os.RELATOCLIENTE || '',
+            marca: os.marca || os.MARCA || '',
+            modelo: os.modelo || os.MODELO || '',
+            numSerie: os.numSerie || os.NUMSERIE || '',
+            horimetro: os.horimetro || os.HORIMETRO || '',
+            combustivel: os.combustivel || os.COMBUSTIVEL || '',
+            whatsappCliente: os.whatsappCliente || os.WHATSAPPCLIENTE || '',
+            cnpj: os.cnpj || os.CNPJ || '',
+            cidadeCliente: os.cidadeCliente || os.CIDADECLIENTE || '',
+            endereco: os.endereco || os.ENDERECO || '',
+            tecnico: os.tecnico || os.TECNICO || 'MARLIFT',
+            recebedor: os.recebedor || os.RECEBEDOR || '',
+            fotosBase64: os.fotosBase64 || [],
+            fotoHorimetro: os.fotoHorimetro || null,
+            fotosPendencias: os.fotosPendencias || [],
+            assinaturaTecnico: os.assinaturaTecnico || '',
+            assinaturaCliente: os.assinaturaCliente || '',
+            checklistData: os.checklistData || {}
+          }));
           Storage.saveOSHistory();
           if (Historico.render) Historico.render();
           if (Historico.updateStats) Historico.updateStats();
           if (Clientes.updateStats) Clientes.updateStats();
         }
-        if (data.agendamentos) {
-          State.agendamentos = data.agendamentos;
+        
+        // ========== AGENDAMENTOS ==========
+        if (data.agendamentos && Array.isArray(data.agendamentos)) {
+          State.agendamentos = data.agendamentos.map(ag => ({
+            id: ag.id || Date.now(),
+            cliente: ag.cliente || ag.CLIENTE || '',
+            equipamento: ag.equipamento || ag.EQUIPAMENTO || '',
+            data: ag.data || ag.DATA || '',
+            horario: ag.horario || ag.HORARIO || '',
+            tecnico: ag.tecnico || ag.TECNICO || '',
+            descricao: ag.descricao || ag.DESCRICAO || '',
+            status: (ag.status || ag.STATUS || 'pendente').toLowerCase()
+          }));
           Storage.saveAgendamentos();
           if (Agendamentos.atualizarLista) Agendamentos.atualizarLista();
+          if (Agendamentos.atualizarSelectTecnicos) Agendamentos.atualizarSelectTecnicos();
         }
-        if (data.permissoes && Object.keys(data.permissoes).length > 0) {
+        
+        // ========== PERMISSÕES ==========
+        if (data.permissoes && typeof data.permissoes === 'object') {
           localStorage.setItem('marlift_permissoes_tecnico', JSON.stringify(data.permissoes));
           if (Permissoes.carregarNaInterface) Permissoes.carregarNaInterface();
         }
-        if (data.usuarios && data.usuarios.length > 0) {
+        
+        // ========== USUÁRIOS ==========
+        if (data.usuarios && Array.isArray(data.usuarios) && data.usuarios.length > 0) {
           Auth.saveUsers(data.usuarios);
           if (UserManager.render) UserManager.render();
           if (Agendamentos.atualizarSelectTecnicos) Agendamentos.atualizarSelectTecnicos();
         }
+        
         this.setStatus('Sincronizado', true);
         showToast('✅ Dados sincronizados da planilha');
       } else {
-        throw new Error(data.error || 'Erro na resposta');
+        throw new Error(data.error || 'Erro na resposta da planilha');
       }
     } catch (error) {
       console.error('Erro no fetchFromSheet:', error);
@@ -610,7 +649,7 @@ var Checklist = { total:0, checked:0,
 var Clientes = { 
   load: function() { State.clients = Storage.loadClients(); this.renderTable(); this.updateStats(); },
   updateStats: function() { var totalClientes = State.clients.length; var totalMarcas = 0; State.clients.forEach(function(c) { totalMarcas += (c.equipamentos || []).length; }); var clientesComOS = new Set(); var totalOS = 0; var osAbertas = 0; var osAprovadas = 0; State.osHistory.forEach(function(os) { if (os.cliente) { clientesComOS.add(os.cliente); totalOS++; } if (os.status === 'abertura' || os.status === 'execucao' || os.status === 'finalizacao') osAbertas++; if (os.status === 'aprovada') osAprovadas++; }); $('statTotalClientes').innerText = totalClientes; $('statTotalMarcas').innerText = totalMarcas; $('statClientesComOS').innerText = clientesComOS.size; $('statTotalOSClientes').innerText = totalOS; $('statOSAbertasCliente').innerText = osAbertas; $('statOSAprovadasCliente').innerText = osAprovadas; },
-  renderTable: function() { var tbody = $('cad_tableBody'); if(!tbody) return; tbody.innerHTML = ''; if (!State.clients || State.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>'; return; } State.clients.forEach(function(c) { var row = tbody.insertRow(); var marcasLista = (c.equipamentos || []).map(function(eq) { return eq.marca; }).join(', '); row.innerHTML = '<td class="p-2 font-medium">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2">' + (marcasLista || '-') + '</td><td class="p-2"><button onclick="Clientes.select(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete(' + c.id + ')"></i></td>'; }); },
+  renderTable: function() { var tbody = $('cad_tableBody'); if(!tbody) return; tbody.innerHTML = ''; if (!State.clients || State.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td><tr>'; return; } State.clients.forEach(function(c) { var row = tbody.insertRow(); var marcasLista = (c.equipamentos || []).map(function(eq) { return eq.marca; }).join(', '); row.innerHTML = '<td class="p-2 font-medium">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2">' + (marcasLista || '-') + '</td><td class="p-2"><button onclick="Clientes.select(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete(' + c.id + ')"></i></td>'; }); },
   addEquipField: function(marca, modelo, serie, qtd, combustivel) { adicionarCampoEquipamento(marca, modelo, serie, qtd, combustivel); },
   save: async function() { var nome = Utils.getVal('cad_nome').trim(); if (!nome) { showToast('Nome do cliente obrigatório', true); return; } var equipamentos = []; var container = $('equipamentosList'); if (container) { container.querySelectorAll('.equip-item').forEach(function(item) { var marcaSelect = item.querySelector('.equip-marca').value; var outraInput = item.querySelector('.outra-marca'); var marca = marcaSelect === 'OUTRA' ? (outraInput ? outraInput.value.toUpperCase() : '') : marcaSelect; if (marca) { equipamentos.push({ marca: marca, modelo: item.querySelector('.equip-modelo').value || '', serie: item.querySelector('.equip-serie').value || '', qtd: parseInt(item.querySelector('.equip-qtd').value) || 1, combustivel: item.querySelector('.equip-combustivel').value || '' }); } }); } var cliente = { id: State.editingClientId || Date.now(), nome: nome, cnpj: Utils.getVal('cad_cnpj'), endereco: Utils.getVal('cad_endereco'), cidade: Utils.getVal('cad_cidade'), telefone: Utils.getVal('cad_telefone'), whatsapp: Utils.getVal('cad_whatsapp'), email: Utils.getVal('cad_email'), responsavel_nome: Utils.getVal('cad_responsavel_nome'), responsavel_telefone: Utils.getVal('cad_responsavel_telefone'), equipamentos: equipamentos }; if (State.editingClientId) { var idx = State.clients.findIndex(function(c) { return c.id === State.editingClientId; }); if (idx >= 0) State.clients[idx] = cliente; State.editingClientId = null; var cancelBtn = $('cad_btnCancelar'); if (cancelBtn) cancelBtn.style.display = 'none'; } else { State.clients.push(cliente); } Storage.saveClients(); this.renderTable(); this.clearForm(); this.updateStats(); showToast('Cliente salvo'); await GoogleSheetsSync.syncSingleCliente(cliente); },
   select: function(id) { var c = State.clients.find(function(c) { return c.id === id; }); if (!c) return; if (c.equipamentos && c.equipamentos.length > 0) { App.mostrarModalEquipamentos(c); } else { Utils.setVal('cliente', c.nome); Utils.setVal('cnpj', c.cnpj); Utils.setVal('cidadeCliente', c.cidade); Utils.setVal('endereco', c.endereco); Utils.setVal('whatsappCliente', c.whatsapp); showToast('Cliente carregado'); var tabOsBtn = document.querySelector('.tab-button[data-tab="tab-os"]'); if (tabOsBtn) tabOsBtn.click(); } },
