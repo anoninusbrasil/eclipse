@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Marlift Empilhadeiras - OS Profissional v9.4</title>
+  <title>Marlift Empilhadeiras - OS Profissional v9.5</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* (mesmo CSS do original, sem alterações - apenas copie o mesmo estilo para evitar erro) */
+    /* CSS idêntico ao anterior, não repetirei para economizar espaço, mas mantenha o mesmo estilo */
     * { -webkit-tap-highlight-color: transparent; }
     :root { --bg: #0c0f12; --bg-secondary: #141a21; --fg: #e8eaed; --muted: #6b7280; --accent: #f97316; --accent-light: #fb923c; --card: #1a2129; --border: #2a3441; --success: #10b981; --warning: #f59e0b; --danger: #ef4444; --info: #3b82f6; --purple: #8b5cf6; }
     * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
@@ -122,7 +122,7 @@
 <div id="appContainer" style="display:none;">
   <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3">
-      <div class="top-bar"><div class="flex items-center gap-3"><div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div><div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.4</p></div></div><div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border])"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div></div>
+      <div class="top-bar"><div class="flex items-center gap-3"><div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg></div><div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.5</p></div></div><div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border])"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div></div>
       <div class="toolbar"><button onclick="App.gerarPreviaPDF()" id="btnPreviaPDF" class="btn btn-primary text-sm" disabled><i class="fas fa-file-pdf"></i> PDF</button><button onclick="App.enviarEmailComResumo()" id="btnEnviarEmail" class="btn btn-secondary text-sm" disabled><i class="fas fa-envelope"></i> E-mail</button><button onclick="App.sendWhatsAppMessage()" id="btnWhatsApp" class="btn btn-secondary text-sm"><i class="fab fa-whatsapp text-green-500"></i> WhatsApp</button><button onclick="App.novaOS()" id="btnNovaOS" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button><button onclick="GoogleSheetsSync.fullSync()" id="btnSync" class="btn btn-sync text-sm"><i class="fas fa-cloud-upload-alt"></i> Sincronizar</button><button onclick="GoogleSheetsSync.fetchFromSheet()" id="btnDownload" class="btn btn-secondary text-sm"><i class="fas fa-cloud-download-alt"></i> Baixar</button></div>
     </div>
   </header>
@@ -381,7 +381,7 @@ var Fotos = {
   }
 };
 
-// ==================== GOOGLE SHEETS SYNC (CORRIGIDO COM MAPEAMENTO COMPLETO) ====================
+// ==================== GOOGLE SHEETS SYNC (CORRIGIDO - NÃO APAGA DADOS VAZIOS) ====================
 const GoogleSheetsSync = {
   webAppUrl: 'https://script.google.com/macros/s/AKfycbzl7j5zMiasbV0IlVzwmp9pZYUAG6RwpyUYFQa67ewzqYHfYbVJ9etMHG_7DkRxUidy/exec',
   setStatus: function(msg, success) { var st=document.getElementById('syncStatusText'); if(st) st.textContent=msg; },
@@ -426,10 +426,11 @@ const GoogleSheetsSync = {
       console.log('Resposta da planilha (detalhada):', data);
       
       if (data.success) {
+        let hasChanges = false;
+        
         // ========== CLIENTES ==========
-        if (data.clientes && Array.isArray(data.clientes)) {
+        if (data.clientes && Array.isArray(data.clientes) && data.clientes.length > 0) {
           State.clients = data.clientes.map(cliente => {
-            // Mapeia campos em maiúsculo/minúsculo
             return {
               id: cliente.id || cliente.ID || Date.now(),
               nome: cliente.nome || cliente.NOME || '',
@@ -461,12 +462,13 @@ const GoogleSheetsSync = {
             };
           });
           Storage.saveClients();
-          if (Clientes.renderTable) Clientes.renderTable();
-          if (Clientes.updateStats) Clientes.updateStats();
+          hasChanges = true;
+        } else {
+          console.log('Planilha não enviou clientes ou veio vazio. Mantendo dados locais.');
         }
         
-        // ========== OS (HISTÓRICO) ==========
-        if (data.os && Array.isArray(data.os)) {
+        // ========== OS (HISTÓRICO) - Só substitui se veio com dados ==========
+        if (data.os && Array.isArray(data.os) && data.os.length > 0) {
           State.osHistory = data.os.map(os => ({
             numeroOS: os.numeroOS || os.NUMEROOS || os.NUMERO_OS || '',
             dataOS: os.dataOS || os.DATAOS || os.DATA_OS || '',
@@ -498,13 +500,13 @@ const GoogleSheetsSync = {
             checklistData: os.checklistData || {}
           }));
           Storage.saveOSHistory();
-          if (Historico.render) Historico.render();
-          if (Historico.updateStats) Historico.updateStats();
-          if (Clientes.updateStats) Clientes.updateStats();
+          hasChanges = true;
+        } else {
+          console.log('Planilha não enviou histórico de OS ou veio vazio. Mantendo dados locais.');
         }
         
-        // ========== AGENDAMENTOS ==========
-        if (data.agendamentos && Array.isArray(data.agendamentos)) {
+        // ========== AGENDAMENTOS - Só substitui se veio com dados ==========
+        if (data.agendamentos && Array.isArray(data.agendamentos) && data.agendamentos.length > 0) {
           State.agendamentos = data.agendamentos.map(ag => ({
             id: ag.id || Date.now(),
             cliente: ag.cliente || ag.CLIENTE || '',
@@ -516,25 +518,43 @@ const GoogleSheetsSync = {
             status: (ag.status || ag.STATUS || 'pendente').toLowerCase()
           }));
           Storage.saveAgendamentos();
-          if (Agendamentos.atualizarLista) Agendamentos.atualizarLista();
-          if (Agendamentos.atualizarSelectTecnicos) Agendamentos.atualizarSelectTecnicos();
+          hasChanges = true;
+        } else {
+          console.log('Planilha não enviou agendamentos ou veio vazio. Mantendo dados locais.');
         }
         
-        // ========== PERMISSÕES ==========
-        if (data.permissoes && typeof data.permissoes === 'object') {
+        // ========== PERMISSÕES - Só substitui se veio com dados ==========
+        if (data.permissoes && typeof data.permissoes === 'object' && Object.keys(data.permissoes).length > 0) {
           localStorage.setItem('marlift_permissoes_tecnico', JSON.stringify(data.permissoes));
-          if (Permissoes.carregarNaInterface) Permissoes.carregarNaInterface();
+          hasChanges = true;
+        } else {
+          console.log('Planilha não enviou permissões ou veio vazio. Mantendo configuração local.');
         }
         
-        // ========== USUÁRIOS ==========
+        // ========== USUÁRIOS - Só substitui se veio com dados ==========
         if (data.usuarios && Array.isArray(data.usuarios) && data.usuarios.length > 0) {
           Auth.saveUsers(data.usuarios);
-          if (UserManager.render) UserManager.render();
+          hasChanges = true;
+        } else {
+          console.log('Planilha não enviou usuários ou veio vazio. Mantendo usuários locais.');
+        }
+        
+        // Se houver qualquer alteração, atualiza as interfaces
+        if (hasChanges) {
+          if (Clientes.renderTable) Clientes.renderTable();
+          if (Clientes.updateStats) Clientes.updateStats();
+          if (Historico.render) Historico.render();
+          if (Historico.updateStats) Historico.updateStats();
+          if (Agendamentos.atualizarLista) Agendamentos.atualizarLista();
           if (Agendamentos.atualizarSelectTecnicos) Agendamentos.atualizarSelectTecnicos();
+          if (Permissoes.carregarNaInterface) Permissoes.carregarNaInterface();
+          if (UserManager.render) UserManager.render();
+          showToast('✅ Dados sincronizados da planilha (apenas seções com dados)');
+        } else {
+          showToast('⚠️ Sincronização concluída, mas nenhum dado novo foi encontrado na planilha. Dados locais mantidos.');
         }
         
         this.setStatus('Sincronizado', true);
-        showToast('✅ Dados sincronizados da planilha');
       } else {
         throw new Error(data.error || 'Erro na resposta da planilha');
       }
@@ -649,7 +669,7 @@ var Checklist = { total:0, checked:0,
 var Clientes = { 
   load: function() { State.clients = Storage.loadClients(); this.renderTable(); this.updateStats(); },
   updateStats: function() { var totalClientes = State.clients.length; var totalMarcas = 0; State.clients.forEach(function(c) { totalMarcas += (c.equipamentos || []).length; }); var clientesComOS = new Set(); var totalOS = 0; var osAbertas = 0; var osAprovadas = 0; State.osHistory.forEach(function(os) { if (os.cliente) { clientesComOS.add(os.cliente); totalOS++; } if (os.status === 'abertura' || os.status === 'execucao' || os.status === 'finalizacao') osAbertas++; if (os.status === 'aprovada') osAprovadas++; }); $('statTotalClientes').innerText = totalClientes; $('statTotalMarcas').innerText = totalMarcas; $('statClientesComOS').innerText = clientesComOS.size; $('statTotalOSClientes').innerText = totalOS; $('statOSAbertasCliente').innerText = osAbertas; $('statOSAprovadasCliente').innerText = osAprovadas; },
-  renderTable: function() { var tbody = $('cad_tableBody'); if(!tbody) return; tbody.innerHTML = ''; if (!State.clients || State.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td><tr>'; return; } State.clients.forEach(function(c) { var row = tbody.insertRow(); var marcasLista = (c.equipamentos || []).map(function(eq) { return eq.marca; }).join(', '); row.innerHTML = '<td class="p-2 font-medium">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2">' + (marcasLista || '-') + '</td><td class="p-2"><button onclick="Clientes.select(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete(' + c.id + ')"></i></td>'; }); },
+  renderTable: function() { var tbody = $('cad_tableBody'); if(!tbody) return; tbody.innerHTML = ''; if (!State.clients || State.clients.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>'; return; } State.clients.forEach(function(c) { var row = tbody.insertRow(); var marcasLista = (c.equipamentos || []).map(function(eq) { return eq.marca; }).join(', '); row.innerHTML = '<td class="p-2 font-medium">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2">' + (marcasLista || '-') + '</td><td class="p-2"><button onclick="Clientes.select(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete(' + c.id + ')"></i></td>'; }); },
   addEquipField: function(marca, modelo, serie, qtd, combustivel) { adicionarCampoEquipamento(marca, modelo, serie, qtd, combustivel); },
   save: async function() { var nome = Utils.getVal('cad_nome').trim(); if (!nome) { showToast('Nome do cliente obrigatório', true); return; } var equipamentos = []; var container = $('equipamentosList'); if (container) { container.querySelectorAll('.equip-item').forEach(function(item) { var marcaSelect = item.querySelector('.equip-marca').value; var outraInput = item.querySelector('.outra-marca'); var marca = marcaSelect === 'OUTRA' ? (outraInput ? outraInput.value.toUpperCase() : '') : marcaSelect; if (marca) { equipamentos.push({ marca: marca, modelo: item.querySelector('.equip-modelo').value || '', serie: item.querySelector('.equip-serie').value || '', qtd: parseInt(item.querySelector('.equip-qtd').value) || 1, combustivel: item.querySelector('.equip-combustivel').value || '' }); } }); } var cliente = { id: State.editingClientId || Date.now(), nome: nome, cnpj: Utils.getVal('cad_cnpj'), endereco: Utils.getVal('cad_endereco'), cidade: Utils.getVal('cad_cidade'), telefone: Utils.getVal('cad_telefone'), whatsapp: Utils.getVal('cad_whatsapp'), email: Utils.getVal('cad_email'), responsavel_nome: Utils.getVal('cad_responsavel_nome'), responsavel_telefone: Utils.getVal('cad_responsavel_telefone'), equipamentos: equipamentos }; if (State.editingClientId) { var idx = State.clients.findIndex(function(c) { return c.id === State.editingClientId; }); if (idx >= 0) State.clients[idx] = cliente; State.editingClientId = null; var cancelBtn = $('cad_btnCancelar'); if (cancelBtn) cancelBtn.style.display = 'none'; } else { State.clients.push(cliente); } Storage.saveClients(); this.renderTable(); this.clearForm(); this.updateStats(); showToast('Cliente salvo'); await GoogleSheetsSync.syncSingleCliente(cliente); },
   select: function(id) { var c = State.clients.find(function(c) { return c.id === id; }); if (!c) return; if (c.equipamentos && c.equipamentos.length > 0) { App.mostrarModalEquipamentos(c); } else { Utils.setVal('cliente', c.nome); Utils.setVal('cnpj', c.cnpj); Utils.setVal('cidadeCliente', c.cidade); Utils.setVal('endereco', c.endereco); Utils.setVal('whatsappCliente', c.whatsapp); showToast('Cliente carregado'); var tabOsBtn = document.querySelector('.tab-button[data-tab="tab-os"]'); if (tabOsBtn) tabOsBtn.click(); } },
