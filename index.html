@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Marlift Empilhadeiras - OS Profissional v10.0</title>
+  <title>Marlift Empilhadeiras - OS Profissional v9.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -82,16 +82,14 @@
     .login-logo{width:70px;height:70px;background:linear-gradient(135deg,var(--accent),var(--accent-light));border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
     .login-logo svg{width:40px;height:40px;color:#fff}
     .login-error{background:rgba(239,68,68,.2);border:1px solid var(--danger);color:#fca5a5;padding:10px;border-radius:8px;margin-top:12px;text-align:center;font-size:13px;display:none}
-    .permission-item{background:var(--bg-secondary);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);margin-bottom:8px}
+    .permission-item{background:var(--bg-secondary);border-radius:12px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border)}
     .permission-item label{cursor:pointer;font-weight:500;display:flex;align-items:center;gap:10px}
     .permission-item input{width:20px;height:20px;accent-color:var(--accent);cursor:pointer}
     .journey-step{background:var(--bg-secondary);border-radius:16px;padding:20px;margin-bottom:20px;border-left:4px solid var(--accent)}
     .journey-step.completed{border-left-color:var(--success);opacity:.8}
     .journey-step h3{color:var(--accent);margin-bottom:15px;display:flex;align-items:center;gap:10px}
+    .location-btn{background:var(--info);color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
     .schedule-card{background:var(--bg-secondary);border-radius:12px;padding:15px;margin-bottom:15px;border:1px solid var(--border)}
-    .user-table{width:100%;border-collapse:collapse}
-    .user-table th,.user-table td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
-    .user-table th{background:var(--bg-secondary);color:var(--accent)}
     @media(max-width:768px){.step{font-size:8px;padding:6px 2px}.timer-display{font-size:1.5rem}.btn{padding:8px 12px;font-size:11px}.photo-item{width:80px;height:80px}.stat-value{font-size:1.1rem}.toolbar{gap:6px}.toolbar .btn{font-size:10px;padding:6px 8px}.top-bar{flex-direction:column;text-align:center}.user-area{margin-top:5px}.tab-button{padding:8px 12px;font-size:11px}}
     @media(max-width:480px){.stats-grid{grid-template-columns:repeat(2,1fr)}.table-os th,.table-os td{padding:6px 4px;font-size:10px}}
     @media print{.no-print{display:none!important}body{background:#fff;color:#000}}
@@ -106,116 +104,151 @@
     <h1 class="font-display text-3xl text-center text-[var(--accent)] mb-2">MARLIFT</h1>
     <p class="text-center text-[var(--muted)] text-sm mb-6">Sistema de Ordem de Servico</p>
     <div class="space-y-4">
-      <div><label class="block text-xs text-[var(--muted)] mb-1">Usuario</label><input type="text" id="loginUsername" class="form-input" placeholder="admin" autocomplete="off" autofocus></div>
-      <div><label class="block text-xs text-[var(--muted)] mb-1">Senha</label><input type="password" id="loginPassword" class="form-input" placeholder="admin123" onkeypress="if(event.key==='Enter')Auth.login()"></div>
+      <div><label class="block text-xs text-[var(--muted)] mb-1">Usuario</label><input type="text" id="loginUsername" class="form-input" placeholder="admin ou tecnico" autocomplete="off" autofocus></div>
+      <div><label class="block text-xs text-[var(--muted)] mb-1">Senha</label><input type="password" id="loginPassword" class="form-input" placeholder="admin123 ou 123456" onkeypress="if(event.key==='Enter')Auth.login()"></div>
       <button onclick="Auth.login()" class="btn btn-primary w-full"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+      <button onclick="Auth.recoverPassword()" class="btn btn-secondary w-full text-sm"><i class="fas fa-key"></i> Esqueceu a senha?</button>
       <div id="loginErrorMessage" class="login-error"></div>
     </div>
-    <div class="mt-6 text-center text-xs text-[var(--muted)]"><p>MARLIFT EMPILHADEIRAS</p><p class="mt-1">Suporte: (98)98824-8877</p></div>
+    <div class="mt-6 text-center text-xs text-[var(--muted)]"><p>Site: <strong class="text-[var(--accent)]">www.MARLIFT.com.br</strong></p><p class="mt-1">Suporte Tecnico <strong>(98)98824-8877</strong></p></div>
   </div>
 </div>
 
+<!-- MODAL EQUIPAMENTOS -->
+<div id="equipModal" class="modal"><div class="modal-content"><div class="modal-title"><i class="fas fa-forklift"></i> Selecione o Equipamento</div><div id="equipList"></div><button onclick="App.fecharModalEquip()" class="btn btn-secondary w-full mt-3">Cancelar</button></div></div>
+
 <!-- SISTEMA PRINCIPAL -->
 <div id="appContainer" style="display:none">
-  <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 sticky top-0 z-50">
+  <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3">
       <div class="top-bar">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S</p></div>
+          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.8</p></div>
         </div>
-        <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName"></span><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] ml-3"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+        <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border)]"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
       </div>
       <div class="toolbar">
-        <button onclick="App.novaOS()" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button>
-        <button onclick="App.salvarOSManual()" class="btn btn-primary text-sm"><i class="fas fa-save"></i> Salvar</button>
+        <button onclick="App.gerarPreviaPDF()" id="btnPreviaPDF" class="btn btn-primary text-sm" disabled><i class="fas fa-file-pdf"></i> PDF</button>
+        <button onclick="App.enviarEmailComResumo()" id="btnEnviarEmail" class="btn btn-secondary text-sm" disabled><i class="fas fa-envelope"></i> E-mail</button>
+        <button onclick="App.sendWhatsAppMessage()" id="btnWhatsApp" class="btn btn-secondary text-sm"><i class="fab fa-whatsapp text-green-500"></i> WhatsApp</button>
+        <button onclick="App.novaOS()" id="btnNovaOS" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button>
+        <button onclick="SyncQueue.forceSync()" id="btnSync" class="btn btn-secondary text-sm"><i class="fas fa-cloud-upload-alt"></i> Sincronizar</button>
+        <button onclick="GoogleSheetsSync.fetchFromSheet()" id="btnDownload" class="btn btn-secondary text-sm"><i class="fas fa-cloud-download-alt"></i> Baixar</button>
       </div>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-6">
-    <!-- Step Indicator -->
     <div class="step-indicator no-print mb-6">
-      <div class="step" data-step="abertura">1. ABERTURA</div>
-      <div class="step" data-step="execucao">2. EXECUCAO</div>
-      <div class="step" data-step="finalizacao">3. FINALIZANDO</div>
-      <div class="step" data-step="fechada">4. FECHADA</div>
-      <div class="step" data-step="aprovada">5. APROVADA</div>
+      <div class="step" data-step="abertura">Abertura</div>
+      <div class="step" data-step="execucao">Execucao</div>
+      <div class="step" data-step="finalizacao">Finalizando</div>
+      <div class="step" data-step="fechada">Fechada</div>
+      <div class="step" data-step="aprovada">Aprovada</div>
     </div>
 
-    <!-- Tabs -->
     <div id="tabsContainer" class="flex border-b border-[var(--border)] mb-6 no-print overflow-x-auto">
       <button class="tab-button active" data-tab="tab-os">O.S</button>
       <button class="tab-button" data-tab="tab-checklist">Checklist</button>
       <button class="tab-button" data-tab="tab-clientes">Clientes</button>
       <button class="tab-button" data-tab="tab-historico">Historico</button>
-      <button class="tab-button" data-tab="tab-agendamentos">Agendamentos</button>
-      <button class="tab-button" data-tab="tab-usuarios">Usuarios</button>
+      <button class="tab-button" data-tab="tab-agendamentos" id="tabAgendamentosBtn" style="display:none">Agendamentos</button>
+      <button class="tab-button" data-tab="tab-jornada" id="tabJornadaBtn" style="display:none">Minha Jornada</button>
+      <button class="tab-button" data-tab="tab-permissoes" id="tabPermissoesBtn" style="display:none">Permissoes</button>
+      <button class="tab-button" data-tab="tab-usuarios" id="tabUsuariosBtn" style="display:none">Usuarios</button>
     </div>
 
     <!-- TAB O.S -->
     <div id="tab-os" class="tab-content active">
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <div class="flex justify-between items-center mb-4"><h2 class="font-display text-xl">Informacoes da O.S</h2><span class="status-badge status-abertura" id="statusBadge">EM ABERTURA</span></div>
+        <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><h2 class="font-display text-xl">Informacoes da O.S</h2><div><span class="status-badge" id="statusBadge">EM ABERTURA</span></div></div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">N° O.S</label><input type="text" id="numeroOS" class="form-input font-mono font-bold" readonly placeholder="Clique em Nova OS"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">N° O.S</label><input type="text" id="numeroOS" class="form-input font-mono font-bold text-lg" readonly placeholder="Clique em Nova OS"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Data</label><input type="date" id="dataOS" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Tipo</label><select id="tipoChamado" class="form-input"><option value="normal">Normal</option><option value="emergencial">Emergencial</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option></select></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Tipo de Chamado</label><select id="tipoChamado" class="form-input"><option value="normal">Normal</option><option value="emergencial">Emergencial</option><option value="garantia">Garantia</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option><option value="avaliacao">Avaliacao</option><option value="orcamento">Orcamento</option></select></div>
         </div>
-        <div><label class="block text-xs text-[var(--muted)] mb-1">Relato do Cliente</label><textarea id="relatoCliente" class="form-input" rows="2"></textarea></div>
-        <div class="action-buttons mt-4">
-          <button onclick="App.mudarStatus('abertura')" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Abrir O.S</button>
-          <button onclick="App.iniciarExecucao()" id="btnIniciarExecucao" class="btn btn-info"><i class="fas fa-play"></i> Iniciar</button>
-          <button onclick="App.finalizarServico()" id="btnFinalizar" class="btn btn-warning"><i class="fas fa-stop"></i> Finalizar</button>
-          <button onclick="App.fecharOS()" id="btnFecharOS" class="btn btn-danger"><i class="fas fa-lock"></i> Fechar</button>
-          <button onclick="App.mudarStatus('aprovada')" id="btnAprovar" class="btn btn-success"><i class="fas fa-stamp"></i> Aprovar</button>
+        <div><label class="block text-xs text-[var(--muted)] mb-1">Relato do Cliente</label><textarea id="relatoCliente" class="form-input" rows="2" placeholder="Descreva o problema..."></textarea></div>
+        <div class="action-buttons no-print">
+          <button id="btnAbrirOS" class="btn btn-primary" onclick="App.mudarStatus('abertura')"><i class="fas fa-plus-circle"></i> Abrir O.S</button>
+          <button id="btnIniciarExecucao" class="btn btn-info" onclick="App.iniciarExecucao()"><i class="fas fa-play"></i> Iniciar Execucao</button>
+          <button id="btnFinalizar" class="btn btn-warning" onclick="App.finalizarServico()"><i class="fas fa-stop"></i> Finalizar Servico</button>
+          <button id="btnFecharOS" class="btn btn-danger" onclick="App.fecharOS()"><i class="fas fa-lock"></i> Fechar O.S</button>
+          <button id="btnAprovar" class="btn btn-success" onclick="App.mudarStatus('aprovada')"><i class="fas fa-stamp"></i> Aprovar com Assinatura</button>
         </div>
       </div>
 
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Dados do Equipamento</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Marca</label><select id="marcaSelect" class="form-input"></select><div id="marcaOutraDiv" style="display:none" class="mt-1"><input type="text" id="marcaOutra" class="form-input" placeholder="Digite a marca"></div></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Marca</label><select id="marcaSelect" class="form-input"></select><div id="marcaOutraDiv" style="display:none" class="mt-1"><input type="text" id="marcaOutra" class="form-input" placeholder="Digite a marca"></div><input type="hidden" id="marca"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Modelo</label><input type="text" id="modelo" class="form-input"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">N° Serie</label><input type="text" id="numSerie" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Horimetro</label><input type="text" id="horimetro" class="form-input" placeholder="Ex: 1250h"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Horimetro <span class="text-red-400">*</span></label><input type="text" id="horimetro" class="form-input" placeholder="Ex: 1250h" required></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Combustivel</label><select id="combustivel" class="form-input"><option value="">Selecione</option><option value="eletrico">Eletrico</option><option value="diesel">Diesel</option><option value="gasolina">Gasolina</option><option value="glp">GLP</option></select></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">WhatsApp Cliente</label><input type="text" id="whatsappCliente" class="form-input" placeholder="(00) 00000-0000"></div>
         </div>
         <div class="grid md:grid-cols-3 gap-4 mt-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="cliente" class="form-input" list="clientesList"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="cliente" class="form-input" required></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">CNPJ/CPF</label><input type="text" id="cnpj" class="form-input"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Cidade</label><input type="text" id="cidadeCliente" class="form-input"></div>
         </div>
-        <div class="mt-4"><label class="block text-xs text-[var(--muted)] mb-1">Endereco</label><input type="text" id="endereco" class="form-input"></div>
-        <datalist id="clientesList"></datalist>
+        <div class="mt-4"><label class="block text-xs text-[var(--muted)] mb-1">Endereco</label><div class="flex gap-2"><input type="text" id="endereco" class="form-input flex-1"><button type="button" onclick="App.abrirMapa()" class="btn btn-secondary"><i class="fas fa-map-marker-alt"></i></button></div></div>
       </div>
 
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Servico Realizado</h2>
-        <div><label class="block text-xs text-[var(--muted)] mb-1">Diagnostico</label><textarea id="descricaoServico" class="form-input" rows="3"></textarea></div>
-        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pecas Aplicadas</label><textarea id="pecasAplicadas" class="form-input" rows="2"></textarea></div>
-        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pendencias</label><textarea id="pendencias" class="form-input" rows="2"></textarea></div>
+        <div><label class="block text-xs text-[var(--muted)] mb-1">Diagnostico / Servicos executados</label><textarea id="descricaoServico" class="form-input min-h-24" placeholder="Descreva o diagnostico..."></textarea></div>
+        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pecas / Materiais Aplicados</label><textarea id="pecasAplicadas" class="form-input min-h-20" placeholder="Liste as pecas..."></textarea></div>
+        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pendencias / Itens Criticos</label><textarea id="pendencias" class="form-input min-h-20" placeholder="Pendencias..."></textarea></div>
+      </div>
+
+      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2"><i class="fas fa-camera"></i> Foto do Horimetro</h2><input type="file" id="fotoHorimetroInput" accept="image/*" class="form-input"><div id="fotoHorimetroPreview" class="photo-preview"></div></div>
+      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2">Fotos do Servico (max. 10)</h2><input type="file" id="fotosServico" multiple accept="image/*" class="form-input"><div id="fotosPreview" class="photo-preview"></div></div>
+      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2"><i class="fas fa-exclamation-triangle"></i> Fotos das Pendencias (max. 10)</h2><input type="file" id="fotosPendenciasInput" multiple accept="image/*" class="form-input"><div id="fotosPendenciasPreview" class="photo-preview"></div></div>
+
+      <div class="checklist-card p-4 md:p-5 mb-5">
+        <h2 class="font-display text-xl mb-3">Assinaturas Digitais</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><canvas id="sigTecnicoCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button type="button" onclick="Signature.clear('tec')" class="btn btn-secondary text-xs">Limpar</button><button type="button" onclick="Signature.save('tec')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaTecnicoData"><input type="text" id="tecnico" placeholder="Marlift Empilhadeiras" class="form-input mt-2"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente / Recebedor</label><canvas id="sigClienteCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button type="button" onclick="Signature.clear('cli')" class="btn btn-secondary text-xs">Limpar</button><button type="button" onclick="Signature.save('cli')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaClienteData"><input type="text" id="recebedor" placeholder="Nome do recebedor" class="form-input mt-2"></div>
+        </div>
       </div>
 
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3">Assinaturas</h2>
-        <div class="grid md:grid-cols-2 gap-6">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><canvas id="sigTecnicoCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button onclick="Signature.clear('tec')" class="btn btn-secondary text-xs">Limpar</button><button onclick="Signature.save('tec')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaTecnicoData"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><canvas id="sigClienteCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button onclick="Signature.clear('cli')" class="btn btn-secondary text-xs">Limpar</button><button onclick="Signature.save('cli')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaClienteData"><input type="text" id="recebedor" placeholder="Nome do recebedor" class="form-input mt-2"></div>
+        <h2 class="font-display text-xl mb-3">Controle de Horas</h2>
+        <div class="text-center mb-4"><div class="timer-display" id="timerDisplay">00:00:00</div><div class="flex gap-2 justify-center mt-3 flex-wrap"><button type="button" onclick="Timer.control('start')" class="btn btn-success text-sm">Iniciar</button><button type="button" onclick="Timer.control('pause')" class="btn btn-warning text-sm">Pausar</button><button type="button" onclick="Timer.control('stop')" class="btn btn-danger text-sm">Parar</button></div></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Inicio</label><input type="time" id="horaInicio" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Saida Almoco</label><input type="time" id="horaAlmocoSaida" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Retorno Almoco</label><input type="time" id="horaAlmocoRetorno" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Termino</label><input type="time" id="horaTermino" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Horas Cobradas</label><input type="text" id="horasTotais" class="form-input font-mono font-bold" readonly></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Horas Extras</label><input type="text" id="horasExtras" class="form-input" placeholder="00:00"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Adicional Noturno</label><input type="text" id="adicionalNoturno" class="form-input" placeholder="00:00"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Total Geral</label><input type="text" id="totalGeral" class="form-input font-mono font-bold text-[var(--success)]" readonly></div>
         </div>
       </div>
+
+      <div class="flex gap-3 justify-center mb-8 no-print flex-wrap"><button onclick="App.salvarOSManual()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Progresso</button></div>
     </div>
 
     <!-- TAB CHECKLIST -->
     <div id="tab-checklist" class="tab-content">
-      <div class="checklist-card p-4 mb-5">
-        <div class="flex justify-between items-center"><span>Progresso</span><span id="progressText" class="font-mono text-[var(--accent)]">0%</span></div>
-        <div class="progress-bar mt-2"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
-      </div>
+      <div class="checklist-card p-4 mb-5"><div class="flex justify-between items-center flex-wrap"><span class="font-semibold">Progresso do Checklist</span><span id="progressText" class="font-mono text-[var(--accent)] text-lg">0%</span></div><div class="progress-bar mt-2"><div id="progressFill" class="progress-fill" style="width:0%"></div></div></div>
       <div id="checklistSections"></div>
     </div>
 
     <!-- TAB CLIENTES -->
     <div id="tab-clientes" class="tab-content">
+      <div class="stats-grid no-print">
+        <div class="stat-card"><div class="stat-value" id="statTotalClientes">0</div><div class="stat-label">Total Clientes</div></div>
+        <div class="stat-card"><div class="stat-value" id="statTotalMarcas">0</div><div class="stat-label">Total Marcas</div></div>
+        <div class="stat-card"><div class="stat-value" id="statClientesComOS">0</div><div class="stat-label">Clientes c/ OS</div></div>
+        <div class="stat-card"><div class="stat-value" id="statTotalOSClientes">0</div><div class="stat-label">Total OS</div></div>
+        <div class="stat-card"><div class="stat-value" id="statOSAbertasCliente">0</div><div class="stat-label">OS em Aberto</div></div>
+        <div class="stat-card"><div class="stat-value" id="statOSAprovadasCliente">0</div><div class="stat-label">OS Aprovadas</div></div>
+      </div>
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Cadastro de Cliente</h2>
         <div class="grid md:grid-cols-2 gap-3">
@@ -226,568 +259,553 @@
           <input type="text" id="cad_telefone" placeholder="Telefone" class="form-input">
           <input type="text" id="cad_whatsapp" placeholder="WhatsApp" class="form-input">
           <input type="email" id="cad_email" placeholder="E-mail" class="form-input">
+          <input type="text" id="cad_responsavel_nome" placeholder="Responsavel (Nome)" class="form-input">
+          <input type="text" id="cad_responsavel_telefone" placeholder="Telefone do Responsavel" class="form-input">
         </div>
-        <div class="flex gap-3 mt-5">
-          <button onclick="Clientes.save()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
+        <div class="mt-4"><label class="font-semibold text-sm">Equipamentos do Cliente</label><div id="equipamentosList"></div><button type="button" onclick="Clientes.addEquipField()" class="btn btn-secondary text-sm mt-2"><i class="fas fa-plus"></i> Adicionar Equipamento</button></div>
+        <div class="flex gap-3 mt-5 flex-wrap">
+          <button class="btn btn-primary" onclick="Clientes.save()"><i class="fas fa-save"></i> Salvar Cliente</button>
           <button id="cad_btnCancelar" class="btn btn-secondary" style="display:none" onclick="Clientes.cancelEdit()">Cancelar</button>
+          <button class="btn btn-secondary" onclick="Clientes.exportCSV()"><i class="fas fa-file-csv"></i> Exportar CSV</button>
+          <button class="btn btn-secondary" onclick="Clientes.importCSV()"><i class="fas fa-upload"></i> Importar CSV</button>
         </div>
       </div>
-      <div><input type="text" id="cad_searchInput" placeholder="Buscar..." class="form-input w-full md:w-64 mb-3"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2">Nome</th><th class="p-2">Cidade</th><th class="p-2">Acoes</th></tr></thead><tbody id="cad_tableBody"></tbody></table></div></div>
+      <div class="mt-5">
+        <input type="text" id="cad_searchInput" placeholder="Buscar cliente..." class="form-input w-full md:w-64 mb-3">
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2 md:p-3 text-left">Nome</th><th class="p-2 md:p-3 text-left">Cidade</th><th class="p-2 md:p-3 text-left">Marcas</th><th class="p-2 md:p-3 text-left">Acoes</th></tr></thead><tbody id="cad_tableBody"></tbody></table></div>
+      </div>
     </div>
 
     <!-- TAB HISTORICO -->
     <div id="tab-historico" class="tab-content">
+      <div class="stats-grid no-print">
+        <div class="stat-card"><div class="stat-value" id="statTotalOS">0</div><div class="stat-label">Total de OS</div></div>
+        <div class="stat-card"><div class="stat-value text-[#60a5fa]" id="statStatusAbertura">0</div><div class="stat-label">Em Abertura</div></div>
+        <div class="stat-card"><div class="stat-value text-[#fbbf24]" id="statStatusExecucao">0</div><div class="stat-label">Em Execucao</div></div>
+        <div class="stat-card"><div class="stat-value text-[#34d399]" id="statStatusFinalizacao">0</div><div class="stat-label">Finalizando</div></div>
+        <div class="stat-card"><div class="stat-value text-[#a78bfa]" id="statStatusFechada">0</div><div class="stat-label">Fechadas</div></div>
+        <div class="stat-card"><div class="stat-value text-[#4ade80]" id="statStatusAprovada">0</div><div class="stat-label">Aprovadas</div></div>
+        <div class="stat-card"><div class="stat-value text-[#f97316]" id="statTipoEmergencial">0</div><div class="stat-label">Emergenciais</div></div>
+        <div class="stat-card"><div class="stat-value text-[#10b981]" id="statTipoPreventiva">0</div><div class="stat-label">Preventivas</div></div>
+        <div class="stat-card"><div class="stat-value text-[#ef4444]" id="statTipoCorretiva">0</div><div class="stat-label">Corretivas</div></div>
+        <div class="stat-card"><div class="stat-value text-[#8b5cf6]" id="statTipoGarantia">0</div><div class="stat-label">Garantia</div></div>
+        <div class="stat-card"><div class="stat-value text-[#06b6d4]" id="statTipoNormal">0</div><div class="stat-label">Normal</div></div>
+        <div class="stat-card"><div class="stat-value text-[#ec4899]" id="statTipoAvaliacao">0</div><div class="stat-label">Avaliacoes</div></div>
+        <div class="stat-card"><div class="stat-value text-[#f59e0b]" id="statTipoOrcamento">0</div><div class="stat-label">Orcamentos</div></div>
+        <div class="stat-card"><div class="stat-value" id="statEsteMes">0</div><div class="stat-label">OS este Mes</div></div>
+      </div>
       <div class="checklist-card p-4 md:p-5">
         <h2 class="font-display text-xl mb-3">Historico de O.S</h2>
-        <div class="flex gap-3 mb-4"><input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48"><select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos</option><option value="abertura">Abertura</option><option value="execucao">Execucao</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select><button onclick="Historico.exportCSV()" class="btn btn-secondary text-sm">Exportar</button></div>
-        <div class="overflow-x-auto"><table class="table-os"><thead><tr><th>OS</th><th>Data</th><th>Cliente</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="historicoTableBody"></tbody></table></div>
+        <div class="flex flex-wrap gap-3 mb-4">
+          <input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48">
+          <select id="historicoFiltroTipo" class="form-input w-36"><option value="">Todos os Tipos</option><option value="emergencial">Emergencial</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option><option value="garantia">Garantia</option><option value="normal">Normal</option><option value="avaliacao">Avaliacao</option><option value="orcamento">Orcamento</option></select>
+          <select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos Status</option><option value="abertura">Abertura</option><option value="execucao">Execucao</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select>
+          <button onclick="Historico.exportCSV()" class="btn btn-secondary text-sm"><i class="fas fa-file-csv"></i> Exportar</button>
+          <button onclick="Historico.importCSV()" class="btn btn-secondary text-sm"><i class="fas fa-upload"></i> Importar</button>
+          <button onclick="Historico.clear()" class="btn btn-secondary text-sm text-red-400"><i class="fas fa-trash"></i> Limpar</button>
+        </div>
+        <div class="overflow-x-auto"><table class="table-os"><thead><tr><th>O.S</th><th>Data</th><th>Cliente</th><th>Status</th><th>Horas</th><th>Acoes</th></tr></thead><tbody id="historicoTableBody"></tbody></table></div>
+        <div id="historicoEmpty" class="text-center py-8 text-[var(--muted)] hidden">Nenhuma O.S encontrada</div>
       </div>
     </div>
 
     <!-- TAB AGENDAMENTOS -->
     <div id="tab-agendamentos" class="tab-content">
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3">Novo Agendamento</h2>
-        <div class="grid md:grid-cols-2 gap-4">
-          <input type="text" id="ag_cliente" placeholder="Cliente" class="form-input" list="clientesList">
-          <input type="text" id="ag_equipamento" placeholder="Equipamento" class="form-input">
-          <input type="date" id="ag_data" class="form-input">
-          <input type="time" id="ag_horario" class="form-input">
-          <input type="text" id="ag_descricao" placeholder="Descricao" class="form-input">
+        <h2 class="font-display text-xl mb-3"><i class="fas fa-calendar-alt"></i> Gerenciar Agendamentos</h2>
+        <div class="grid md:grid-cols-2 gap-4 mb-4">
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="ag_cliente" class="form-input" list="clientesList" placeholder="Selecione ou digite"><datalist id="clientesList"></datalist></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Equipamento</label><input type="text" id="ag_equipamento" class="form-input" placeholder="Marca/Modelo"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Data</label><input type="date" id="ag_data" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Horario</label><input type="time" id="ag_horario" class="form-input"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><select id="ag_tecnico" class="form-input"><option value="">Selecione</option></select></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Descricao</label><textarea id="ag_descricao" class="form-input" rows="2" placeholder="Descricao resumida..."></textarea></div>
         </div>
-        <div class="mt-4"><button onclick="Agendamentos.salvar()" class="btn btn-primary">Salvar</button></div>
+        <div class="flex gap-3 flex-wrap"><button onclick="Agendamentos.salvar()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button><button onclick="Agendamentos.limparForm()" class="btn btn-secondary">Limpar</button><input type="hidden" id="ag_editId" value=""></div>
       </div>
-      <div class="checklist-card p-4"><h3 class="font-display text-lg mb-3">Agendamentos</h3><div id="agendamentosLista"></div></div>
+      <div class="checklist-card p-4 md:p-5"><h3 class="font-display text-lg mb-3">Agendamentos Pendentes</h3><div id="agendamentosLista"></div></div>
+    </div>
+
+    <!-- TAB JORNADA -->
+    <div id="tab-jornada" class="tab-content"><div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-3"><i class="fas fa-truck-moving"></i> Controle de Deslocamento</h2><div id="jornadaStatus" class="mb-4 p-3 rounded-lg bg-[var(--bg-secondary)] text-center"><i class="fas fa-info-circle"></i> Carregando...</div><div id="jornadaSteps"></div></div></div>
+
+    <!-- TAB PERMISSOES -->
+    <div id="tab-permissoes" class="tab-content">
+      <div class="checklist-card p-4 md:p-5">
+        <h2 class="font-display text-xl mb-3"><i class="fas fa-lock"></i> Permissoes - Tecnico</h2>
+        <div id="permissoesContainer"></div>
+        <div class="flex gap-3 mt-6 flex-wrap"><button onclick="Permissoes.salvar()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Permissoes</button><button onclick="Permissoes.resetarPadrao()" class="btn btn-secondary"><i class="fas fa-undo"></i> Restaurar Padrao</button></div>
+      </div>
     </div>
 
     <!-- TAB USUARIOS -->
     <div id="tab-usuarios" class="tab-content">
       <div class="checklist-card p-4 md:p-5">
-        <h2 class="font-display text-xl mb-3">Usuarios</h2>
-        <div class="grid md:grid-cols-3 gap-3 mb-4">
-          <input type="text" id="userNome" placeholder="Nome" class="form-input">
-          <input type="text" id="userLogin" placeholder="Login" class="form-input">
-          <input type="password" id="userSenha" placeholder="Senha" class="form-input">
+        <h2 class="font-display text-xl mb-3"><i class="fas fa-users"></i> Gerenciar Usuarios</h2>
+        <div class="grid md:grid-cols-2 gap-4 mb-5">
+          <div><input type="text" id="userNome" placeholder="Nome" class="form-input"></div>
+          <div><input type="text" id="userLogin" placeholder="Login" class="form-input"></div>
+          <div><input type="password" id="userSenha" placeholder="Senha" class="form-input"></div>
+          <div><select id="userNivel" class="form-input"><option value="admin">Admin</option><option value="tecnico">Tecnico</option><option value="visualizador">Visualizador</option></select></div>
         </div>
-        <div class="flex gap-3 mb-5"><button onclick="UserManager.addUser()" class="btn btn-primary">Adicionar</button><button onclick="UserManager.cancelEdit()" id="userCancelBtn" class="btn btn-secondary" style="display:none">Cancelar</button></div>
-        <div class="overflow-x-auto"><table class="user-table"><thead><tr><th>Nome</th><th>Login</th><th>Acoes</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
+        <div class="flex gap-3 mb-5 flex-wrap"><button onclick="UserManager.addUser()" class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar</button><button onclick="UserManager.cancelEdit()" id="userCancelBtn" class="btn btn-secondary" style="display:none">Cancelar</button></div>
+        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2">Nome</th><th class="p-2">Login</th><th class="p-2">Nivel</th><th class="p-2">Acoes</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
       </div>
     </div>
   </main>
 
-  <div id="toastCenter" class="toast-center"><i class="fas fa-check-circle text-green-500"></i><span id="toastMessage"></span></div>
-  <div class="sync-status"><i class="fas fa-cloud"></i> <span id="syncStatusText">Online</span></div>
+  <div id="toastCenter" class="toast-center"><i class="fas fa-check-circle text-green-500 text-xl"></i><span id="toastMessage">Operacao realizada</span></div>
+  <div class="sync-status" id="syncStatus"><i class="fas fa-cloud-upload-alt"></i> <span id="syncStatusText">Pronto</span></div>
 </div>
 
 <script>
-// ==================== UTILITARIOS ====================
-function $(id) { return document.getElementById(id); }
-function showToast(msg, isErr) {
-  var t = $('toastCenter');
-  if (!t) return;
-  $('toastMessage').textContent = msg;
-  t.style.borderColor = isErr ? 'var(--danger)' : 'var(--success)';
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2500);
+/* ==================== CONFIGURACOES ==================== */
+var Config = {
+  marcas: ["TOYOTA","CLARK","BYD","PALETRANS","LINDE","HYSTER","YALE","CATERPILLAR","KOMATSU","MITSUBISHI","NISSAN","STILL","CROWN","JUNGHEINRICH","TCM","HYUNDAI","DOOSAN","HELI","HANGCHA","LONKING","OUTRA"],
+  checklist: [
+    {id:'motor',title:'Motor e Componentes',items:[{id:'motor_oleo',label:'Nivel de oleo do motor'},{id:'motor_filtro_oleo',label:'Filtro de oleo'},{id:'motor_filtro_ar',label:'Filtro de ar'},{id:'motor_filtro_comb',label:'Filtro de combustivel'},{id:'motor_correias',label:'Correias'},{id:'motor_radiador',label:'Radiador'}]},
+    {id:'eletrico',title:'Sistema Eletrico',items:[{id:'eletr_bateria',label:'Bateria'},{id:'eletr_terminais',label:'Terminais'},{id:'eletr_alternador',label:'Alternador'},{id:'eletr_partida',label:'Motor de partida'},{id:'eletr_farois',label:'Farois'},{id:'eletr_buzina',label:'Buzina'}]},
+    {id:'hidraulico',title:'Sistema Hidraulico',items:[{id:'hidr_oleo',label:'Nivel oleo hidraulico'},{id:'hidr_bomba',label:'Bomba hidraulica'},{id:'hidr_cilindros',label:'Cilindros'},{id:'hidr_vazamentos',label:'Vazamentos'},{id:'hidr_mangueiras',label:'Mangueiras'}]},
+    {id:'transmissao',title:'Transmissao e Freios',items:[{id:'trans_oleo',label:'Oleo transmissao'},{id:'freio_servico',label:'Freio de servico'},{id:'freio_estac',label:'Freio de estacionamento'},{id:'freio_pastilhas',label:'Pastilhas/Lonas'}]},
+    {id:'direcao',title:'Direcao',items:[{id:'dir_volante',label:'Volante'},{id:'dir_caixa',label:'Caixa de direcao'},{id:'dir_hidraulica',label:'Direcao hidraulica'}]},
+    {id:'estrutura',title:'Estrutura e Garfos',items:[{id:'est_mastros',label:'Mastros'},{id:'est_correntes',label:'Correntes'},{id:'est_garfos',label:'Garfos'},{id:'est_roletes',label:'Roletes'}]},
+    {id:'seguranca',title:'Seguranca',items:[{id:'seg_cinto',label:'Cinto de seguranca'},{id:'seg_extintor',label:'Extintor'},{id:'seg_espelhos',label:'Espelhos'},{id:'seg_alarme',label:'Alarme de re'}]}
+  ],
+  maxFotos: 10,
+  inactivityTimeout: 15 * 60 * 1000 // 15 minutos
+};
+
+var State = {
+  currentStatus:'abertura', fotosServico:[], fotoHorimetro:null, fotosPendencias:[],
+  clients:[], osHistory:[], editingClientId:null, hasUnsavedChanges:false,
+  osCounter:0, agendamentos:[], jornada:{}
+};
+
+/* ==================== STORAGE ==================== */
+var Storage = {
+  saveClients:function(){localStorage.setItem('marlift_clientes',JSON.stringify(State.clients))},
+  loadClients:function(){var d=localStorage.getItem('marlift_clientes');State.clients=d?JSON.parse(d):[];return State.clients},
+  saveOSHistory:function(){localStorage.setItem('marlift_os_history',JSON.stringify(State.osHistory))},
+  loadOSHistory:function(){var d=localStorage.getItem('marlift_os_history');State.osHistory=d?JSON.parse(d):[];return State.osHistory},
+  saveCounter:function(){localStorage.setItem('marlift_os_counter',State.osCounter)},
+  loadCounter:function(){var d=localStorage.getItem('marlift_os_counter');State.osCounter=d?parseInt(d):0;return State.osCounter},
+  saveAgendamentos:function(){localStorage.setItem('marlift_agendamentos',JSON.stringify(State.agendamentos))},
+  loadAgendamentos:function(){var d=localStorage.getItem('marlift_agendamentos');State.agendamentos=d?JSON.parse(d):[];return State.agendamentos},
+  saveJornada:function(login,jd){var a=localStorage.getItem('marlift_jornadas');var o=a?JSON.parse(a):{};o[login]=jd;localStorage.setItem('marlift_jornadas',JSON.stringify(o))},
+  loadJornada:function(login){var a=localStorage.getItem('marlift_jornadas');var o=a?JSON.parse(a):{};return o[login]||null}
+};
+
+/* ==================== FUNÇÕES DE NORMALIZAÇÃO DATA/HORA ==================== */
+function normalizeDate(dateValue) {
+  if (!dateValue) return '';
+  if (typeof dateValue === 'string' && dateValue.includes('T')) {
+    var d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      var year = d.getUTCFullYear();
+      var month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      var day = String(d.getUTCDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+  }
+  if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return dateValue;
+  return '';
+}
+function extractTimeFromDate(dateValue) {
+  if (!dateValue) return '';
+  if (typeof dateValue === 'string' && dateValue.includes('T')) {
+    var d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      var hours = String(d.getUTCHours()).padStart(2, '0');
+      var minutes = String(d.getUTCMinutes()).padStart(2, '0');
+      return hours + ':' + minutes;
+    }
+  }
+  if (typeof dateValue === 'string' && /^\d{2}:\d{2}$/.test(dateValue)) return dateValue;
+  if (typeof dateValue === 'string' && dateValue.includes(':')) {
+    var parts = dateValue.split(':');
+    if (parts.length >= 2) return parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+  }
+  return '';
 }
 
-// ==================== CONFIG ====================
-var Config = {
-  marcas: ["TOYOTA","CLARK","BYD","LINDE","HYSTER","YALE","CATERPILLAR","KOMATSU","MITSUBISHI","HYUNDAI","HELI","OUTRA"],
-  checklist: [
-    {id:'motor',title:'Motor',items:[{id:'motor_oleo',label:'Nivel de oleo'},{id:'motor_filtro',label:'Filtros'},{id:'motor_correias',label:'Correias'}]},
-    {id:'hidraulico',title:'Hidraulico',items:[{id:'hidr_oleo',label:'Nivel oleo'},{id:'hidr_vazamento',label:'Vazamentos'}]},
-    {id:'eletrico',title:'Eletrico',items:[{id:'eletr_bateria',label:'Bateria'},{id:'eletr_farois',label:'Farois'}]},
-    {id:'seguranca',title:'Seguranca',items:[{id:'seg_cinto',label:'Cinto'},{id:'seg_extintor',label:'Extintor'}]}
-  ]
+/* ==================== FILA DE SINCRONIZACAO OFFLINE ==================== */
+var SyncQueue = {
+  key: 'marlift_sync_queue',
+  add: function(action, entity, data) {
+    var queue = this.getQueue();
+    queue.push({ action: action, entity: entity, data: data, timestamp: Date.now() });
+    localStorage.setItem(this.key, JSON.stringify(queue));
+    this.process();
+  },
+  getQueue: function() {
+    var q = localStorage.getItem(this.key);
+    return q ? JSON.parse(q) : [];
+  },
+  clearQueue: function() { localStorage.removeItem(this.key); },
+  async process() {
+    if (!navigator.onLine) { return; }
+    var queue = this.getQueue();
+    if (queue.length === 0) return;
+    var syncStatus = document.getElementById('syncStatusText');
+    if (syncStatus) syncStatus.innerText = 'Sincronizando fila ('+queue.length+')...';
+    var successItems = [];
+    for (var i = 0; i < queue.length; i++) {
+      var item = queue[i];
+      try {
+        var ok = false;
+        if (item.entity === 'cliente') ok = await GoogleSheetsSync.syncSingleCliente(item.data);
+        else if (item.entity === 'os') ok = await GoogleSheetsSync.syncSingleOS(item.data);
+        else if (item.entity === 'agendamento') ok = await GoogleSheetsSync.syncSingleAgendamento(item.data);
+        else if (item.entity === 'usuario') ok = await GoogleSheetsSync.syncUsuarios(item.data);
+        else if (item.entity === 'permissao') ok = await GoogleSheetsSync.syncPermissoes(item.data);
+        if (ok) successItems.push(i);
+      } catch(e) { console.warn('[SyncQueue] Erro sync item', e); }
+    }
+    var newQueue = queue.filter((_, idx) => !successItems.includes(idx));
+    localStorage.setItem(this.key, JSON.stringify(newQueue));
+    if (syncStatus) syncStatus.innerText = newQueue.length ? `Fila: ${newQueue.length}` : 'Sincronizado';
+    if (newQueue.length === 0) this.clearQueue();
+    else setTimeout(() => this.process(), 5000);
+  },
+  forceSync: async function() { 
+    showToast('Forçando sincronização...');
+    await this.process(); 
+    await GoogleSheetsSync.fullSync();
+  }
 };
 
-// ==================== STATE ====================
-var State = {
-  currentStatus: 'abertura',
-  clients: [],
-  osHistory: [],
-  editingClientId: null,
-  osCounter: 0,
-  agendamentos: []
+/* ==================== GOOGLE SHEETS SYNC ==================== */
+var GoogleSheetsSync = {
+  webAppUrl:'https://script.google.com/macros/s/AKfycbwYcOExXE7XH9KnGc_JM6SyeqDAOAJsU-CFVEYfOXwbdco2dSIPQT07VwXFspBA3GGnfQ/exec',
+  setStatus:function(m){var s=document.getElementById('syncStatusText');if(s)s.textContent=m},
+  hasValidData:function(arr,req){if(!arr||!Array.isArray(arr)||arr.length===0)return false;if(req)return arr.some(function(i){if(typeof i!=='object'||i===null)return false;var v=i[req];return v!==null&&v!==undefined&&String(v).trim()!==''});return arr.some(function(i){if(typeof i!=='object'||i===null)return false;return Object.values(i).some(function(v){if(v===null||v===undefined)return false;if(typeof v==='string'&&v.trim()==='')return false;if(Array.isArray(v)&&v.length===0)return false;if(typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===0)return false;return true})})},
+  hasValidPermissions:function(o){if(!o||typeof o!=='object'||Array.isArray(o))return false;return Object.keys(o).some(function(k){return o[k]===true})},
+  async postData(action,data){try{var r=await fetch(this.webAppUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,data:data})});var j=await r.json();return j.success}catch(e){console.error('postData ['+action+']:',e);return false}},
+  async syncSingleAgendamento(a){if(!a) return false; return await this.postData('syncAgendamento', a);},
+  async syncPermissoes(p){return await this.postData('syncPermissoes',p);},
+  async syncUsuarios(u){return await this.postData('syncUsuarios',u);},
+  async syncSingleOS(o){return await this.postData('syncOS',o);},
+  async syncSingleCliente(c){return await this.postData('syncCliente',c);},
+  async fetchFromSheet(){
+    try{
+      this.setStatus('Baixando...');
+      var response=await fetch(this.webAppUrl);
+      var data=await response.json();
+      if(!data.success)throw new Error(data.error||'Erro na planilha');
+      var mudancas=[], ignoradas=[];
+      
+      /* Clientes */
+      if(this.hasValidData(data.clientes,'nome')){
+        var cv=data.clientes.filter(function(c){return(c.nome||c.NOME||'').trim()!==''});
+        if(cv.length>0){
+          State.clients=cv.map(function(c){return{id:c.id||c.ID||Date.now(),nome:(c.nome||c.NOME||'').trim(),cnpj:(c.cnpj||c.CNPJ||'').trim(),endereco:(c.endereco||c.ENDERECO||'').trim(),cidade:(c.cidade||c.CIDADE||'').trim(),telefone:(c.telefone||c.TELEFONE||'').trim(),whatsapp:(c.whatsapp||c.WHATSAPP||'').trim(),email:(c.email||c.EMAIL||'').trim(),responsavel_nome:(c.responsavel_nome||c.RESPONSAVEL_NOME||'').trim(),responsavel_telefone:(c.responsavel_telefone||c.RESPONSAVEL_TELEFONE||'').trim(),equipamentos:function(){try{var e=c.equipamentos||c.EQUIPAMENTOS;if(typeof e==='string'){var p=JSON.parse(e);if(Array.isArray(p)&&p.length>0)return p.filter(function(q){return q.marca||q.Marca}).map(function(q){return{marca:(q.marca||q.Marca||'').trim(),modelo:(q.modelo||q.Modelo||'').trim(),serie:(q.serie||q.Serie||'').trim(),qtd:q.qtd||1,combustivel:(q.combustivel||q.Combustivel||'').trim()}});return[]}if(Array.isArray(e))return e.filter(function(q){return q.marca||q.Marca})}catch(x){}return[]}()}});
+          Storage.saveClients();mudancas.push('Clientes ('+State.clients.length+')')
+        }else ignoradas.push('Clientes (nomes vazios)')
+      }else ignoradas.push('Clientes (sem dados)');
+      
+      /* OS */
+      if(this.hasValidData(data.os,'numeroOS')){
+        var ov=data.os.filter(function(o){return(o.numeroOS||o.NUMEROOS||o.NUMERO_OS||'').trim()!==''});
+        if(ov.length>0){
+          State.osHistory=ov.map(function(o){return{numeroOS:(o.numeroOS||o.NUMEROOS||o.NUMERO_OS||'').trim(),dataOS:normalizeDate(o.dataOS||o.DATAOS||o.DATA_OS||''),cliente:(o.cliente||o.CLIENTE||'').trim(),status:(o.status||o.STATUS||'abertura').toLowerCase().trim(),tipoChamado:(o.tipoChamado||o.TIPOCHAMADO||'normal').toLowerCase().trim(),horasTotais:o.horasTotais||o.HORASTOTAIS||'0h',totalGeral:o.totalGeral||o.TOTALGERAL||'00:00',descricaoServico:o.descricaoServico||o.DESCRICAOSERVICO||'',pecasAplicadas:o.pecasAplicadas||o.PECASAPLICADAS||'',pendencias:o.pendencias||o.PENDENCIAS||'',relatoCliente:o.relatoCliente||o.RELATOCLIENTE||'',marca:o.marca||o.MARCA||'',modelo:o.modelo||o.MODELO||'',numSerie:o.numSerie||o.NUMSERIE||'',horimetro:o.horimetro||o.HORIMETRO||'',combustivel:o.combustivel||o.COMBUSTIVEL||'',whatsappCliente:o.whatsappCliente||o.WHATSAPPCLIENTE||'',cnpj:o.cnpj||o.CNPJ||'',cidadeCliente:o.cidadeCliente||o.CIDADECLIENTE||'',endereco:o.endereco||o.ENDERECO||'',tecnico:o.tecnico||o.TECNICO||'MARLIFT',recebedor:o.recebedor||o.RECEBEDOR||'',fotosBase64:function(){try{var f=o.fotosBase64;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),fotoHorimetro:o.fotoHorimetro||null,fotosPendencias:function(){try{var f=o.fotosPendencias;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),assinaturaTecnico:o.assinaturaTecnico||'',assinaturaCliente:o.assinaturaCliente||'',checklistData:function(){try{var c=o.checklistData;if(typeof c==='string')return JSON.parse(c);if(typeof c==='object'&&c!==null&&!Array.isArray(c))return c}catch(e){}return{}}()}});
+          Storage.saveOSHistory();mudancas.push('OS ('+State.osHistory.length+')')
+        }else ignoradas.push('OS (numeros vazios)')
+      }else ignoradas.push('OS (sem dados)');
+      
+      /* Agendamentos com normalização */
+      if(this.hasValidData(data.agendamentos,'cliente')){
+        var av=data.agendamentos.filter(function(a){return(a.cliente||a.CLIENTE||'').trim()!==''});
+        if(av.length>0){
+          State.agendamentos=av.map(function(a){
+            var rawData = a.data || a.DATA || '';
+            var rawHorario = a.horario || a.HORARIO || '';
+            var dataStr = normalizeDate(rawData);
+            var horarioStr = extractTimeFromDate(rawHorario);
+            if (!horarioStr && rawHorario && typeof rawHorario === 'string' && rawHorario.includes(':')) {
+              var parts = rawHorario.split(':');
+              if (parts.length >= 2) horarioStr = parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+            }
+            if (!horarioStr && rawData && typeof rawData === 'string' && rawData.includes('T')) {
+              horarioStr = extractTimeFromDate(rawData);
+            }
+            return {
+              id:a.id||Date.now(),
+              cliente:(a.cliente||a.CLIENTE||'').trim(),
+              equipamento:(a.equipamento||a.EQUIPAMENTO||'').trim(),
+              data:dataStr,
+              horario:horarioStr,
+              tecnico:(a.tecnico||a.TECNICO||'').trim(),
+              descricao:(a.descricao||a.DESCRICAO||'').trim(),
+              status:(a.status||a.STATUS||'pendente').toLowerCase().trim()
+            };
+          });
+          Storage.saveAgendamentos();mudancas.push('Agendamentos ('+State.agendamentos.length+')')
+        }else ignoradas.push('Agendamentos (vazios)')
+      }else ignoradas.push('Agendamentos (sem dados)');
+      
+      /* Permissoes */
+      if(this.hasValidPermissions(data.permissoes)){localStorage.setItem('marlift_permissoes_tecnico',JSON.stringify(data.permissoes));mudancas.push('Permissoes')}else ignoradas.push('Permissoes (sem dados)');
+      /* Usuarios */
+      if(this.hasValidData(data.usuarios,'login')){
+        var uv=data.usuarios.filter(function(u){return(u.login||u.LOGIN||'').trim()!==''});
+        if(uv.length>0){Auth.saveUsers(uv);mudancas.push('Usuarios ('+uv.length+')')}else ignoradas.push('Usuarios (logins vazios)')
+      }else ignoradas.push('Usuarios (sem dados)');
+      
+      /* Atualizar UI */
+      if(mudancas.length>0){Clientes.renderTable();Clientes.updateStats();Historico.render();Historico.updateStats();Agendamentos.atualizarLista();Agendamentos.atualizarSelectTecnicos();if(Permissoes.carregarNaInterface)Permissoes.carregarNaInterface();UserManager.render()}
+      var msg='';
+      if(mudancas.length>0)msg='Sincronizado: '+mudancas.join(', ');
+      if(ignoradas.length>0)msg+=(msg?'\n':'')+'Mantidos locais: '+ignoradas.join(', ');
+      if(!msg)msg='Nenhuma alteracao necessaria';
+      showToast(msg);this.setStatus('OK')
+    }catch(err){console.error('[SYNC]',err);this.setStatus('Erro');showToast('Erro: '+err.message,true)}
+  },
+  async fullSync(){await this.fetchFromSheet();await SyncQueue.process();}
 };
 
-// ==================== STORAGE ====================
-var Storage = {
-  saveClients: function() { localStorage.setItem('marlift_clientes', JSON.stringify(State.clients)); },
-  loadClients: function() { var d = localStorage.getItem('marlift_clientes'); State.clients = d ? JSON.parse(d) : []; return State.clients; },
-  saveOSHistory: function() { localStorage.setItem('marlift_os_history', JSON.stringify(State.osHistory)); },
-  loadOSHistory: function() { var d = localStorage.getItem('marlift_os_history'); State.osHistory = d ? JSON.parse(d) : []; return State.osHistory; },
-  saveCounter: function() { localStorage.setItem('marlift_os_counter', State.osCounter); },
-  loadCounter: function() { var d = localStorage.getItem('marlift_os_counter'); State.osCounter = d ? parseInt(d) : 0; return State.osCounter; },
-  saveAgendamentos: function() { localStorage.setItem('marlift_agendamentos', JSON.stringify(State.agendamentos)); },
-  loadAgendamentos: function() { var d = localStorage.getItem('marlift_agendamentos'); State.agendamentos = d ? JSON.parse(d) : []; return State.agendamentos; }
-};
-
-// ==================== AUTH ====================
+/* ==================== AUTH ==================== */
 var Auth = {
-  currentUser: null,
-  getUsers: function() {
-    var u = localStorage.getItem('marlift_users');
-    if (u) return JSON.parse(u);
-    var d = [{id:1, nome:'Administrador', login:'admin', senha:'admin123', nivel:'admin'}];
-    localStorage.setItem('marlift_users', JSON.stringify(d));
-    return d;
+  currentUser:null,
+  inactivityTimer: null,
+  resetInactivityTimer: function() {
+    if (this.inactivityTimer) clearTimeout(this.inactivityTimer);
+    if (this.currentUser) {
+      this.inactivityTimer = setTimeout(() => { this.logout('inactivity'); }, Config.inactivityTimeout);
+    }
   },
-  login: function() {
-    var login = $('loginUsername').value.trim();
-    var senha = $('loginPassword').value;
+  getUsers:function(){var u=localStorage.getItem('marlift_users');if(u)return JSON.parse(u);var d=[{id:1,nome:'Administrador',login:'admin',senha:'admin123',nivel:'admin'},{id:2,nome:'Tecnico Principal',login:'tecnico',senha:'123456',nivel:'tecnico'}];localStorage.setItem('marlift_users',JSON.stringify(d));return d},
+  saveUsers:function(u){localStorage.setItem('marlift_users',JSON.stringify(u))},
+  login:function(){
+    var login=document.getElementById('loginUsername').value.trim(),senha=document.getElementById('loginPassword').value,errDiv=document.getElementById('loginErrorMessage');
+    if(errDiv){errDiv.style.display='none';errDiv.innerHTML=''}
+    if(!login||!senha){if(errDiv){errDiv.innerHTML='Preencha usuario e senha';errDiv.style.display='block'}showToast('Preencha usuario e senha',true);return}
+    var users=this.getUsers(),user=users.find(function(u){return u.login===login&&u.senha===senha});
+    if(!user){if(errDiv){errDiv.innerHTML='Usuario ou senha invalidos!';errDiv.style.display='block'}showToast('Credenciais invalidas!',true);document.getElementById('loginPassword').value='';return}
+    this.currentUser=user;localStorage.setItem('marlift_current_user',JSON.stringify(user));
+    document.getElementById('loginScreen').style.display='none';document.getElementById('appContainer').style.display='block';document.getElementById('currentUserName').innerHTML=user.nome;
+    this.updatePermissions();showToast('Bem-vindo, '+user.nome+'!');
+    this.startInactivityTimer();
+    App.init();
+    if(user.nivel==='tecnico')setTimeout(function(){Jornada.carregar()},500)
+  },
+  logout:function(reason){
+    if(this.currentUser && reason === 'inactivity') showToast('Logout por inatividade', true);
+    if(this.inactivityTimer) clearTimeout(this.inactivityTimer);
+    this.currentUser=null;localStorage.removeItem('marlift_current_user');Timer.cleanup();
+    document.getElementById('loginScreen').style.display='flex';document.getElementById('appContainer').style.display='none';
+  },
+  startInactivityTimer:function(){
+    var events = ['mousedown','mousemove','keypress','scroll','touchstart'];
+    var reset = () => this.resetInactivityTimer();
+    events.forEach(ev => document.addEventListener(ev, reset));
+    this.resetInactivityTimer();
+  },
+  recoverPassword:function(){
+    var login = prompt('Digite seu login de usuario:');
+    if(!login) return;
     var users = this.getUsers();
-    var user = users.find(function(u) { return u.login === login && u.senha === senha; });
-    if (!user) { showToast('Credenciais invalidas!', true); return; }
-    this.currentUser = user;
-    localStorage.setItem('marlift_current_user', JSON.stringify(user));
-    $('loginScreen').style.display = 'none';
-    $('appContainer').style.display = 'block';
-    $('currentUserName').innerHTML = user.nome;
-    App.init();
+    var user = users.find(u => u.login === login);
+    if(!user) { alert('Usuario nao encontrado!'); return; }
+    alert(`Sua senha é: ${user.senha}\nRecomendamos alterar no proximo acesso.`);
   },
-  logout: function() {
-    this.currentUser = null;
-    localStorage.removeItem('marlift_current_user');
-    $('loginScreen').style.display = 'flex';
-    $('appContainer').style.display = 'none';
-  },
-  checkSession: function() {
-    var s = localStorage.getItem('marlift_current_user');
-    if (s) {
-      this.currentUser = JSON.parse(s);
-      $('loginScreen').style.display = 'none';
-      $('appContainer').style.display = 'block';
-      $('currentUserName').innerHTML = this.currentUser.nome;
-      return true;
-    }
-    return false;
-  }
+  checkSession:function(){var s=localStorage.getItem('marlift_current_user');if(s){this.currentUser=JSON.parse(s);document.getElementById('loginScreen').style.display='none';document.getElementById('appContainer').style.display='block';document.getElementById('currentUserName').innerHTML=this.currentUser.nome;this.updatePermissions();this.startInactivityTimer();return true}return false},
+  updatePermissions:function(){if(!this.currentUser)return;var a=this.currentUser.nivel==='admin',t=this.currentUser.nivel==='tecnico';var ta=document.getElementById('tabAgendamentosBtn'),tj=document.getElementById('tabJornadaBtn'),tp=document.getElementById('tabPermissoesBtn'),tu=document.getElementById('tabUsuariosBtn');if(ta)ta.style.display=a?'inline-flex':'none';if(tj)tj.style.display=t?'inline-flex':'none';if(tp)tp.style.display=a?'inline-flex':'none';if(tu)tu.style.display=a?'inline-flex':'none';},
+  isAdmin:function(){return this.currentUser&&this.currentUser.nivel==='admin'}
 };
 
-// ==================== SIGNATURE ====================
-var Signature = {
-  canvases: {}, drawing: { tec: false, cli: false },
-  init: function() {
-    this.canvases.tec = $('sigTecnicoCanvas');
-    this.canvases.cli = $('sigClienteCanvas');
-    this.setup('tec');
-    this.setup('cli');
-  },
-  setup: function(w) {
-    var cv = this.canvases[w];
-    if (!cv) return;
-    cv.width = cv.offsetWidth;
-    cv.height = cv.offsetHeight;
-    var ctx = cv.getContext('2d');
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    var self = this;
-    var getPos = function(e) {
-      var rect = cv.getBoundingClientRect();
-      var x = (e.clientX - rect.left) * (cv.width / rect.width);
-      var y = (e.clientY - rect.top) * (cv.height / rect.height);
-      return { x: Math.max(0, Math.min(x, cv.width)), y: Math.max(0, Math.min(y, cv.height)) };
-    };
-    cv.addEventListener('mousedown', function(e) { self.drawing[w] = true; var p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
-    cv.addEventListener('mousemove', function(e) { if (!self.drawing[w]) return; var p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
-    cv.addEventListener('mouseup', function() { self.drawing[w] = false; ctx.beginPath(); });
-  },
-  clear: function(w) {
-    var cv = this.canvases[w];
-    if (!cv) return;
-    var ctx = cv.getContext('2d');
-    ctx.clearRect(0, 0, cv.width, cv.height);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 2;
-    var inputId = w === 'tec' ? 'assinaturaTecnicoData' : 'assinaturaClienteData';
-    if ($(inputId)) $(inputId).value = '';
-  },
-  save: function(w) {
-    var cv = this.canvases[w];
-    if (!cv) return;
-    var inputId = w === 'tec' ? 'assinaturaTecnicoData' : 'assinaturaClienteData';
-    if ($(inputId)) $(inputId).value = cv.toDataURL('image/png');
-    showToast('Assinatura salva');
-  }
+/* ==================== UTILITARIOS ==================== */
+function $(id){return document.getElementById(id)}
+function showToast(msg,isErr){var t=$('toastCenter');if(!t)return;var m=$('toastMessage');if(m)m.textContent=msg;t.style.borderColor=isErr?'var(--danger)':'var(--success)';t.classList.remove('show');void t.offsetWidth;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(function(){t.classList.remove('show')},2800)}
+var Utils={
+  generateOSNumber:function(){State.osCounter=Storage.loadCounter();State.osCounter++;Storage.saveCounter();var n=new Date(),yy=n.getFullYear().toString().slice(-2),mm=String(n.getMonth()+1).padStart(2,'0'),os='OS-'+yy+mm+'-'+String(State.osCounter).padStart(4,'0');var i=$('numeroOS');if(i)i.value=os;return os},
+  setDefaultDate:function(){var i=$('dataOS');if(i&&!i.value)i.value=new Date().toISOString().split('T')[0]},
+  getVal:function(id){var e=$(id);return e?e.value:''},
+  setVal:function(id,v){var e=$(id);if(e)e.value=v||''},
+  formatStatus:function(s){return{abertura:'ABERTURA',execucao:'EM EXECUCAO',finalizacao:'FINALIZANDO',fechada:'FECHADA',aprovada:'APROVADA'}[s]||(s||'').toUpperCase()},
+  timeDiff:function(s,e){if(!s||!e)return 0;var sp=s.split(':').map(Number),ep=e.split(':').map(Number),d=(ep[0]*60+ep[1])-(sp[0]*60+sp[1]);return d<0?d+1440:d},
+  timeToMinutes:function(t){if(!t)return 0;if(t.indexOf('h')!==-1)return parseInt(t)*60;var p=t.split(':');return parseInt(p[0])*60+parseInt(p[1]||0)},
+  validarHorimetro:function(h){return /^[0-9]{1,5}h?$/.test(h);}
 };
 
-// ==================== CHECKLIST ====================
-var Checklist = {
-  total: 0, checked: 0,
-  render: function() {
-    var container = $('checklistSections');
-    if (!container) return;
-    container.innerHTML = '';
-    this.total = 0;
-    Config.checklist.forEach(function(section) {
-      this.total += section.items.length;
-      var div = document.createElement('div');
-      div.className = 'checklist-card p-4 mb-4';
-      div.innerHTML = '<h3 class="font-display text-lg mb-2">' + section.title + '</h3>';
-      section.items.forEach(function(item) {
-        div.innerHTML += '<div class="checklist-item"><label><input type="checkbox" id="chk_' + item.id + '" onchange="Checklist.updateProgress()"> ' + item.label + '</label><select id="' + item.id + '_status" class="form-input w-24"><option value="ok">OK</option><option value="atencao">Atencao</option><option value="critico">Critico</option></select></div>';
-      });
-      container.appendChild(div);
-    }.bind(this));
-    this.updateProgress();
-  },
-  updateProgress: function() {
-    var cbs = document.querySelectorAll('#checklistSections input[type="checkbox"]');
-    this.checked = Array.from(cbs).filter(function(cb) { return cb.checked; }).length;
-    var pct = this.total > 0 ? Math.round(this.checked / this.total * 100) : 0;
-    if ($('progressText')) $('progressText').textContent = pct + '%';
-    if ($('progressFill')) $('progressFill').style.width = pct + '%';
-  }
+/* ==================== TIMER ==================== */
+var Timer={interval:null,seconds:0,running:false,paused:false,
+  control:function(a){if(a==='start')this.start();else if(a==='pause')this.pause();else if(a==='stop')this.stop()},
+  start:function(){if(this.running&&!this.paused)return;if(this.paused){if(!Utils.getVal('horaAlmocoRetorno'))Utils.setVal('horaAlmocoRetorno',new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));this.paused=false;this.running=true}else{this.running=true;this.paused=false;if(this.seconds===0)this.reset();if(!Utils.getVal('horaInicio'))Utils.setVal('horaInicio',new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))}if(this.interval)clearInterval(this.interval);var self=this;this.interval=setInterval(function(){if(!self.paused&&self.running){self.seconds++;self.updateDisplay()}},1000)},
+  pause:function(){if(!this.running)return;this.paused=true;if(!Utils.getVal('horaAlmocoSaida'))Utils.setVal('horaAlmocoSaida',new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}))},
+  stop:function(){if(!this.running)return;clearInterval(this.interval);this.running=false;this.paused=false;if(!Utils.getVal('horaTermino'))Utils.setVal('horaTermino',new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));Horas.calcular()},
+  reset:function(){this.seconds=0;var d=$('timerDisplay');if(d)d.textContent='00:00:00'},
+  updateDisplay:function(){var h=Math.floor(this.seconds/3600),m=Math.floor((this.seconds%3600)/60),s=this.seconds%60,d=$('timerDisplay');if(d)d.textContent=String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')},
+  cleanup:function(){if(this.interval){clearInterval(this.interval);this.interval=null}}
 };
 
-// ==================== CLIENTES ====================
-var Clientes = {
-  load: function() { State.clients = Storage.loadClients(); this.renderTable(); this.updateDatalist(); },
-  updateDatalist: function() { var dl = $('clientesList'); if (dl) { dl.innerHTML = ''; State.clients.forEach(function(c) { var opt = document.createElement('option'); opt.value = c.nome; dl.appendChild(opt); }); } },
-  renderTable: function() {
-    var tb = $('cad_tableBody');
-    if (!tb) return;
-    tb.innerHTML = '';
-    State.clients.forEach(function(c) {
-      tb.innerHTML += '<tr><td class="p-2">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2"><button onclick="Clientes.selecionar(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.editar(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.excluir(' + c.id + ')"></i></td></tr>';
-    });
-  },
-  selecionar: function(id) {
-    var c = State.clients.find(function(c) { return c.id === id; });
-    if (!c) return;
-    $('cliente').value = c.nome;
-    $('cnpj').value = c.cnpj || '';
-    $('cidadeCliente').value = c.cidade || '';
-    $('endereco').value = c.endereco || '';
-    $('whatsappCliente').value = c.whatsapp || '';
-    showToast('Cliente carregado');
-    document.querySelector('.tab-button[data-tab="tab-os"]').click();
-  },
-  editar: function(id) {
-    var c = State.clients.find(function(c) { return c.id === id; });
-    if (!c) return;
-    State.editingClientId = id;
-    $('cad_nome').value = c.nome || '';
-    $('cad_cnpj').value = c.cnpj || '';
-    $('cad_endereco').value = c.endereco || '';
-    $('cad_cidade').value = c.cidade || '';
-    $('cad_telefone').value = c.telefone || '';
-    $('cad_whatsapp').value = c.whatsapp || '';
-    $('cad_email').value = c.email || '';
-    $('cad_btnCancelar').style.display = 'inline-flex';
-    showToast('Editando cliente');
-  },
-  excluir: function(id) {
-    if (!confirm('Excluir cliente?')) return;
-    State.clients = State.clients.filter(function(c) { return c.id !== id; });
-    Storage.saveClients();
-    this.renderTable();
-    this.updateDatalist();
-    showToast('Cliente excluido');
-  },
-  cancelEdit: function() {
-    State.editingClientId = null;
-    $('cad_nome').value = ''; $('cad_cnpj').value = ''; $('cad_endereco').value = ''; $('cad_cidade').value = ''; $('cad_telefone').value = ''; $('cad_whatsapp').value = ''; $('cad_email').value = '';
-    $('cad_btnCancelar').style.display = 'none';
-  },
-  save: function() {
-    var nome = $('cad_nome').value.trim();
-    if (!nome) { showToast('Nome obrigatorio', true); return; }
-    var cliente = {
-      id: State.editingClientId || Date.now(),
-      nome: nome,
-      cnpj: $('cad_cnpj').value,
-      endereco: $('cad_endereco').value,
-      cidade: $('cad_cidade').value,
-      telefone: $('cad_telefone').value,
-      whatsapp: $('cad_whatsapp').value,
-      email: $('cad_email').value,
-      equipamentos: []
-    };
-    if (State.editingClientId) {
-      var idx = State.clients.findIndex(function(c) { return c.id === State.editingClientId; });
-      if (idx >= 0) State.clients[idx] = cliente;
-      State.editingClientId = null;
-      $('cad_btnCancelar').style.display = 'none';
-    } else {
-      State.clients.push(cliente);
-    }
-    Storage.saveClients();
-    this.cancelEdit();
-    this.renderTable();
-    this.updateDatalist();
-    showToast('Cliente salvo');
-  }
+/* ==================== HORAS ==================== */
+var Horas={
+  calcular:function(){var i=Utils.getVal('horaInicio'),t=Utils.getVal('horaTermino');if(!i||!t)return 0;var total=Utils.timeDiff(i,t),sa=Utils.getVal('horaAlmocoSaida'),re=Utils.getVal('horaAlmocoRetorno');if(sa&&re)total-=Utils.timeDiff(sa,re);var h=Math.max(1,Math.ceil(total/60));Utils.setVal('horasTotais',h+'h');this.updateTotal();return h},
+  updateTotal:function(){var hs=Utils.getVal('horasTotais'),min=0;if(hs){var m=hs.match(/(\d+)h/);if(m)min=parseInt(m[1])*60}var ex=Utils.timeToMinutes(Utils.getVal('horasExtras')),nt=Utils.timeToMinutes(Utils.getVal('adicionalNoturno')),tot=min+ex+nt,h=Math.floor(tot/60),m=tot%60;Utils.setVal('totalGeral',String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'))},
+  initListeners:function(){var self=this;['horaInicio','horaTermino','horaAlmocoSaida','horaAlmocoRetorno'].forEach(function(id){var el=$(id);if(el)el.addEventListener('change',function(){self.calcular()})});var ex=$('horasExtras');if(ex)ex.addEventListener('input',function(){self.updateTotal()});var nt=$('adicionalNoturno');if(nt)nt.addEventListener('input',function(){self.updateTotal()})}
 };
 
-// ==================== HISTORICO ====================
-var Historico = {
-  load: function() { State.osHistory = Storage.loadOSHistory(); this.render(); },
-  render: function() {
-    var search = $('historicoSearch') ? $('historicoSearch').value.toLowerCase() : '';
-    var statusFilter = $('historicoFiltroStatus') ? $('historicoFiltroStatus').value : '';
-    var filtered = State.osHistory.filter(function(o) {
-      return (!search || (o.numeroOS && o.numeroOS.toLowerCase().includes(search)) || (o.cliente && o.cliente.toLowerCase().includes(search))) &&
-             (!statusFilter || o.status === statusFilter);
-    });
-    var tb = $('historicoTableBody');
-    if (!tb) return;
-    tb.innerHTML = '';
-    filtered.forEach(function(o) {
-      tb.innerHTML += '<tr><td class="font-mono">' + (o.numeroOS || '-') + '</td><td>' + (o.dataOS || '-') + '</td><td>' + (o.cliente || '-') + '</td><td><span class="status-badge status-' + (o.status || 'abertura') + '">' + (o.status || 'ABERTURA').toUpperCase() + '</span></td><td><button onclick="Historico.ver(\'' + o.numeroOS + '\')" class="text-blue-400"><i class="fas fa-eye"></i></button> <button onclick="Historico.excluir(\'' + o.numeroOS + '\')" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button></td></tr>';
-    });
-  },
-  ver: function(num) {
-    var os = State.osHistory.find(function(o) { return o.numeroOS === num; });
-    if (!os) return;
-    for (var key in os) { if ($(key) && key !== 'fotosBase64') $(key).value = os[key] || ''; }
-    State.currentStatus = os.status || 'abertura';
-    App.updateUI();
-    showToast('OS carregada');
-    document.querySelector('.tab-button[data-tab="tab-os"]').click();
-  },
-  excluir: function(num) {
-    if (!confirm('Excluir OS?')) return;
-    State.osHistory = State.osHistory.filter(function(o) { return o.numeroOS !== num; });
-    Storage.saveOSHistory();
-    this.render();
-    showToast('OS excluida');
-  },
-  exportCSV: function() {
-    var csv = 'Numero OS,Data,Cliente,Status\n';
-    State.osHistory.forEach(function(o) { csv += '"' + (o.numeroOS || '') + '","' + (o.dataOS || '') + '","' + (o.cliente || '') + '","' + (o.status || '') + '"\n'; });
-    var blob = new Blob([csv], { type: 'text/csv' });
-    var link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'historico_os.csv';
-    link.click();
-    showToast('Exportado');
-  }
+/* ==================== SIGNATURE ==================== */
+var Signature={canvases:{},drawing:{tec:false,cli:false},
+  init:function(){this.canvases.tec=$('sigTecnicoCanvas');this.canvases.cli=$('sigClienteCanvas');this.setupCanvas('tec');this.setupCanvas('cli');this.clear('tec');this.clear('cli')},
+  setupCanvas:function(w){var self=this,cv=this.canvases[w];if(!cv)return;cv.width=cv.offsetWidth;cv.height=cv.offsetHeight;var cx=cv.getContext('2d');cx.strokeStyle='#1a1a1a';cx.lineWidth=2;cx.lineCap='round';cx.lineJoin='round';var gc=function(e){var r=cv.getBoundingClientRect(),sx=cv.width/r.width,sy=cv.height/r.height,cx2,cy2;if(e.touches){cx2=e.touches[0].clientX;cy2=e.touches[0].clientY}else{cx2=e.clientX;cy2=e.clientY}return{x:Math.max(0,Math.min((cx2-r.left)*sx,cv.width)),y:Math.max(0,Math.min((cy2-r.top)*sy,cv.height))}};var draw=function(e){if(!self.drawing[w])return;e.preventDefault();var c=gc(e);cx.lineTo(c.x,c.y);cx.stroke();cx.beginPath();cx.moveTo(c.x,c.y)};var start=function(e){e.preventDefault();self.drawing[w]=true;var c=gc(e);cx.beginPath();cx.moveTo(c.x,c.y)};var stop=function(){self.drawing[w]=false;cx.beginPath()};cv.addEventListener('mousedown',start);cv.addEventListener('mousemove',draw);cv.addEventListener('mouseup',stop);cv.addEventListener('mouseleave',stop);cv.addEventListener('touchstart',start,{passive:false});cv.addEventListener('touchmove',draw,{passive:false});cv.addEventListener('touchend',stop)},
+  clear:function(w){var cv=this.canvases[w];if(!cv)return;var cx=cv.getContext('2d');cx.clearRect(0,0,cv.width,cv.height);cx.fillStyle='#ffffff';cx.fillRect(0,0,cv.width,cv.height);cx.strokeStyle='#1a1a1a';cx.lineWidth=2;Utils.setVal(w==='tec'?'assinaturaTecnicoData':'assinaturaClienteData','')},
+  save:function(w){var cv=this.canvases[w];if(!cv)return;Utils.setVal(w==='tec'?'assinaturaTecnicoData':'assinaturaClienteData',cv.toDataURL('image/png'));showToast('Assinatura salva');State.hasUnsavedChanges=true},
+  loadFromData:function(w,url){if(!url)return;var cv=this.canvases[w];if(!cv)return;var cx=cv.getContext('2d'),img=new Image();img.onload=function(){cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(img,0,0,cv.width,cv.height);Utils.setVal(w==='tec'?'assinaturaTecnicoData':'assinaturaClienteData',url)};img.src=url}
 };
 
-// ==================== AGENDAMENTOS ====================
+/* ==================== CHECKLIST ==================== */
+var Checklist={total:0,checked:0,
+  render:function(){var c=$('checklistSections');if(!c)return;c.innerHTML='';this.total=0;var self=this;Config.checklist.forEach(function(sec){self.total+=sec.items.length;var d=document.createElement('div');d.className='checklist-card p-4 md:p-5 mb-4';var ih=sec.items.map(function(it){return'<div class="checklist-item"><label><input type="checkbox" data-check="true" id="'+it.id+'" onchange="Checklist.updateProgress()"><span class="text-sm">'+it.label+'</span></label><select class="form-input w-24 text-xs" id="'+it.id+'_status"><option value="ok">OK</option><option value="atencao">Atencao</option><option value="critico">Critico</option><option value="na">N/A</option></select></div>'}).join('');d.innerHTML='<div class="flex justify-between items-center mb-3 flex-wrap"><h3 class="font-display text-xl">'+sec.title+'</h3><button type="button" class="btn btn-secondary text-xs" onclick="Checklist.selectAll(\''+sec.id+'\')">Selecionar Todos</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-2">'+ih+'</div>';c.appendChild(d)});this.updateProgress()},
+  selectAll:function(sid){var sec=Config.checklist.find(function(s){return s.id===sid});if(sec)sec.items.forEach(function(it){var cb=$(it.id);if(cb)cb.checked=true});this.updateProgress()},
+  updateProgress:function(){var cbs=document.querySelectorAll('input[data-check="true"]');this.checked=Array.from(cbs).filter(function(cb){return cb.checked}).length;var pct=this.total>0?Math.round(this.checked/this.total*100):0;var pt=$('progressText');if(pt)pt.textContent=pct+'%';var fl=$('progressFill');if(fl)fl.style.width=pct+'%'},
+  getChecklistData:function(){var d={};document.querySelectorAll('input[data-check="true"]').forEach(function(cb){d[cb.id]=cb.checked});document.querySelectorAll('#checklistSections select').forEach(function(s){d[s.id]=s.value});return d},
+  loadChecklistData:function(d){if(!d)return;document.querySelectorAll('input[data-check="true"]').forEach(function(cb){if(d[cb.id]!==undefined)cb.checked=d[cb.id]});document.querySelectorAll('#checklistSections select').forEach(function(s){if(d[s.id]!==undefined)s.value=d[s.id]});this.updateProgress()}
+};
+
+/* ==================== CLIENTES ==================== */
+var Clientes={
+  load:function(){State.clients=Storage.loadClients();this.renderTable();this.updateStats()},
+  updateStats:function(){var tc=State.clients.length,tm=0;State.clients.forEach(function(c){tm+=(c.equipamentos||[]).length});var cc=new Set(),to=0,oa=0,op=0;State.osHistory.forEach(function(o){if(o.cliente){cc.add(o.cliente);to++}if(o.status==='abertura'||o.status==='execucao'||o.status==='finalizacao')oa++;if(o.status==='aprovada')op++});$('statTotalClientes').innerText=tc;$('statTotalMarcas').innerText=tm;$('statClientesComOS').innerText=cc.size;$('statTotalOSClientes').innerText=to;$('statOSAbertasCliente').innerText=oa;$('statOSAprovadasCliente').innerText=op},
+  renderTable:function(){var tb=$('cad_tableBody');if(!tb)return;tb.innerHTML='';if(!State.clients.length){tb.innerHTML='</td><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>';return}State.clients.forEach(function(c){var r=tb.insertRow();var ml=(c.equipamentos||[]).map(function(e){return e.marca}).join(', ');r.innerHTML='<td class="p-2 font-medium">'+(c.nome||'-')+'</td><td class="p-2">'+(c.cidade||'-')+'</td><td class="p-2">'+(ml||'-')+'</td><td class="p-2"><button onclick="Clientes.select('+c.id+')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit('+c.id+')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete('+c.id+')"></i></td>'})},
+  addEquipField:function(m,mo,s,q,co){adicionarCampoEquipamento(m,mo,s,q,co)},
+  save:async function(){var nm=Utils.getVal('cad_nome').trim();if(!nm){showToast('Nome obrigatorio',true);return}var eq=[];var ct=$('equipamentosList');if(ct)ct.querySelectorAll('.equip-item').forEach(function(it){var ms=it.querySelector('.equip-marca').value,oi=it.querySelector('.outra-marca'),mk=ms==='OUTRA'?(oi?oi.value.toUpperCase():''):ms;if(mk)eq.push({marca:mk,modelo:it.querySelector('.equip-modelo').value||'',serie:it.querySelector('.equip-serie').value||'',qtd:parseInt(it.querySelector('.equip-qtd').value)||1,combustivel:it.querySelector('.equip-combustivel').value||''})});var cl={id:State.editingClientId||Date.now(),nome:nm,cnpj:Utils.getVal('cad_cnpj'),endereco:Utils.getVal('cad_endereco'),cidade:Utils.getVal('cad_cidade'),telefone:Utils.getVal('cad_telefone'),whatsapp:Utils.getVal('cad_whatsapp'),email:Utils.getVal('cad_email'),responsavel_nome:Utils.getVal('cad_responsavel_nome'),responsavel_telefone:Utils.getVal('cad_responsavel_telefone'),equipamentos:eq};if(State.editingClientId){var idx=State.clients.findIndex(function(c){return c.id===State.editingClientId});if(idx>=0)State.clients[idx]=cl;State.editingClientId=null;var cb=$('cad_btnCancelar');if(cb)cb.style.display='none'}else State.clients.push(cl);Storage.saveClients();this.renderTable();this.clearForm();this.updateStats();showToast('Cliente salvo');try{await GoogleSheetsSync.syncSingleCliente(cl);}catch(e){SyncQueue.add('upsert','cliente',cl);showToast('Salvo localmente, pendente sincronização',true);}},
+  select:function(id){var c=State.clients.find(function(c){return c.id===id});if(!c)return;if(c.equipamentos&&c.equipamentos.length>0){App.mostrarModalEquipamentos(c)}else{Utils.setVal('cliente',c.nome);Utils.setVal('cnpj',c.cnpj);Utils.setVal('cidadeCliente',c.cidade);Utils.setVal('endereco',c.endereco);Utils.setVal('whatsappCliente',c.whatsapp);showToast('Cliente carregado');var tb=document.querySelector('.tab-button[data-tab="tab-os"]');if(tb)tb.click()}},
+  edit:function(id){var c=State.clients.find(function(c){return c.id===id});if(!c)return;State.editingClientId=id;Utils.setVal('cad_nome',c.nome);Utils.setVal('cad_cnpj',c.cnpj);Utils.setVal('cad_endereco',c.endereco);Utils.setVal('cad_cidade',c.cidade);Utils.setVal('cad_telefone',c.telefone);Utils.setVal('cad_whatsapp',c.whatsapp);Utils.setVal('cad_email',c.email||'');Utils.setVal('cad_responsavel_nome',c.responsavel_nome||'');Utils.setVal('cad_responsavel_telefone',c.responsavel_telefone||'');var ct=$('equipamentosList');if(ct)ct.innerHTML='';if(c.equipamentos&&c.equipamentos.length)c.equipamentos.forEach(function(e){adicionarCampoEquipamento(e.marca,e.modelo,e.serie,e.qtd,e.combustivel)});var cb=$('cad_btnCancelar');if(cb)cb.style.display='inline-flex';showToast('Editando cliente')},
+  delete:function(id){if(!confirm('Excluir?'))return;State.clients=State.clients.filter(function(c){return c.id!==id});Storage.saveClients();this.renderTable();this.updateStats();showToast('Excluido');SyncQueue.add('delete','cliente',{id:id})},
+  cancelEdit:function(){State.editingClientId=null;this.clearForm();var cb=$('cad_btnCancelar');if(cb)cb.style.display='none'},
+  clearForm:function(){['cad_nome','cad_cnpj','cad_endereco','cad_cidade','cad_telefone','cad_whatsapp','cad_email','cad_responsavel_nome','cad_responsavel_telefone'].forEach(function(id){Utils.setVal(id,'')});var ct=$('equipamentosList');if(ct)ct.innerHTML=''},
+  exportCSV:function(){var csv="Nome,CNPJ,Endereco,Cidade,Telefone,WhatsApp,Email,Responsavel,TelResponsavel,Marcas\n";State.clients.forEach(function(c){var ml=(c.equipamentos||[]).map(function(e){return e.marca}).join('; ');csv+='"'+(c.nome||'')+'",'+(c.cnpj||'')+',"'+(c.endereco||'')+'","'+(c.cidade||'')+'",'+(c.telefone||'')+','+(c.whatsapp||'')+','+(c.email||'')+','+(c.responsavel_nome||'')+','+(c.responsavel_telefone||'')+',"'+ml+'"\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='clientes_'+new Date().toISOString().split('T')[0]+'.csv';a.click();showToast('Exportado')},
+  importCSV:function(){var inp=document.createElement('input');inp.type='file';inp.accept='.csv';inp.onchange=function(e){var f=e.target.files[0],r=new FileReader();r.onload=function(ev){var lines=ev.target.result.split('\n');for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var p=lines[i].split(',');if(p[0])State.clients.push({id:Date.now()+i,nome:p[0].replace(/"/g,''),cnpj:p[1]||'',endereco:(p[2]||'').replace(/"/g,''),cidade:(p[3]||'').replace(/"/g,''),telefone:p[4]||'',whatsapp:p[5]||'',email:p[6]||'',responsavel_nome:p[7]||'',responsavel_telefone:p[8]||'',equipamentos:[]})}Storage.saveClients();Clientes.renderTable();Clientes.updateStats();showToast('Importado')};r.readAsText(f,'UTF-8')};inp.click()}
+};
+
+/* ==================== HISTORICO ==================== */
+var Historico={
+  load:function(){State.osHistory=Storage.loadOSHistory();this.render();this.updateStats();Clientes.updateStats()},
+  updateStats:function(){var t=State.osHistory.length,sa=0,se=0,sf=0,sfe=0,sap=0,te=0,tp=0,tc=0,tg=0,tn=0,ta=0,to2=0,em=0,now=new Date(),ma=now.getMonth(),aa=now.getFullYear();State.osHistory.forEach(function(o){if(o.status==='abertura')sa++;else if(o.status==='execucao')se++;else if(o.status==='finalizacao')sf++;else if(o.status==='fechada')sfe++;else if(o.status==='aprovada')sap++;if(o.tipoChamado==='emergencial')te++;else if(o.tipoChamado==='preventiva')tp++;else if(o.tipoChamado==='corretiva')tc++;else if(o.tipoChamado==='garantia')tg++;else if(o.tipoChamado==='normal')tn++;else if(o.tipoChamado==='avaliacao')ta++;else if(o.tipoChamado==='orcamento')to2++;if(o.dataOS){var d=new Date(o.dataOS);if(d.getMonth()===ma&&d.getFullYear()===aa)em++}});$('statTotalOS').innerText=t;$('statStatusAbertura').innerText=sa;$('statStatusExecucao').innerText=se;$('statStatusFinalizacao').innerText=sf;$('statStatusFechada').innerText=sfe;$('statStatusAprovada').innerText=sap;$('statTipoEmergencial').innerText=te;$('statTipoPreventiva').innerText=tp;$('statTipoCorretiva').innerText=tc;$('statTipoGarantia').innerText=tg;$('statTipoNormal').innerText=tn;$('statTipoAvaliacao').innerText=ta;$('statTipoOrcamento').innerText=to2;$('statEsteMes').innerText=em},
+  render:function(){var s=Utils.getVal('historicoSearch').toLowerCase(),tp=Utils.getVal('historicoFiltroTipo'),sf=Utils.getVal('historicoFiltroStatus');var f=State.osHistory.filter(function(o){return(!s||(o.numeroOS&&o.numeroOS.toLowerCase().indexOf(s)!==-1)||(o.cliente&&o.cliente.toLowerCase().indexOf(s)!==-1))&&(!tp||o.tipoChamado===tp)&&(!sf||o.status===sf)});var tb=$('historicoTableBody'),em=$('historicoEmpty');if(!tb)return;tb.innerHTML='';if(!f.length){if(em)em.classList.remove('hidden');return}if(em)em.classList.add('hidden');f.forEach(function(o){var r=tb.insertRow(),sc='status-'+(o.status||'abertura'),st=Utils.formatStatus(o.status);r.innerHTML='<td class="font-mono font-bold">'+(o.numeroOS||'-')+'</td><td class="p-2">'+(o.dataOS||'-')+'</td><td class="font-medium">'+(o.cliente||'-').toUpperCase()+'</td><td class="p-2"><span class="status-badge '+sc+'">'+st+'</span></td><td class="font-mono font-bold text-[var(--success)]">'+(o.horasTotais||'-')+'</td><td class="p-2"><button onclick="Historico.view(\''+o.numeroOS+'\')" class="text-blue-400"><i class="fas fa-eye"></i></button> <button onclick="Historico.edit(\''+o.numeroOS+'\')" class="text-orange-400 ml-2"><i class="fas fa-edit"></i></button> <button onclick="Historico.delete(\''+o.numeroOS+'\')" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button></td>'})},
+  view:function(num){var o=State.osHistory.find(function(o){return o.numeroOS===num});if(!o)return;State.currentStatus=o.status||'abertura';document.querySelectorAll('#tab-os input,#tab-os select,#tab-os textarea').forEach(function(el){if(el.id&&el.type!=='file')el.value=''});for(var k in o){if(['fotosBase64','fotoHorimetro','fotosPendencias','assinaturaTecnico','assinaturaCliente','checklistData'].indexOf(k)===-1)Utils.setVal(k,o[k])}if(o.fotoHorimetro){State.fotoHorimetro=o.fotoHorimetro;var p=$('fotoHorimetroPreview');if(p)p.innerHTML='<div class="photo-item"><img src="'+o.fotoHorimetro+'"><div class="photo-remove" onclick="Fotos.removeHorimetro()">x</div></div>'}else Fotos.removeHorimetro();if(o.fotosBase64&&o.fotosBase64.length){State.fotosServico=o.fotosBase64;var p=$('fotosPreview');if(p){p.innerHTML='';o.fotosBase64.forEach(function(src){var d=document.createElement('div');d.className='photo-item';d.innerHTML='<img src="'+src+'"><div class="photo-remove" onclick="Fotos.removeServico(this)">x</div>';p.appendChild(d)})}}else{State.fotosServico=[];var p=$('fotosPreview');if(p)p.innerHTML=''}if(o.fotosPendencias&&o.fotosPendencias.length){State.fotosPendencias=o.fotosPendencias;var p=$('fotosPendenciasPreview');if(p){p.innerHTML='';o.fotosPendencias.forEach(function(src){var d=document.createElement('div');d.className='photo-item';d.innerHTML='<img src="'+src+'"><div class="photo-remove" onclick="Fotos.removePendencia(this)">x</div>';p.appendChild(d)})}}else{State.fotosPendencias=[];var p=$('fotosPendenciasPreview');if(p)p.innerHTML=''}Signature.loadFromData('tec',o.assinaturaTecnico);Signature.loadFromData('cli',o.assinaturaCliente);if(o.checklistData)Checklist.loadChecklistData(o.checklistData);App.updateUI();showToast('OS carregada');var tb=document.querySelector('.tab-button[data-tab="tab-os"]');if(tb)tb.click()},
+  edit:function(n){this.view(n)},
+  delete:function(n){if(!confirm('Excluir OS '+n+'?'))return;State.osHistory=State.osHistory.filter(function(o){return o.numeroOS!==n});Storage.saveOSHistory();this.render();this.updateStats();Clientes.updateStats();showToast('Excluida');SyncQueue.add('delete','os',{numeroOS:n})},
+  exportCSV:function(){var csv='OS,Data,Cliente,Status,Tipo,Horas,Total\n';State.osHistory.forEach(function(o){csv+=(o.numeroOS||'')+','+(o.dataOS||'')+',"'+(o.cliente||'')+'",'+Utils.formatStatus(o.status)+','+(o.tipoChamado||'')+','+(o.horasTotais||'')+','+(o.totalGeral||'')+'\n'});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='historico_'+new Date().toISOString().split('T')[0]+'.csv';a.click();showToast('Exportado')},
+  importCSV:function(){var inp=document.createElement('input');inp.type='file';inp.accept='.csv';inp.onchange=function(e){var f=e.target.files[0],r=new FileReader();r.onload=function(ev){var lines=ev.target.result.split('\n');for(var i=1;i<lines.length;i++){if(!lines[i].trim())continue;var p=lines[i].split(',');if(p[0])State.osHistory.push({numeroOS:p[0]||'OS-'+Date.now()+'-'+i,dataOS:p[1]||'',cliente:(p[2]||'').replace(/"/g,''),status:(p[3]||'').toLowerCase()||'abertura',tipoChamado:(p[4]||'').toLowerCase()||'normal',horasTotais:p[5]||'0h',totalGeral:p[6]||'00:00',descricaoServico:'',pecasAplicadas:'',pendencias:'',relatoCliente:'',marca:'',modelo:'',numSerie:'',horimetro:'',combustivel:'',whatsappCliente:'',cnpj:'',cidadeCliente:'',endereco:'',tecnico:'MARLIFT',recebedor:'',fotosBase64:[],fotoHorimetro:null,fotosPendencias:[],assinaturaTecnico:'',assinaturaCliente:'',checklistData:{}})}Storage.saveOSHistory();Historico.render();Historico.updateStats();Clientes.updateStats();showToast('Importado')};r.readAsText(f,'UTF-8')};inp.click()},
+  clear:function(){if(!confirm('Limpar TODO o historico?'))return;State.osHistory=[];Storage.saveOSHistory();this.render();this.updateStats();Clientes.updateStats();showToast('Limpo')}
+};
+
+/* ==================== PERMISSOES ==================== */
+var Permissoes={
+  padrao:{criar_os:true,editar_os:true,excluir_os:false,mudar_status:true,salvar_os:true,checklist_visualizar:true,checklist_preencher:true,fotos_horimetro:true,fotos_servico:true,fotos_pendencias:true,assinatura_tecnico:true,assinatura_cliente:true,timer_iniciar:true,timer_pausar:true,timer_parar:true,horas_editar:true,gerar_pdf:true,enviar_email:true,enviar_whatsapp:true,sincronizar:false,exportar_csv:false,clientes_cadastrar:true,historico_visualizar:true},
+  carregar:function(){var s=localStorage.getItem('marlift_permissoes_tecnico');if(s)return JSON.parse(s);return JSON.parse(JSON.stringify(this.padrao))},
+  salvar:function(){var p={};for(var k in this.padrao){var ch=document.getElementById('perm_'+k);if(ch)p[k]=ch.checked}localStorage.setItem('marlift_permissoes_tecnico',JSON.stringify(p));showToast('Permissoes salvas');GoogleSheetsSync.syncPermissoes(p);SyncQueue.add('upsert','permissao',p)},
+  resetarPadrao:function(){for(var k in this.padrao){var ch=document.getElementById('perm_'+k);if(ch)ch.checked=this.padrao[k]}this.salvar()},
+  carregarNaInterface:function(){var p=this.carregar();for(var k in p){var ch=document.getElementById('perm_'+k);if(ch)ch.checked=p[k]}}
+};
+
+/* ==================== USER MANAGER ==================== */
+var UserManager={
+  editingId:null,
+  render:function(){var users=Auth.getUsers(),tb=$('userTableBody');if(!tb)return;tb.innerHTML='';users.forEach(function(u){var r=tb.insertRow(),nt=u.nivel==='admin'?'Admin':(u.nivel==='tecnico'?'Tecnico':'Visualizador');r.innerHTML='<td class="p-2">'+u.nome+'</td><td class="p-2">'+u.login+'</td><td class="p-2">'+nt+'</td><td class="p-2"><i class="fas fa-edit text-blue-400 cursor-pointer mr-2" onclick="UserManager.edit('+u.id+')"></i><i class="fas fa-trash text-red-400 cursor-pointer" onclick="UserManager.delete('+u.id+')"></i></td>'})},
+  addUser:function(){var n=document.getElementById('userNome').value.trim(),l=document.getElementById('userLogin').value.trim(),s=document.getElementById('userSenha').value,nv=document.getElementById('userNivel').value;if(!n||!l||!s){showToast('Preencha todos os campos',true);return}var u=Auth.getUsers();if(u.find(function(x){return x.login===l})){showToast('Login ja existe',true);return}u.push({id:Date.now(),nome:n,login:l,senha:s,nivel:nv});Auth.saveUsers(u);this.render();this.clearForm();showToast('Adicionado');GoogleSheetsSync.syncUsuarios(u);SyncQueue.add('upsert','usuario',u)},
+  edit:function(id){var u=Auth.getUsers().find(function(x){return x.id===id});if(!u)return;this.editingId=id;document.getElementById('userNome').value=u.nome;document.getElementById('userLogin').value=u.login;document.getElementById('userSenha').value='';document.getElementById('userNivel').value=u.nivel;document.getElementById('userCancelBtn').style.display='inline-flex';showToast('Editando')},
+  delete:function(id){if(Auth.currentUser&&Auth.currentUser.id===id){showToast('Nao pode excluir proprio usuario',true);return}if(!confirm('Excluir?'))return;Auth.saveUsers(Auth.getUsers().filter(function(u){return u.id!==id}));this.render();showToast('Excluido');GoogleSheetsSync.syncUsuarios(Auth.getUsers());SyncQueue.add('delete','usuario',{id:id})},
+  cancelEdit:function(){this.editingId=null;this.clearForm();document.getElementById('userCancelBtn').style.display='none'},
+  clearForm:function(){document.getElementById('userNome').value='';document.getElementById('userLogin').value='';document.getElementById('userSenha').value='';document.getElementById('userNivel').value='tecnico'}
+};
+
+/* ==================== AGENDAMENTOS ==================== */
 var Agendamentos = {
-  carregar: function() { State.agendamentos = Storage.loadAgendamentos(); this.atualizarLista(); },
-  atualizarLista: function() {
-    var container = $('agendamentosLista');
-    if (!container) return;
-    if (!State.agendamentos.length) { container.innerHTML = '<div class="text-center p-4 text-[var(--muted)]">Nenhum agendamento</div>'; return; }
-    var html = '';
-    State.agendamentos.forEach(function(a) {
-      html += '<div class="schedule-card"><div><strong>' + a.cliente + '</strong><br><small>' + a.data + ' ' + (a.horario || '') + '</small><br><small>' + (a.descricao || '') + '</small></div><div class="mt-2"><button onclick="Agendamentos.excluir(' + a.id + ')" class="btn btn-danger text-xs">Excluir</button></div></div>';
-    });
-    container.innerHTML = html;
-  },
-  salvar: function() {
-    var cliente = $('ag_cliente').value.trim();
-    var data = $('ag_data').value;
-    if (!cliente || !data) { showToast('Preencha cliente e data', true); return; }
-    var agendamento = { id: Date.now(), cliente: cliente, equipamento: $('ag_equipamento').value, data: data, horario: $('ag_horario').value, descricao: $('ag_descricao').value };
-    State.agendamentos.push(agendamento);
-    Storage.saveAgendamentos();
-    $('ag_cliente').value = ''; $('ag_equipamento').value = ''; $('ag_data').value = ''; $('ag_horario').value = ''; $('ag_descricao').value = '';
-    this.atualizarLista();
-    showToast('Agendamento salvo');
-  },
-  excluir: function(id) {
-    if (!confirm('Excluir?')) return;
-    State.agendamentos = State.agendamentos.filter(function(a) { return a.id !== id; });
-    Storage.saveAgendamentos();
-    this.atualizarLista();
-    showToast('Excluido');
-  }
+  carregar:function(){State.agendamentos=Storage.loadAgendamentos();this.atualizarLista();this.atualizarSelectTecnicos();this.atualizarDatalistClientes()},
+  atualizarSelectTecnicos:function(){var s=document.getElementById('ag_tecnico');if(!s)return;var u=Auth.getUsers().filter(function(u){return u.nivel==='tecnico'});s.innerHTML='<option value="">Selecione</option>';u.forEach(function(t){s.innerHTML+='<option value="'+t.login+'">'+t.nome+'</option>'})},
+  atualizarDatalistClientes:function(){var dl=document.getElementById('clientesList');if(!dl)return;dl.innerHTML='';State.clients.forEach(function(c){var o=document.createElement('option');o.value=c.nome;dl.appendChild(o)})},
+  salvar:async function(){if(!Auth.isAdmin()){showToast('Apenas administrador',true);return}var cl=document.getElementById('ag_cliente').value.trim(),eq=document.getElementById('ag_equipamento').value.trim(),dt=document.getElementById('ag_data').value,hr=document.getElementById('ag_horario').value,tc=document.getElementById('ag_tecnico').value,ds=document.getElementById('ag_descricao').value,editId=document.getElementById('ag_editId').value;if(!cl||!dt||!tc){showToast('Cliente, data e tecnico obrigatorios',true);return}if(!dt || !hr){showToast('Data e horário obrigatórios',true);return}var agendamento;if(editId){var idx=State.agendamentos.findIndex(function(a){return a.id==editId});if(idx!==-1){State.agendamentos[idx]={id:parseInt(editId),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};agendamento=State.agendamentos[idx];showToast('Agendamento atualizado')}}else{agendamento={id:Date.now(),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};State.agendamentos.push(agendamento);showToast('Agendamento salvo')}Storage.saveAgendamentos();this.limparForm();this.atualizarLista();try{var ok=await GoogleSheetsSync.syncSingleAgendamento(agendamento);if(ok)console.log('Agendamento sincronizado com Google');else throw new Error('Falha na sincronização');}catch(e){SyncQueue.add('upsert','agendamento',agendamento);showToast('Salvo localmente, pendente sincronização',true);}},
+  limparForm:function(){['ag_cliente','ag_equipamento','ag_data','ag_horario','ag_descricao'].forEach(function(id){document.getElementById(id).value=''});document.getElementById('ag_tecnico').value='';document.getElementById('ag_editId').value=''},
+  atualizarLista:function(){var c=document.getElementById('agendamentosLista');if(!c)return;var p=State.agendamentos.filter(function(a){return a.status!=='concluido'}).sort(function(a,b){return(a.data+''+a.horario).localeCompare(b.data+''+b.horario)});if(!p.length){c.innerHTML='<div class="text-center p-4 text-[var(--muted)]">Nenhum agendamento pendente</div>';return}var h='';p.forEach(function(a){h+='<div class="schedule-card"><div class="flex justify-between items-start flex-wrap"><div><strong>'+a.cliente+'</strong> - '+(a.equipamento||'Nao informado')+'<br><small><i class="fas fa-calendar"></i> '+a.data+' '+a.horario+' | <i class="fas fa-user-cog"></i> '+a.tecnico+'</small><br><small>'+(a.descricao||'')+'</small></div><div><button onclick="Agendamentos.concluir('+a.id+')" class="btn btn-success text-xs py-1 px-2"><i class="fas fa-check"></i></button> <button onclick="Agendamentos.editar('+a.id+')" class="btn btn-info text-xs py-1 px-2"><i class="fas fa-edit"></i></button> <button onclick="Agendamentos.excluir('+a.id+')" class="btn btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button></div></div></div>'});c.innerHTML=h},
+  editar:function(id){var a=State.agendamentos.find(function(a){return a.id===id});if(!a)return;document.getElementById('ag_cliente').value=a.cliente;document.getElementById('ag_equipamento').value=a.equipamento||'';document.getElementById('ag_data').value=a.data;document.getElementById('ag_horario').value=a.horario;document.getElementById('ag_tecnico').value=a.tecnico;document.getElementById('ag_descricao').value=a.descricao||'';document.getElementById('ag_editId').value=a.id;showToast('Editando agendamento')},
+  concluir:async function(id){var i=State.agendamentos.findIndex(function(a){return a.id===id});if(i!==-1){State.agendamentos[i].status='concluido';Storage.saveAgendamentos();this.atualizarLista();showToast('Concluido');try{await GoogleSheetsSync.syncSingleAgendamento(State.agendamentos[i]);}catch(e){SyncQueue.add('upsert','agendamento',State.agendamentos[i]);}}},
+  excluir:async function(id){if(!confirm('Excluir?'))return;var r=State.agendamentos.find(function(a){return a.id===id});State.agendamentos=State.agendamentos.filter(function(a){return a.id!==id});Storage.saveAgendamentos();this.atualizarLista();showToast('Excluido');if(r){try{await GoogleSheetsSync.syncSingleAgendamento(Object.assign({},r,{_deleted:true}));}catch(e){SyncQueue.add('delete','agendamento',{id:id})}}},
+  obterAgendamentosDoDia:function(tl){var h=new Date().toISOString().split('T')[0];return State.agendamentos.filter(function(a){return a.tecnico===tl&&a.data===h&&a.status!=='concluido'})}
 };
 
-// ==================== USER MANAGER ====================
-var UserManager = {
-  editingId: null,
-  render: function() {
-    var users = Auth.getUsers();
-    var tb = $('userTableBody');
-    if (!tb) return;
-    tb.innerHTML = '';
-    users.forEach(function(u) {
-      tb.innerHTML += '<tr><td>' + u.nome + '</td><td>' + u.login + '</td><td><i class="fas fa-edit text-blue-400 cursor-pointer mr-2" onclick="UserManager.editar(' + u.id + ')"></i><i class="fas fa-trash text-red-400 cursor-pointer" onclick="UserManager.excluir(' + u.id + ')"></i></td></tr>';
-    });
-  },
-  addUser: function() {
-    var nome = $('userNome').value.trim();
-    var login = $('userLogin').value.trim();
-    var senha = $('userSenha').value;
-    if (!nome || !login || !senha) { showToast('Preencha todos os campos', true); return; }
-    var users = Auth.getUsers();
-    if (users.find(function(u) { return u.login === login; })) { showToast('Login ja existe', true); return; }
-    users.push({ id: Date.now(), nome: nome, login: login, senha: senha, nivel: 'tecnico' });
-    Auth.saveUsers(users);
-    this.render();
-    $('userNome').value = ''; $('userLogin').value = ''; $('userSenha').value = '';
-    showToast('Usuario adicionado');
-  },
-  editar: function(id) {
-    var user = Auth.getUsers().find(function(u) { return u.id === id; });
-    if (!user) return;
-    this.editingId = id;
-    $('userNome').value = user.nome;
-    $('userLogin').value = user.login;
-    $('userSenha').value = '';
-    $('userCancelBtn').style.display = 'inline-flex';
-    showToast('Editando usuario');
-  },
-  excluir: function(id) {
-    if (Auth.currentUser && Auth.currentUser.id === id) { showToast('Nao pode excluir proprio usuario', true); return; }
-    if (!confirm('Excluir?')) return;
-    var users = Auth.getUsers().filter(function(u) { return u.id !== id; });
-    Auth.saveUsers(users);
-    this.render();
-    showToast('Usuario excluido');
-  },
-  cancelEdit: function() {
-    this.editingId = null;
-    $('userNome').value = ''; $('userLogin').value = ''; $('userSenha').value = '';
-    $('userCancelBtn').style.display = 'none';
-  }
+/* ==================== JORNADA ==================== */
+var Jornada = {
+  carregar:function(){if(!Auth.currentUser||Auth.currentUser.nivel!=='tecnico')return;var s=Storage.loadJornada(Auth.currentUser.login);State.jornada=s||{etapa:'inicio',dados:{}};if(!s)Storage.saveJornada(Auth.currentUser.login,State.jornada);this.renderizar()},
+  renderizar:function(){var c=document.getElementById('jornadaSteps'),sd=document.getElementById('jornadaStatus');if(!c)return;var ah=Agendamentos.obterAgendamentosDoDia(Auth.currentUser.login);sd.innerHTML=ah.length?'<i class="fas fa-tasks"></i> '+ah.length+' agendamento(s) hoje: '+ah.map(function(a){return a.cliente}).join(', '):'<i class="fas fa-info-circle"></i> Nenhum agendamento para hoje.';var h='',d=State.jornada.dados||{},e1=d.inicio&&d.inicio.concluido;h+='<div class="journey-step '+(e1?'completed':'')+'"><h3><i class="fas fa-play-circle"></i> 1. Inicio do Trabalho</h3>';if(!e1){h+='<div class="grid grid-cols-2 gap-3"><div><label>Placa</label><input type="text" id="jornada_placa_inicio" class="form-input" value="'+(d.inicio?d.inicio.placa:'')+'" placeholder="ABC-1234"></div><div><label>KM Inicial</label><input type="number" id="jornada_km_inicio" class="form-input" value="'+(d.inicio?d.inicio.km:'')+'" placeholder="0"></div></div><div class="mt-2"><button onclick="Jornada.obterLocalizacao(\'inicio\')" class="location-btn"><i class="fas fa-map-marker-alt"></i> Localizacao</button> <span id="localizacao_inicio_texto" class="text-xs text-[var(--muted)]">'+(d.inicio&&d.inicio.localizacao?d.inicio.localizacao:'Nao obtida')+'</span></div><div class="mt-2"><label>Foto</label><input type="file" id="jornada_foto_inicio" accept="image/*" class="form-input"></div><button onclick="Jornada.salvarEtapa(\'inicio\')" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Registrar Inicio</button>'}else{h+='<div class="text-green-400"><i class="fas fa-check-circle"></i> Registrado em '+d.inicio.dataHora+' - KM '+d.inicio.km+'</div>'}h+='</div>';var e2=d.chegada&&d.chegada.concluido;h+='<div class="journey-step '+(e2?'completed':'')+'"><h3><i class="fas fa-flag-checkered"></i> 2. Chegada ao Cliente</h3>';if(!e2&&e1){h+='<div><button onclick="Jornada.obterLocalizacao(\'chegada\')" class="location-btn"><i class="fas fa-map-marker-alt"></i> Localizacao</button> <span id="localizacao_chegada_texto" class="text-xs text-[var(--muted)]">'+(d.chegada&&d.chegada.localizacao?d.chegada.localizacao:'Nao obtida')+'</span></div><div class="mt-2"><label>Foto</label><input type="file" id="jornada_foto_chegada" accept="image/*" class="form-input"></div><button onclick="Jornada.salvarEtapa(\'chegada\')" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Registrar Chegada</button>'}else if(e2){h+='<div class="text-green-400"><i class="fas fa-check-circle"></i> Registrado em '+d.chegada.dataHora+'</div>'}else{h+='<div class="text-[var(--warning)]"><i class="fas fa-hourglass-half"></i> Aguarde registrar inicio.</div>'}h+='</div>';var e3=d.final&&d.final.concluido;h+='<div class="journey-step '+(e3?'completed':'')+'"><h3><i class="fas fa-stop-circle"></i> 3. Finalizacao (Retorno)</h3>';if(!e3&&e2){h+='<div class="grid grid-cols-2 gap-3"><div><label>Placa</label><input type="text" id="jornada_placa_final" class="form-input" value="'+(d.final?d.final.placa:'')+'"></div><div><label>KM Final</label><input type="number" id="jornada_km_final" class="form-input" value="'+(d.final?d.final.km:'')+'"></div></div><div class="mt-2"><button onclick="Jornada.obterLocalizacao(\'final\')" class="location-btn"><i class="fas fa-map-marker-alt"></i> Localizacao</button> <span id="localizacao_final_texto" class="text-xs text-[var(--muted)]">'+(d.final&&d.final.localizacao?d.final.localizacao:'Nao obtida')+'</span></div><div class="mt-2"><label>Foto</label><input type="file" id="jornada_foto_final" accept="image/*" class="form-input"></div><button onclick="Jornada.salvarEtapa(\'final\')" class="btn btn-primary mt-3"><i class="fas fa-save"></i> Registrar Finalizacao</button>'}else if(e3){h+='<div class="text-green-400"><i class="fas fa-check-circle"></i> Finalizado em '+d.final.dataHora+' - KM '+d.final.km+'</div>'}else{h+='<div class="text-[var(--warning)]"><i class="fas fa-hourglass-half"></i> Aguarde registrar chegada.</div>'}h+='</div>';if(e2&&!e3){h+='<div class="journey-step"><h3><i class="fas fa-laptop-code"></i> 4. Executar Servico</h3><p>Voce pode iniciar a OS na aba O.S</p><button onclick="document.querySelector(\'.tab-button[data-tab=\\\'tab-os\\\']\').click()" class="btn btn-primary"><i class="fas fa-arrow-right"></i> Ir para O.S</button></div>'}c.innerHTML=h},
+  obterLocalizacao:function(et){if(!navigator.geolocation){showToast('Geolocalizacao nao suportada',true);return}var self=this;navigator.geolocation.getCurrentPosition(function(p){var t=p.coords.latitude.toFixed(6)+', '+p.coords.longitude.toFixed(6);var s=document.getElementById('localizacao_'+et+'_texto');if(s)s.innerHTML=t;if(!State.jornada.dados[et])State.jornada.dados[et]={};State.jornada.dados[et].localizacao=t;Storage.saveJornada(Auth.currentUser.login,State.jornada);showToast('Localizacao obtida')},function(e){showToast('Erro: '+e.message,true)})},
+  salvarEtapa:async function(et){var de={};if(et==='inicio'){var pl=document.getElementById('jornada_placa_inicio').value.trim(),km=document.getElementById('jornada_km_inicio').value.trim();if(!pl||!km){showToast('Preencha placa e KM',true);return}de.placa=pl;de.km=km;var fi=document.getElementById('jornada_foto_inicio');if(fi&&fi.files.length>0)de.foto=await Fotos.compressFile(fi.files[0]);de.localizacao=(State.jornada.dados.inicio||{}).localizacao||'';de.dataHora=new Date().toLocaleString();de.concluido=true;State.jornada.dados.inicio=de;State.jornada.etapa='chegada'}else if(et==='chegada'){var fc=document.getElementById('jornada_foto_chegada'),fd=null;if(fc&&fc.files.length>0)fd=await Fotos.compressFile(fc.files[0]);var lo=(State.jornada.dados.chegada||{}).localizacao||'';if(!lo&&!confirm('Localizacao nao obtida. Continuar?'))return;de={localizacao:lo,foto:fd,dataHora:new Date().toLocaleString(),concluido:true};State.jornada.dados.chegada=de;State.jornada.etapa='trabalhando'}else if(et==='final'){var pf=document.getElementById('jornada_placa_final').value.trim(),kf=document.getElementById('jornada_km_final').value.trim();if(!pf||!kf){showToast('Preencha placa e KM',true);return}var ff=document.getElementById('jornada_foto_final'),fdf=null;if(ff&&ff.files.length>0)fdf=await Fotos.compressFile(ff.files[0]);de={placa:pf,km:kf,localizacao:(State.jornada.dados.final||{}).localizacao||'',foto:fdf,dataHora:new Date().toLocaleString(),concluido:true};State.jornada.dados.final=de;State.jornada.etapa='finalizado'}Storage.saveJornada(Auth.currentUser.login,State.jornada);this.renderizar();showToast('Etapa '+et+' registrada!');if(et==='chegada')showToast('Agora inicie a OS na aba O.S')},
+  removerFoto:function(et){if(State.jornada.dados[et])delete State.jornada.dados[et].foto;Storage.saveJornada(Auth.currentUser.login,State.jornada);this.renderizar();showToast('Foto removida')}
 };
 
-// ==================== APP ====================
-var App = {
-  init: function() {
-    Storage.loadCounter();
-    Clientes.load();
-    Historico.load();
-    Agendamentos.carregar();
-    Checklist.render();
-    Signature.init();
-    this.populateMarcas();
-    this.setupMarcaSelect();
-    this.setupTabs();
-    this.setupSearch();
-    if ($('dataOS')) $('dataOS').value = new Date().toISOString().split('T')[0];
-    this.updateUI();
-    UserManager.render();
-    showToast('Sistema pronto');
+/* ==================== FOTOS ==================== */
+var Fotos = {
+  compressFile:function(file){return new Promise(function(resolve,reject){var r=new FileReader();r.onload=function(ev){var img=new Image();img.src=ev.target.result;img.onload=function(){var cv=document.createElement('canvas'),ra=Math.min(800/img.width,600/img.height),nw=img.width*ra,nh=img.height*ra;cv.width=nw;cv.height=nh;var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,nw,nh);cx.drawImage(img,0,0,nw,nh);resolve(cv.toDataURL('image/jpeg',0.7))};img.onerror=reject};r.readAsDataURL(file)})},
+  compress:function(b64){return Promise.resolve(b64)},
+  init:function(){
+    var fi=document.getElementById('fotoHorimetroInput');
+    if(fi)fi.addEventListener('change',function(e){var f=e.target.files[0];if(f&&f.type.startsWith('image/')){var r=new FileReader();r.onload=async function(ev){try{State.fotoHorimetro=await Fotos.compress(ev.target.result);var p=document.getElementById('fotoHorimetroPreview');if(p)p.innerHTML='<div class="photo-item"><img src="'+State.fotoHorimetro+'"><div class="photo-remove" onclick="Fotos.removeHorimetro()">x</div></div>';State.hasUnsavedChanges=true;showToast('Foto carregada')}catch(err){showToast('Erro',true)}};r.readAsDataURL(f)}});
+    var fs=document.getElementById('fotosServico');
+    if(fs)fs.addEventListener('change',async function(e){var files=Array.from(e.target.files);if(State.fotosServico.length+files.length>Config.maxFotos){showToast('Maximo '+Config.maxFotos+' fotos',true);return}var p=document.getElementById('fotosPreview');for(var i=0;i<files.length;i++){var f=files[i];if(!f.type.startsWith('image/'))continue;var r=new FileReader();await new Promise(function(resolve){r.onload=async function(ev){try{var c=await Fotos.compress(ev.target.result);State.fotosServico.push(c);if(p){var d=document.createElement('div');d.className='photo-item';d.innerHTML='<img src="'+c+'"><div class="photo-remove" onclick="Fotos.removeServico(this)">x</div>';p.appendChild(d)}}catch(err){}resolve()};r.readAsDataURL(f)})}fs.value='';State.hasUnsavedChanges=true});
+    var fp=document.getElementById('fotosPendenciasInput');
+    if(fp)fp.addEventListener('change',async function(e){var files=Array.from(e.target.files);if(State.fotosPendencias.length+files.length>Config.maxFotos){showToast('Maximo '+Config.maxFotos+' fotos',true);return}var p=document.getElementById('fotosPendenciasPreview');for(var i=0;i<files.length;i++){var f=files[i];if(!f.type.startsWith('image/'))continue;var r=new FileReader();await new Promise(function(resolve){r.onload=async function(ev){try{var c=await Fotos.compress(ev.target.result);State.fotosPendencias.push(c);if(p){var d=document.createElement('div');d.className='photo-item';d.innerHTML='<img src="'+c+'"><div class="photo-remove" onclick="Fotos.removePendencia(this)">x</div>';p.appendChild(d)}}catch(err){}resolve()};r.readAsDataURL(f)})}fp.value='';State.hasUnsavedChanges=true})
   },
-  populateMarcas: function() {
-    var sel = $('marcaSelect');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Selecione</option>';
-    Config.marcas.forEach(function(m) { sel.innerHTML += '<option value="' + m + '">' + m + '</option>'; });
-  },
-  setupMarcaSelect: function() {
-    var sel = $('marcaSelect');
-    var div = $('marcaOutraDiv');
-    var input = $('marcaOutra');
-    if (sel && div && input) {
-      sel.addEventListener('change', function() { div.style.display = sel.value === 'OUTRA' ? 'block' : 'none'; });
-    }
-  },
-  setupTabs: function() {
-    var container = $('tabsContainer');
-    if (!container) return;
-    container.addEventListener('click', function(e) {
-      var btn = e.target.closest('.tab-button');
-      if (!btn) return;
-      var tabId = btn.getAttribute('data-tab');
-      document.querySelectorAll('.tab-button').forEach(function(b) { b.classList.remove('active'); });
-      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
-      btn.classList.add('active');
-      if ($(tabId)) $(tabId).classList.add('active');
-    });
-  },
-  setupSearch: function() {
-    var search = $('cad_searchInput');
-    if (search) {
-      search.addEventListener('input', function(e) {
-        var q = e.target.value.toLowerCase();
-        var original = State.clients.slice();
-        State.clients = original.filter(function(c) { return (c.nome && c.nome.toLowerCase().includes(q)) || (c.cidade && c.cidade.toLowerCase().includes(q)); });
-        Clientes.renderTable();
-        setTimeout(function() { State.clients = original; Clientes.renderTable(); }, 100);
-      });
-    }
-    var histSearch = $('historicoSearch');
-    if (histSearch) histSearch.addEventListener('input', function() { Historico.render(); });
-    var statusFilter = $('historicoFiltroStatus');
-    if (statusFilter) statusFilter.addEventListener('change', function() { Historico.render(); });
-  },
-  updateUI: function() {
-    var s = State.currentStatus;
-    var statusMap = { abertura: 'status-abertura', execucao: 'status-execucao', finalizacao: 'status-finalizacao', fechada: 'status-fechada', aprovada: 'status-aprovada' };
-    var statusText = { abertura: 'EM ABERTURA', execucao: 'EM EXECUCAO', finalizacao: 'FINALIZANDO', fechada: 'FECHADA', aprovada: 'APROVADA' };
-    if ($('statusBadge')) { $('statusBadge').className = 'status-badge ' + (statusMap[s] || 'status-abertura'); $('statusBadge').textContent = statusText[s] || 'EM ABERTURA'; }
-    var btns = { btnIniciarExecucao: s === 'abertura', btnFinalizar: s === 'execucao', btnFecharOS: s === 'finalizacao', btnAprovar: s === 'fechada' };
-    for (var id in btns) { if ($(id)) $(id).disabled = !btns[id]; }
-    var steps = ['abertura', 'execucao', 'finalizacao', 'fechada', 'aprovada'];
-    document.querySelectorAll('.step').forEach(function(step, idx) {
-      step.classList.remove('active', 'completed');
-      if (steps[idx] === s) step.classList.add('active');
-      else if (steps.indexOf(s) > idx) step.classList.add('completed');
-    });
-  },
-  mudarStatus: function(novoStatus) {
-    if (novoStatus === 'abertura' && !$('numeroOS').value) { showToast('Clique em Nova OS primeiro', true); return; }
-    if (novoStatus === 'aprovada' && !$('assinaturaClienteData').value) { showToast('Cliente deve assinar', true); return; }
-    State.currentStatus = novoStatus;
-    this.salvar();
-    this.updateUI();
-    Historico.render();
-    showToast('Status: ' + novoStatus.toUpperCase());
-  },
-  iniciarExecucao: function() { if (State.currentStatus === 'abertura') this.mudarStatus('execucao'); },
-  finalizarServico: function() { if (State.currentStatus === 'execucao') this.mudarStatus('finalizacao'); },
-  fecharOS: function() { if (State.currentStatus === 'finalizacao') this.mudarStatus('fechada'); },
-  novaOS: function() {
-    State.currentStatus = 'abertura';
-    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file') $(el).value = ''; });
-    if ($('dataOS')) $('dataOS').value = new Date().toISOString().split('T')[0];
-    document.querySelectorAll('#checklistSections input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
-    Checklist.updateProgress();
-    Signature.clear('tec');
-    Signature.clear('cli');
-    this.generateOSNumber();
-    this.updateUI();
-    showToast('Nova OS criada');
-  },
-  generateOSNumber: function() {
-    State.osCounter = Storage.loadCounter();
-    State.osCounter++;
-    Storage.saveCounter();
-    var d = new Date();
-    var os = 'OS-' + d.getFullYear().toString().slice(-2) + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(State.osCounter).padStart(4, '0');
-    if ($('numeroOS')) $('numeroOS').value = os;
-    return os;
-  },
-  salvar: function() {
-    var dados = {};
-    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file') dados[el.id] = $(el).value; });
-    dados.status = State.currentStatus;
-    if (!dados.numeroOS) dados.numeroOS = this.generateOSNumber();
-    var marcaSel = $('marcaSelect').value;
-    var marcaOutra = $('marcaOutra') ? $('marcaOutra').value : '';
-    dados.marca = marcaSel === 'OUTRA' ? marcaOutra.toUpperCase() : marcaSel;
-    var idx = State.osHistory.findIndex(function(o) { return o.numeroOS === dados.numeroOS; });
-    if (idx >= 0) State.osHistory[idx] = dados;
-    else State.osHistory.unshift(dados);
-    Storage.saveOSHistory();
-    Historico.render();
-    showToast('OS salva');
-  },
-  salvarOSManual: function() { this.salvar(); }
+  removeHorimetro:function(){State.fotoHorimetro=null;var i=document.getElementById('fotoHorimetroInput');if(i)i.value='';var p=document.getElementById('fotoHorimetroPreview');if(p)p.innerHTML=''},
+  removeServico:function(el){var c=el.parentNode.parentNode,idx=Array.from(c.children).indexOf(el.parentNode);if(idx!==-1){State.fotosServico.splice(idx,1);el.parentNode.remove()}},
+  removePendencia:function(el){var c=el.parentNode.parentNode,idx=Array.from(c.children).indexOf(el.parentNode);if(idx!==-1){State.fotosPendencias.splice(idx,1);el.parentNode.remove()}}
 };
 
-// Inicializacao
-document.addEventListener('DOMContentLoaded', function() {
-  if (!Auth.checkSession()) {
-    $('loginScreen').style.display = 'flex';
-    $('appContainer').style.display = 'none';
-  } else {
-    App.init();
-  }
+/* ==================== APP PRINCIPAL ==================== */
+var App={
+  init:function(){
+    Storage.loadCounter();Clientes.load();Historico.load();Agendamentos.carregar();
+    this.populateMarcas();Checklist.render();Signature.init();Fotos.init();Horas.initListeners();Utils.setDefaultDate();this.setupTabs();this.setupMarcaSelect();this.setupSearch();
+    State.currentStatus='abertura';this.updateUI();UserManager.render();
+    var pc=document.getElementById('permissoesContainer');
+    if(pc&&Auth.isAdmin()){var h='';for(var k in Permissoes.padrao)h+='<div class="permission-item"><label><input type="checkbox" id="perm_'+k+'"> '+k.replace(/_/g,' ').toUpperCase()+'</label></div>';pc.innerHTML=h;Permissoes.carregarNaInterface()}
+    window.addEventListener('online', () => { showToast('Conexão restaurada, sincronizando...'); SyncQueue.forceSync(); });
+    setTimeout(function(){GoogleSheetsSync.fetchFromSheet()},2000)
+  },
+  populateMarcas:function(){var s=$('marcaSelect');if(!s)return;s.innerHTML='<option value="">Selecione</option>';Config.marcas.forEach(function(m){if(m!=='OUTRA')s.innerHTML+='<option value="'+m+'">'+m+'</option>'});s.innerHTML+='<option value="OUTRA">OUTRA</option>'},
+  setupMarcaSelect:function(){var s=$('marcaSelect'),d=$('marcaOutraDiv'),i=$('marcaOutra');if(s&&d&&i){s.addEventListener('change',function(){d.style.display=s.value==='OUTRA'?'block':'none';Utils.setVal('marca',s.value==='OUTRA'?i.value.toUpperCase():s.value)});i.addEventListener('input',function(){Utils.setVal('marca',i.value.toUpperCase())})}},
+  setupTabs:function(){var c=document.getElementById('tabsContainer');if(!c)return;var handler=function(e){var t=e.target.closest('.tab-button');if(!t)return;e.preventDefault();var tid=t.getAttribute('data-tab');if(!tid)return;document.querySelectorAll('.tab-button').forEach(function(x){x.classList.remove('active')});document.querySelectorAll('.tab-content').forEach(function(x){x.classList.remove('active')});t.classList.add('active');var tc=document.getElementById(tid);if(tc)tc.classList.add('active')};c.addEventListener('click',handler)},
+  setupSearch:function(){var hs=$('historicoSearch');if(hs)hs.addEventListener('input',function(){Historico.render()});var tf=$('historicoFiltroTipo');if(tf)tf.addEventListener('change',function(){Historico.render()});var sf=$('historicoFiltroStatus');if(sf)sf.addEventListener('change',function(){Historico.render()});var si=$('cad_searchInput');if(si)si.addEventListener('input',function(e){var q=e.target.value.toLowerCase(),orig=State.clients;State.clients=orig.filter(function(c){return(c.nome&&c.nome.toLowerCase().indexOf(q)!==-1)||(c.cidade&&c.cidade.toLowerCase().indexOf(q)!==-1)});Clientes.renderTable();State.clients=orig})},
+  updateUI:function(){var a=State.currentStatus==='abertura',ex=State.currentStatus==='execucao',fi=State.currentStatus==='finalizacao',fe=State.currentStatus==='fechada',ap=State.currentStatus==='aprovada';var bi=$('btnIniciarExecucao');if(bi)bi.disabled=!a;var bf=$('btnFinalizar');if(bf)bf.disabled=!ex;var bfe=$('btnFecharOS');if(bfe)bfe.disabled=!fi;var ba=$('btnAprovar');if(ba)ba.disabled=!fe;var bp=$('btnPreviaPDF'),be=$('btnEnviarEmail');if(bp)bp.disabled=!ap;if(be)be.disabled=!ap;['descricaoServico','pecasAplicadas','pendencias','horasExtras','adicionalNoturno','modelo','numSerie','horimetro'].forEach(function(id){var el=$(id);if(el)el.disabled=fe||ap});var ms=$('marcaSelect');if(ms)ms.disabled=fe||ap;var bg=$('statusBadge');if(bg){var cfg={abertura:{text:'EM ABERTURA',cls:'status-abertura'},execucao:{text:'EM EXECUCAO',cls:'status-execucao'},finalizacao:{text:'FINALIZANDO',cls:'status-finalizacao'},fechada:{text:'FECHADA',cls:'status-fechada'},aprovada:{text:'APROVADA',cls:'status-aprovada'}}[State.currentStatus];bg.textContent=cfg.text;bg.className='status-badge '+cfg.cls}var steps=['abertura','execucao','finalizacao','fechada','aprovada'];document.querySelectorAll('.step').forEach(function(st,idx){st.classList.remove('active','completed','locked');if(steps[idx]===State.currentStatus)st.classList.add('active');else if(steps.indexOf(State.currentStatus)>idx)st.classList.add(steps[idx]==='fechada'&&State.currentStatus==='aprovada'?'locked':'completed')})},
+  coletarDados:function(){var d={};document.querySelectorAll('#tab-os input,#tab-os select,#tab-os textarea').forEach(function(el){if(el.id&&el.type!=='file')d[el.id]=el.value});Object.assign(d,Checklist.getChecklistData());var ms=$('marcaSelect').value,mo=$('marcaOutra').value;d.marca=ms==='OUTRA'?mo.toUpperCase():ms;return d},
+  salvar:async function(){Signature.save('tec');Signature.save('cli');var d=this.coletarDados();d.status=State.currentStatus;d.fotosBase64=State.fotosServico;d.fotoHorimetro=State.fotoHorimetro;d.fotosPendencias=State.fotosPendencias;d.assinaturaTecnico=Utils.getVal('assinaturaTecnicoData');d.assinaturaCliente=Utils.getVal('assinaturaClienteData');d.checklistData=Checklist.getChecklistData();Horas.calcular();d.horasTotais=Utils.getVal('horasTotais');d.totalGeral=Utils.getVal('totalGeral');if(!d.numeroOS)d.numeroOS=Utils.generateOSNumber();try{var idx=State.osHistory.findIndex(function(o){return o.numeroOS===d.numeroOS});if(idx>=0)State.osHistory[idx]=d;else State.osHistory.unshift(d);Storage.saveOSHistory();State.hasUnsavedChanges=false;Historico.updateStats();Clientes.updateStats();await GoogleSheetsSync.syncSingleOS(d);SyncQueue.add('upsert','os',d);return true}catch(e){showToast('Erro ao salvar',true);return false}},
+  salvarOSManual:async function(){var ok=await this.salvar();if(ok){showToast('OS salva');Historico.render()}},
+  mudarStatus:async function(ns){if(ns==='abertura'){if(!Utils.getVal('numeroOS')){showToast('Clique em Nova OS primeiro',true);return}if(!Utils.getVal('cliente').trim()){showToast('Cliente obrigatorio',true);return}}if(ns==='execucao'&&State.currentStatus!=='abertura'){showToast('Precisa estar em ABERTURA',true);return}if(ns==='finalizacao'&&State.currentStatus!=='execucao'){showToast('Precisa estar em EXECUCAO',true);return}if(ns==='fechada'&&State.currentStatus!=='finalizacao'){showToast('Precisa estar FINALIZANDO',true);return}if(ns==='aprovada'){if(State.currentStatus!=='fechada'){showToast('Precisa estar FECHADA',true);return}if(!Utils.getVal('assinaturaClienteData')){showToast('Cliente deve assinar',true);return}if(!Utils.getVal('recebedor').trim()){showToast('Nome do recebedor',true);return}}State.currentStatus=ns;if(ns==='finalizacao'||ns==='fechada')Horas.calcular();var ok=await this.salvar();if(ok){this.updateUI();Historico.render();showToast('Status: '+Utils.formatStatus(ns))}},
+  iniciarExecucao:function(){if(State.currentStatus!=='abertura')return;this.mudarStatus('execucao');Timer.control('start');showToast('Execucao iniciada')},
+  finalizarServico:function(){if(State.currentStatus!=='execucao')return;var h=Utils.getVal('horimetro');if(!h){showToast('Horimetro obrigatorio',true);return}if(!Utils.validarHorimetro(h)){showToast('Horimetro invalido (ex: 1250 ou 1250h)',true);return}Timer.control('stop');Horas.calcular();this.mudarStatus('finalizacao');showToast('Servico finalizado')},
+  fecharOS:function(){if(State.currentStatus!=='finalizacao')return;if(!Utils.getVal('descricaoServico').trim()){showToast('Descreva o servico',true);return}if(!Utils.getVal('horimetro')){showToast('Horimetro obrigatorio',true);return}if(!Utils.validarHorimetro(Utils.getVal('horimetro'))){showToast('Horimetro invalido',true);return}Horas.calcular();if(!confirm('Fechar OS? Dados nao poderao ser alterados.'))return;this.mudarStatus('fechada');showToast('OS fechada')},
+  novaOS:function(){if(State.hasUnsavedChanges&&!confirm('Alteracoes nao salvas. Criar nova OS?'))return;State.currentStatus='abertura';State.fotosServico=[];State.fotoHorimetro=null;State.fotosPendencias=[];State.hasUnsavedChanges=false;document.querySelectorAll('#tab-os input,#tab-os select,#tab-os textarea').forEach(function(el){if(el.id&&el.type!=='file')el.value=''});Utils.setDefaultDate();document.querySelectorAll('input[data-check="true"]').forEach(function(cb){cb.checked=false});Checklist.updateProgress();$('fotosPreview').innerHTML='';$('fotoHorimetroPreview').innerHTML='';$('fotosPendenciasPreview').innerHTML='';$('fotosServico').value='';$('fotoHorimetroInput').value='';$('fotosPendenciasInput').value='';Signature.clear('tec');Signature.clear('cli');Timer.reset();Timer.seconds=0;Timer.running=false;Timer.paused=false;if(Timer.interval)clearInterval(Timer.interval);Utils.generateOSNumber();this.updateUI();showToast('Nova OS criada');document.querySelector('.tab-button[data-tab="tab-clientes"]').click()},
+  getResumoEmail:function(){var t=Utils.getVal('tipoChamado')||'normal',st=Utils.formatStatus(State.currentStatus),ht=Utils.getVal('horasTotais')||'0h',mk=Utils.getVal('marca')||'Nao informada',md=Utils.getVal('modelo')||'Nao informado',ds=Utils.getVal('descricaoServico')||'Nao informado',pc=Utils.getVal('pecasAplicadas')||'Nenhuma',pd=Utils.getVal('pendencias')||'Nenhuma',rl=Utils.getVal('relatoCliente')||'Nao informado',cn=Utils.getVal('cliente'),dt=Utils.getVal('dataOS')||new Date().toLocaleDateString('pt-BR'),no=Utils.getVal('numeroOS')||'OS-'+Date.now();return'MARLIFT EMPILHADEIRAS\n======================\nOS: '+no+'\nData: '+dt+'\nCliente: '+cn+'\nEmpilhadeira: '+mk+' '+md+'\nTempo: '+ht+'\nStatus: '+st+'\nRelato:\n'+rl+'\n\nServico Realizado:\n'+ds+'\n\nPecas:\n'+pc+'\n\nPendencias:\n'+pd+'\n======================\nMARLIFT Empilhadeiras'},
+  enviarEmailComResumo:function(){if(State.currentStatus!=='aprovada'){showToast('Somente OS aprovadas',true);return}var cn=Utils.getVal('cliente'),ce=State.clients.find(function(c){return c.nome===cn}),em=ce?ce.email:'';if(!em){em=prompt('Digite o e-mail do cliente:');if(!em||!em.includes('@')){showToast('Email invalido',true);return}}window.location.href='mailto:'+encodeURIComponent(em)+'?subject='+encodeURIComponent('MARLIFT - OS '+Utils.getVal('numeroOS'))+'&body='+encodeURIComponent(this.getResumoEmail());showToast('Abrindo e-mail')},
+  gerarPreviaPDF:function(){if(State.currentStatus!=='aprovada'){showToast('Somente OS aprovadas',true);return}var w=window.open();w.document.write(this.gerarRelatorioHTML());w.document.close();setTimeout(function(){w.print()},500)},
+  gerarRelatorioHTML:function(){var ed=Utils.getVal('endereco'),ml=ed?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(ed):'',mh=ed?'<div style="margin-top:8px"><a href="'+ml+'" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#f97316;color:white;padding:8px 16px;border-radius:8px;text-decoration:none;font-weight:bold">Ver localizacao</a></div>':'',fh=State.fotosServico.length?'<div><h3>Fotos do Servico</h3><div style="display:flex;flex-wrap:wrap;gap:10px">'+State.fotosServico.map(function(s){return'<img src="'+s+'" style="max-width:200px;border-radius:8px">'}).join('')+'</div></div>':'',hi=State.fotoHorimetro?'<div><h3>Horimetro</h3><img src="'+State.fotoHorimetro+'" style="max-width:180px;border-radius:8px"></div>':'',ci=[];document.querySelectorAll('input[data-check="true"]').forEach(function(cb){if(cb.checked)ci.push(cb.parentElement.innerText.trim())});ch=ci.length?'<div><h3>Itens Verificados</h3><ul><li>'+ci.join('</li><li>')+'</li></ul></div>':'',cn=Utils.getVal('cliente'),ce=State.clients.find(function(c){return c.nome===cn}),ec=ce?ce.email:'Nao informado',hc=Utils.getVal('horasTotais')||'0h',tg=Utils.getVal('totalGeral')||'00:00';return'<!DOCTYPE html><html><head><title>Relatorio_'+Utils.getVal('numeroOS')+'</title><meta charset="UTF-8"><style>body{font-family:Arial;padding:30px;max-width:900px;margin:auto}h1{color:#f97316}h3{color:#333;border-bottom:1px solid #ddd;padding-bottom:5px;margin-top:20px}</style></head><body><h1>MARLIFT EMPILHADEIRAS</h1><h2>RELATORIO - OS '+Utils.getVal('numeroOS')+'</h2><p>Data: '+new Date().toLocaleString('pt-BR')+'</p><h3>Dados do Cliente</h3><p><strong>Cliente:</strong> '+Utils.getVal('cliente')+'<br><strong>CNPJ:</strong> '+Utils.getVal('cnpj')+'<br><strong>Email:</strong> '+ec+'<br><strong>Endereco:</strong> '+Utils.getVal('endereco')+' - '+Utils.getVal('cidadeCliente')+'</p>'+mh+'<h3>Equipamento</h3><p><strong>Marca:</strong> '+Utils.getVal('marca')+' | <strong>Modelo:</strong> '+Utils.getVal('modelo')+' | <strong>Serie:</strong> '+Utils.getVal('numSerie')+' | <strong>Horimetro:</strong> '+Utils.getVal('horimetro')+'h</p>'+hi+'<h3>Servico Executado</h3><p><strong>Diagnostico:</strong><br>'+(Utils.getVal('descricaoServico')||'').replace(/\n/g,'<br>')+'<br><strong>Pecas:</strong><br>'+(Utils.getVal('pecasAplicadas')||'').replace(/\n/g,'<br>')+'<br><strong>Pendencias:</strong><br>'+(Utils.getVal('pendencias')||'').replace(/\n/g,'<br>')+'</p>'+ch+fh+'<h3>Horas</h3><p><strong>Cobradas:</strong> '+hc+' | <strong>Total:</strong> '+tg+'</p><h3>Assinaturas</h3><div style="display:flex;gap:40px"><div><strong>Tecnico:</strong> '+Utils.getVal('tecnico')+'<br>'+(Utils.getVal('assinaturaTecnicoData')?'<img src="'+Utils.getVal('assinaturaTecnicoData')+'" style="max-width:200px;border:1px solid #ccc">':'Nao assinado')+'</div><div><strong>Cliente:</strong> '+Utils.getVal('recebedor')+'<br>'+(Utils.getVal('assinaturaClienteData')?'<img src="'+Utils.getVal('assinaturaClienteData')+'" style="max-width:200px;border:1px solid #ccc">':'Nao assinado')+'</div></div><p style="margin-top:30px;text-align:center;color:#999;font-size:12px">Documento gerado eletronicamente - MARLIFT Empilhadeiras</p></body></html>'},
+  abrirMapa:function(){var e=Utils.getVal('endereco');if(e)window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(e));else showToast('Informe o endereco',true)},
+  sendWhatsAppMessage:function(){var n=prompt('WhatsApp com DDD:',Utils.getVal('whatsappCliente'));if(!n)return;window.open('https://wa.me/'+n.replace(/\D/g,'')+'?text='+encodeURIComponent(this.getResumoEmail()))},
+  fecharModalEquip:function(){$('equipModal').style.display='none'},
+  mostrarModalEquipamentos:function(cl){var md=$('equipModal'),el=$('equipList');el.innerHTML='';if(cl.equipamentos&&cl.equipamentos.length>0){cl.equipamentos.forEach(function(eq){var d=document.createElement('div');d.className='equip-option';d.innerHTML='<div><strong><i class="fas fa-forklift"></i> '+(eq.marca||'N/A')+' '+(eq.modelo||'')+'</strong></div><div class="text-sm text-[var(--muted)]">Serie: '+(eq.serie||'N/A')+' | Qtd: '+(eq.qtd||1)+'</div>';d.onclick=function(){App.carregarEquipamento(eq,cl);md.style.display='none'};el.appendChild(d)})}else{el.innerHTML='<div class="text-center py-4 text-[var(--muted)]">Nenhum equipamento.</div>';var b=document.createElement('button');b.className='btn btn-primary w-full mt-2';b.innerHTML='Carregar cliente';b.onclick=function(){Utils.setVal('cliente',cl.nome);Utils.setVal('cnpj',cl.cnpj);Utils.setVal('cidadeCliente',cl.cidade);Utils.setVal('endereco',cl.endereco);Utils.setVal('whatsappCliente',cl.whatsapp);showToast('Cliente carregado');md.style.display='none';document.querySelector('.tab-button[data-tab="tab-os"]').click()};el.appendChild(b)}md.style.display='flex'},
+  carregarEquipamento:function(eq,cl){Utils.setVal('cliente',cl.nome);Utils.setVal('cnpj',cl.cnpj);Utils.setVal('cidadeCliente',cl.cidade);Utils.setVal('endereco',cl.endereco);Utils.setVal('whatsappCliente',cl.whatsapp);var ms=$('marcaSelect');if(ms){var mk=eq.marca||'';if(Config.marcas.indexOf(mk)!==-1){ms.value=mk;$('marcaOutraDiv').style.display='none'}else if(mk){ms.value='OUTRA';Utils.setVal('marcaOutra',mk);$('marcaOutraDiv').style.display='block'}}Utils.setVal('modelo',eq.modelo||'');Utils.setVal('numSerie',eq.serie||'');if(eq.combustivel)Utils.setVal('combustivel',eq.combustivel);showToast('Equipamento carregado');document.querySelector('.tab-button[data-tab="tab-os"]').click()}
+};
+
+/* ==================== CAMPO EQUIPAMENTO ==================== */
+function adicionarCampoEquipamento(marca,modelo,serie,qtd,combustivel){
+  marca=marca||'';modelo=modelo||'';serie=serie||'';qtd=qtd||1;combustivel=combustivel||'';
+  var ct=$('equipamentosList');if(!ct)return;
+  var d=document.createElement('div');d.className='equip-item';
+  var opts='<option value="">Selecione</option>';
+  Config.marcas.forEach(function(m){if(m!=='OUTRA')opts+='<option value="'+m+'"'+(marca===m?' selected':'')+'>'+m+'</option>'});
+  opts+='<option value="OUTRA"'+(marca==='OUTRA'?' selected':'')+'>OUTRA</option>';
+  d.innerHTML='<select class="form-input w-28 equip-marca">'+opts+'</select><div class="outra-marca-container" style="display:'+(marca==='OUTRA'?'block':'none')+'"><input type="text" placeholder="Marca" class="form-input w-28 outra-marca" value="'+(marca==='OUTRA'?'':marca)+'"></div><input type="text" placeholder="Modelo" class="form-input w-28 equip-modelo" value="'+modelo+'"><input type="text" placeholder="Serie" class="form-input w-28 equip-serie" value="'+serie+'"><input type="number" placeholder="Qtd" class="form-input w-20 equip-qtd" value="'+qtd+'"><select class="form-input w-28 equip-combustivel"><option value="">Comb.</option><option value="eletrico"'+(combustivel==='eletrico'?' selected':'')+'>Eletrico</option><option value="diesel"'+(combustivel==='diesel'?' selected':'')+'>Diesel</option><option value="gasolina"'+(combustivel==='gasolina'?' selected':'')+'>Gasolina</option><option value="glp"'+(combustivel==='glp'?' selected':'')+'>GLP</option></select><button type="button" class="text-red-500" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>';
+  ct.appendChild(d);
+  var sel=d.querySelector('.equip-marca'),od=d.querySelector('.outra-marca-container');
+  sel.addEventListener('change',function(){od.style.display=sel.value==='OUTRA'?'block':'none';if(sel.value!=='OUTRA'){var oi=d.querySelector('.outra-marca');if(oi)oi.value=''}})
+}
+
+/* ==================== INIT ==================== */
+document.addEventListener('DOMContentLoaded',function(){
+  // Sincroniza dados da planilha antes de mostrar o login
+  GoogleSheetsSync.fetchFromSheet().catch(e=>console.log('Sync inicial falhou, modo offline',e));
+  if(!Auth.checkSession()){document.getElementById('loginScreen').style.display='flex';document.getElementById('appContainer').style.display='none'}else{App.init()}
 });
 </script>
 </body>
