@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Marlift Empilhadeiras - OS Profissional v9.6</title>
+  <title>Marlift Empilhadeiras - OS Profissional v9.7</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -124,7 +124,7 @@
       <div class="top-bar">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.6</p></div>
+          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.7</p></div>
         </div>
         <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border)]"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
       </div>
@@ -402,7 +402,8 @@ var SyncQueue = {
     var queue = this.getQueue();
     queue.push({ action: action, entity: entity, data: data, timestamp: Date.now() });
     localStorage.setItem(this.key, JSON.stringify(queue));
-    this.process();
+    console.log('[SyncQueue] Adicionado:', action, entity);
+    this.process(); // tenta processar imediatamente se online
   },
   getQueue: function() {
     var q = localStorage.getItem(this.key);
@@ -410,11 +411,11 @@ var SyncQueue = {
   },
   clearQueue: function() { localStorage.removeItem(this.key); },
   async process() {
-    if (!navigator.onLine) { console.log('Offline, sync queue paused'); return; }
+    if (!navigator.onLine) { console.log('[SyncQueue] Offline, pausado'); return; }
     var queue = this.getQueue();
     if (queue.length === 0) return;
     var syncStatus = document.getElementById('syncStatusText');
-    if (syncStatus) syncStatus.innerText = 'Sincronizando fila...';
+    if (syncStatus) syncStatus.innerText = 'Sincronizando fila ('+queue.length+')...';
     var successItems = [];
     for (var i = 0; i < queue.length; i++) {
       var item = queue[i];
@@ -426,7 +427,7 @@ var SyncQueue = {
         else if (item.entity === 'usuario') ok = await GoogleSheetsSync.syncUsuarios(item.data);
         else if (item.entity === 'permissao') ok = await GoogleSheetsSync.syncPermissoes(item.data);
         if (ok) successItems.push(i);
-      } catch(e) { console.warn('Erro sync item', e); }
+      } catch(e) { console.warn('[SyncQueue] Erro sync item', e); }
     }
     var newQueue = queue.filter((_, idx) => !successItems.includes(idx));
     localStorage.setItem(this.key, JSON.stringify(newQueue));
@@ -434,7 +435,11 @@ var SyncQueue = {
     if (newQueue.length === 0) this.clearQueue();
     else setTimeout(() => this.process(), 5000);
   },
-  forceSync: async function() { await this.process(); await GoogleSheetsSync.fullSync(); }
+  forceSync: async function() { 
+    showToast('Forçando sincronização...');
+    await this.process(); 
+    await GoogleSheetsSync.fullSync();
+  }
 };
 
 /* ==================== GOOGLE SHEETS SYNC ==================== */
@@ -444,11 +449,11 @@ var GoogleSheetsSync = {
   hasValidData:function(arr,req){if(!arr||!Array.isArray(arr)||arr.length===0)return false;if(req)return arr.some(function(i){if(typeof i!=='object'||i===null)return false;var v=i[req];return v!==null&&v!==undefined&&String(v).trim()!==''});return arr.some(function(i){if(typeof i!=='object'||i===null)return false;return Object.values(i).some(function(v){if(v===null||v===undefined)return false;if(typeof v==='string'&&v.trim()==='')return false;if(Array.isArray(v)&&v.length===0)return false;if(typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===0)return false;return true})})},
   hasValidPermissions:function(o){if(!o||typeof o!=='object'||Array.isArray(o))return false;return Object.keys(o).some(function(k){return o[k]===true})},
   async postData(action,data){try{var r=await fetch(this.webAppUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:action,data:data})});var j=await r.json();return j.success}catch(e){console.error('postData ['+action+']:',e);return false}},
-  async syncSingleAgendamento(a){return await this.postData('syncAgendamento',a)},
-  async syncPermissoes(p){return await this.postData('syncPermissoes',p)},
-  async syncUsuarios(u){return await this.postData('syncUsuarios',u)},
-  async syncSingleOS(o){return await this.postData('syncOS',o)},
-  async syncSingleCliente(c){return await this.postData('syncCliente',c)},
+  async syncSingleAgendamento(a){if(!a) return false; return await this.postData('syncAgendamento', a);},
+  async syncPermissoes(p){return await this.postData('syncPermissoes',p);},
+  async syncUsuarios(u){return await this.postData('syncUsuarios',u);},
+  async syncSingleOS(o){return await this.postData('syncOS',o);},
+  async syncSingleCliente(c){return await this.postData('syncCliente',c);},
   async fetchFromSheet(){
     try{
       this.setStatus('Baixando...');
@@ -605,7 +610,7 @@ var Clientes={
   updateStats:function(){var tc=State.clients.length,tm=0;State.clients.forEach(function(c){tm+=(c.equipamentos||[]).length});var cc=new Set(),to=0,oa=0,op=0;State.osHistory.forEach(function(o){if(o.cliente){cc.add(o.cliente);to++}if(o.status==='abertura'||o.status==='execucao'||o.status==='finalizacao')oa++;if(o.status==='aprovada')op++});$('statTotalClientes').innerText=tc;$('statTotalMarcas').innerText=tm;$('statClientesComOS').innerText=cc.size;$('statTotalOSClientes').innerText=to;$('statOSAbertasCliente').innerText=oa;$('statOSAprovadasCliente').innerText=op},
   renderTable:function(){var tb=$('cad_tableBody');if(!tb)return;tb.innerHTML='';if(!State.clients.length){tb.innerHTML='<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>';return}State.clients.forEach(function(c){var r=tb.insertRow();var ml=(c.equipamentos||[]).map(function(e){return e.marca}).join(', ');r.innerHTML='<td class="p-2 font-medium">'+(c.nome||'-')+'</td><td class="p-2">'+(c.cidade||'-')+'</td><td class="p-2">'+(ml||'-')+'</td><td class="p-2"><button onclick="Clientes.select('+c.id+')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit('+c.id+')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete('+c.id+')"></i></td>'})},
   addEquipField:function(m,mo,s,q,co){adicionarCampoEquipamento(m,mo,s,q,co)},
-  save:async function(){var nm=Utils.getVal('cad_nome').trim();if(!nm){showToast('Nome obrigatorio',true);return}var eq=[];var ct=$('equipamentosList');if(ct)ct.querySelectorAll('.equip-item').forEach(function(it){var ms=it.querySelector('.equip-marca').value,oi=it.querySelector('.outra-marca'),mk=ms==='OUTRA'?(oi?oi.value.toUpperCase():''):ms;if(mk)eq.push({marca:mk,modelo:it.querySelector('.equip-modelo').value||'',serie:it.querySelector('.equip-serie').value||'',qtd:parseInt(it.querySelector('.equip-qtd').value)||1,combustivel:it.querySelector('.equip-combustivel').value||''})});var cl={id:State.editingClientId||Date.now(),nome:nm,cnpj:Utils.getVal('cad_cnpj'),endereco:Utils.getVal('cad_endereco'),cidade:Utils.getVal('cad_cidade'),telefone:Utils.getVal('cad_telefone'),whatsapp:Utils.getVal('cad_whatsapp'),email:Utils.getVal('cad_email'),responsavel_nome:Utils.getVal('cad_responsavel_nome'),responsavel_telefone:Utils.getVal('cad_responsavel_telefone'),equipamentos:eq};if(State.editingClientId){var idx=State.clients.findIndex(function(c){return c.id===State.editingClientId});if(idx>=0)State.clients[idx]=cl;State.editingClientId=null;var cb=$('cad_btnCancelar');if(cb)cb.style.display='none'}else State.clients.push(cl);Storage.saveClients();this.renderTable();this.clearForm();this.updateStats();showToast('Cliente salvo');await GoogleSheetsSync.syncSingleCliente(cl);SyncQueue.add('upsert','cliente',cl)},
+  save:async function(){var nm=Utils.getVal('cad_nome').trim();if(!nm){showToast('Nome obrigatorio',true);return}var eq=[];var ct=$('equipamentosList');if(ct)ct.querySelectorAll('.equip-item').forEach(function(it){var ms=it.querySelector('.equip-marca').value,oi=it.querySelector('.outra-marca'),mk=ms==='OUTRA'?(oi?oi.value.toUpperCase():''):ms;if(mk)eq.push({marca:mk,modelo:it.querySelector('.equip-modelo').value||'',serie:it.querySelector('.equip-serie').value||'',qtd:parseInt(it.querySelector('.equip-qtd').value)||1,combustivel:it.querySelector('.equip-combustivel').value||''})});var cl={id:State.editingClientId||Date.now(),nome:nm,cnpj:Utils.getVal('cad_cnpj'),endereco:Utils.getVal('cad_endereco'),cidade:Utils.getVal('cad_cidade'),telefone:Utils.getVal('cad_telefone'),whatsapp:Utils.getVal('cad_whatsapp'),email:Utils.getVal('cad_email'),responsavel_nome:Utils.getVal('cad_responsavel_nome'),responsavel_telefone:Utils.getVal('cad_responsavel_telefone'),equipamentos:eq};if(State.editingClientId){var idx=State.clients.findIndex(function(c){return c.id===State.editingClientId});if(idx>=0)State.clients[idx]=cl;State.editingClientId=null;var cb=$('cad_btnCancelar');if(cb)cb.style.display='none'}else State.clients.push(cl);Storage.saveClients();this.renderTable();this.clearForm();this.updateStats();showToast('Cliente salvo');try{await GoogleSheetsSync.syncSingleCliente(cl);}catch(e){SyncQueue.add('upsert','cliente',cl);showToast('Salvo localmente, pendente sincronização',true);}},
   select:function(id){var c=State.clients.find(function(c){return c.id===id});if(!c)return;if(c.equipamentos&&c.equipamentos.length>0){App.mostrarModalEquipamentos(c)}else{Utils.setVal('cliente',c.nome);Utils.setVal('cnpj',c.cnpj);Utils.setVal('cidadeCliente',c.cidade);Utils.setVal('endereco',c.endereco);Utils.setVal('whatsappCliente',c.whatsapp);showToast('Cliente carregado');var tb=document.querySelector('.tab-button[data-tab="tab-os"]');if(tb)tb.click()}},
   edit:function(id){var c=State.clients.find(function(c){return c.id===id});if(!c)return;State.editingClientId=id;Utils.setVal('cad_nome',c.nome);Utils.setVal('cad_cnpj',c.cnpj);Utils.setVal('cad_endereco',c.endereco);Utils.setVal('cad_cidade',c.cidade);Utils.setVal('cad_telefone',c.telefone);Utils.setVal('cad_whatsapp',c.whatsapp);Utils.setVal('cad_email',c.email||'');Utils.setVal('cad_responsavel_nome',c.responsavel_nome||'');Utils.setVal('cad_responsavel_telefone',c.responsavel_telefone||'');var ct=$('equipamentosList');if(ct)ct.innerHTML='';if(c.equipamentos&&c.equipamentos.length)c.equipamentos.forEach(function(e){adicionarCampoEquipamento(e.marca,e.modelo,e.serie,e.qtd,e.combustivel)});var cb=$('cad_btnCancelar');if(cb)cb.style.display='inline-flex';showToast('Editando cliente')},
   delete:function(id){if(!confirm('Excluir?'))return;State.clients=State.clients.filter(function(c){return c.id!==id});Storage.saveClients();this.renderTable();this.updateStats();showToast('Excluido');SyncQueue.add('delete','cliente',{id:id})},
@@ -653,12 +658,13 @@ var Agendamentos = {
   carregar:function(){State.agendamentos=Storage.loadAgendamentos();this.atualizarLista();this.atualizarSelectTecnicos();this.atualizarDatalistClientes()},
   atualizarSelectTecnicos:function(){var s=document.getElementById('ag_tecnico');if(!s)return;var u=Auth.getUsers().filter(function(u){return u.nivel==='tecnico'});s.innerHTML='<option value="">Selecione</option>';u.forEach(function(t){s.innerHTML+='<option value="'+t.login+'">'+t.nome+'</option>'})},
   atualizarDatalistClientes:function(){var dl=document.getElementById('clientesList');if(!dl)return;dl.innerHTML='';State.clients.forEach(function(c){var o=document.createElement('option');o.value=c.nome;dl.appendChild(o)})},
-  salvar:function(){if(!Auth.isAdmin()){showToast('Apenas administrador',true);return}var cl=document.getElementById('ag_cliente').value.trim(),eq=document.getElementById('ag_equipamento').value.trim(),dt=document.getElementById('ag_data').value,hr=document.getElementById('ag_horario').value,tc=document.getElementById('ag_tecnico').value,ds=document.getElementById('ag_descricao').value,editId=document.getElementById('ag_editId').value;if(!cl||!dt||!tc){showToast('Cliente, data e tecnico obrigatorios',true);return}if(editId){var idx=State.agendamentos.findIndex(function(a){return a.id==editId});if(idx!==-1){State.agendamentos[idx]={id:parseInt(editId),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};showToast('Agendamento atualizado')}}else{var n={id:Date.now(),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};State.agendamentos.push(n);showToast('Agendamento salvo')}Storage.saveAgendamentos();this.limparForm();this.atualizarLista();GoogleSheetsSync.syncSingleAgendamento(State.agendamentos.find(a=>a.id==(editId||n.id)));SyncQueue.add('upsert','agendamento',State.agendamentos.find(a=>a.id==(editId||n.id)))},
+  salvar:async function(){if(!Auth.isAdmin()){showToast('Apenas administrador',true);return}var cl=document.getElementById('ag_cliente').value.trim(),eq=document.getElementById('ag_equipamento').value.trim(),dt=document.getElementById('ag_data').value,hr=document.getElementById('ag_horario').value,tc=document.getElementById('ag_tecnico').value,ds=document.getElementById('ag_descricao').value,editId=document.getElementById('ag_editId').value;if(!cl||!dt||!tc){showToast('Cliente, data e tecnico obrigatorios',true);return}if(!dt || !hr){showToast('Data e horário obrigatórios',true);return}var agendamento;if(editId){var idx=State.agendamentos.findIndex(function(a){return a.id==editId});if(idx!==-1){State.agendamentos[idx]={id:parseInt(editId),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};agendamento=State.agendamentos[idx];showToast('Agendamento atualizado')}}else{agendamento={id:Date.now(),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};State.agendamentos.push(agendamento);showToast('Agendamento salvo')}Storage.saveAgendamentos();this.limparForm();this.atualizarLista();// Sincronização obrigatória com a planilha
+try{var ok=await GoogleSheetsSync.syncSingleAgendamento(agendamento);if(ok)console.log('Agendamento sincronizado com Google');else throw new Error('Falha na sincronização');}catch(e){SyncQueue.add('upsert','agendamento',agendamento);showToast('Salvo localmente, pendente sincronização',true);}},
   limparForm:function(){['ag_cliente','ag_equipamento','ag_data','ag_horario','ag_descricao'].forEach(function(id){document.getElementById(id).value=''});document.getElementById('ag_tecnico').value='';document.getElementById('ag_editId').value=''},
   atualizarLista:function(){var c=document.getElementById('agendamentosLista');if(!c)return;var p=State.agendamentos.filter(function(a){return a.status!=='concluido'}).sort(function(a,b){return(a.data+''+a.horario).localeCompare(b.data+''+b.horario)});if(!p.length){c.innerHTML='<div class="text-center p-4 text-[var(--muted)]">Nenhum agendamento pendente</div>';return}var h='';p.forEach(function(a){h+='<div class="schedule-card"><div class="flex justify-between items-start flex-wrap"><div><strong>'+a.cliente+'</strong> - '+(a.equipamento||'Nao informado')+'<br><small><i class="fas fa-calendar"></i> '+a.data+' '+a.horario+' | <i class="fas fa-user-cog"></i> '+a.tecnico+'</small><br><small>'+(a.descricao||'')+'</small></div><div><button onclick="Agendamentos.concluir('+a.id+')" class="btn btn-success text-xs py-1 px-2"><i class="fas fa-check"></i></button> <button onclick="Agendamentos.editar('+a.id+')" class="btn btn-info text-xs py-1 px-2"><i class="fas fa-edit"></i></button> <button onclick="Agendamentos.excluir('+a.id+')" class="btn btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button></div></div></div>'});c.innerHTML=h},
   editar:function(id){var a=State.agendamentos.find(function(a){return a.id===id});if(!a)return;document.getElementById('ag_cliente').value=a.cliente;document.getElementById('ag_equipamento').value=a.equipamento||'';document.getElementById('ag_data').value=a.data;document.getElementById('ag_horario').value=a.horario;document.getElementById('ag_tecnico').value=a.tecnico;document.getElementById('ag_descricao').value=a.descricao||'';document.getElementById('ag_editId').value=a.id;showToast('Editando agendamento')},
-  concluir:function(id){var i=State.agendamentos.findIndex(function(a){return a.id===id});if(i!==-1){State.agendamentos[i].status='concluido';Storage.saveAgendamentos();this.atualizarLista();showToast('Concluido');GoogleSheetsSync.syncSingleAgendamento(State.agendamentos[i]);SyncQueue.add('upsert','agendamento',State.agendamentos[i])}},
-  excluir:function(id){if(!confirm('Excluir?'))return;var r=State.agendamentos.find(function(a){return a.id===id});State.agendamentos=State.agendamentos.filter(function(a){return a.id!==id});Storage.saveAgendamentos();this.atualizarLista();showToast('Excluido');if(r)GoogleSheetsSync.syncSingleAgendamento(Object.assign({},r,{_deleted:true}));SyncQueue.add('delete','agendamento',{id:id})},
+  concluir:async function(id){var i=State.agendamentos.findIndex(function(a){return a.id===id});if(i!==-1){State.agendamentos[i].status='concluido';Storage.saveAgendamentos();this.atualizarLista();showToast('Concluido');try{await GoogleSheetsSync.syncSingleAgendamento(State.agendamentos[i]);}catch(e){SyncQueue.add('upsert','agendamento',State.agendamentos[i]);}}},
+  excluir:async function(id){if(!confirm('Excluir?'))return;var r=State.agendamentos.find(function(a){return a.id===id});State.agendamentos=State.agendamentos.filter(function(a){return a.id!==id});Storage.saveAgendamentos();this.atualizarLista();showToast('Excluido');if(r){try{await GoogleSheetsSync.syncSingleAgendamento(Object.assign({},r,{_deleted:true}));}catch(e){SyncQueue.add('delete','agendamento',{id:id})}}},
   obterAgendamentosDoDia:function(tl){var h=new Date().toISOString().split('T')[0];return State.agendamentos.filter(function(a){return a.tecnico===tl&&a.data===h&&a.status!=='concluido'})}
 };
 
