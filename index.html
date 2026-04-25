@@ -476,7 +476,7 @@ var SyncQueue = {
 
 /* ==================== GOOGLE SHEETS SYNC ==================== */
 var GoogleSheetsSync = {
-  webAppUrl:'https://script.google.com/macros/s/AKfycbwYcOExXE7XH9KnGc_JM6SyeqDAOAJsU-CFVEYfOXwbdco2dSIPQT07VwXFspBA3GGnfQ/exec',
+  webAppUrl:'https://script.google.com/macros/s/AKfycbyOTYC0Ig9gG4I8BOAP2ABP3yjiVzpz01ejI4GC9yQxEUoumuj-Z19aUcGZ2yRTnYS5Iw/exec',
   setStatus:function(m){var s=document.getElementById('syncStatusText');if(s)s.textContent=m},
   hasValidData:function(arr,req){if(!arr||!Array.isArray(arr)||arr.length===0)return false;if(req)return arr.some(function(i){if(typeof i!=='object'||i===null)return false;var v=i[req];return v!==null&&v!==undefined&&String(v).trim()!==''});return arr.some(function(i){if(typeof i!=='object'||i===null)return false;return Object.values(i).some(function(v){if(v===null||v===undefined)return false;if(typeof v==='string'&&v.trim()==='')return false;if(Array.isArray(v)&&v.length===0)return false;if(typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).length===0)return false;return true})})},
   hasValidPermissions:function(o){if(!o||typeof o!=='object'||Array.isArray(o))return false;return Object.keys(o).some(function(k){return o[k]===true})},
