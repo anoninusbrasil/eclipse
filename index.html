@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Marlift Empilhadeiras - OS Profissional v9.7</title>
+  <title>Marlift Empilhadeiras - OS Profissional v9.8</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -124,7 +124,7 @@
       <div class="top-bar">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.7</p></div>
+          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v9.8</p></div>
         </div>
         <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border)]"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
       </div>
@@ -395,6 +395,39 @@ var Storage = {
   loadJornada:function(login){var a=localStorage.getItem('marlift_jornadas');var o=a?JSON.parse(a):{};return o[login]||null}
 };
 
+/* ==================== FUNÇÕES DE NORMALIZAÇÃO DATA/HORA ==================== */
+function normalizeDate(dateValue) {
+  if (!dateValue) return '';
+  if (typeof dateValue === 'string' && dateValue.includes('T')) {
+    var d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      var year = d.getUTCFullYear();
+      var month = String(d.getUTCMonth() + 1).padStart(2, '0');
+      var day = String(d.getUTCDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+  }
+  if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) return dateValue;
+  return '';
+}
+function extractTimeFromDate(dateValue) {
+  if (!dateValue) return '';
+  if (typeof dateValue === 'string' && dateValue.includes('T')) {
+    var d = new Date(dateValue);
+    if (!isNaN(d.getTime())) {
+      var hours = String(d.getUTCHours()).padStart(2, '0');
+      var minutes = String(d.getUTCMinutes()).padStart(2, '0');
+      return hours + ':' + minutes;
+    }
+  }
+  if (typeof dateValue === 'string' && /^\d{2}:\d{2}$/.test(dateValue)) return dateValue;
+  if (typeof dateValue === 'string' && dateValue.includes(':')) {
+    var parts = dateValue.split(':');
+    if (parts.length >= 2) return parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+  }
+  return '';
+}
+
 /* ==================== FILA DE SINCRONIZACAO OFFLINE ==================== */
 var SyncQueue = {
   key: 'marlift_sync_queue',
@@ -402,8 +435,7 @@ var SyncQueue = {
     var queue = this.getQueue();
     queue.push({ action: action, entity: entity, data: data, timestamp: Date.now() });
     localStorage.setItem(this.key, JSON.stringify(queue));
-    console.log('[SyncQueue] Adicionado:', action, entity);
-    this.process(); // tenta processar imediatamente se online
+    this.process();
   },
   getQueue: function() {
     var q = localStorage.getItem(this.key);
@@ -411,7 +443,7 @@ var SyncQueue = {
   },
   clearQueue: function() { localStorage.removeItem(this.key); },
   async process() {
-    if (!navigator.onLine) { console.log('[SyncQueue] Offline, pausado'); return; }
+    if (!navigator.onLine) { return; }
     var queue = this.getQueue();
     if (queue.length === 0) return;
     var syncStatus = document.getElementById('syncStatusText');
@@ -461,6 +493,7 @@ var GoogleSheetsSync = {
       var data=await response.json();
       if(!data.success)throw new Error(data.error||'Erro na planilha');
       var mudancas=[], ignoradas=[];
+      
       /* Clientes */
       if(this.hasValidData(data.clientes,'nome')){
         var cv=data.clientes.filter(function(c){return(c.nome||c.NOME||'').trim()!==''});
@@ -469,22 +502,47 @@ var GoogleSheetsSync = {
           Storage.saveClients();mudancas.push('Clientes ('+State.clients.length+')')
         }else ignoradas.push('Clientes (nomes vazios)')
       }else ignoradas.push('Clientes (sem dados)');
+      
       /* OS */
       if(this.hasValidData(data.os,'numeroOS')){
         var ov=data.os.filter(function(o){return(o.numeroOS||o.NUMEROOS||o.NUMERO_OS||'').trim()!==''});
         if(ov.length>0){
-          State.osHistory=ov.map(function(o){return{numeroOS:(o.numeroOS||o.NUMEROOS||o.NUMERO_OS||'').trim(),dataOS:o.dataOS||o.DATAOS||o.DATA_OS||'',cliente:(o.cliente||o.CLIENTE||'').trim(),status:(o.status||o.STATUS||'abertura').toLowerCase().trim(),tipoChamado:(o.tipoChamado||o.TIPOCHAMADO||'normal').toLowerCase().trim(),horasTotais:o.horasTotais||o.HORASTOTAIS||'0h',totalGeral:o.totalGeral||o.TOTALGERAL||'00:00',descricaoServico:o.descricaoServico||o.DESCRICAOSERVICO||'',pecasAplicadas:o.pecasAplicadas||o.PECASAPLICADAS||'',pendencias:o.pendencias||o.PENDENCIAS||'',relatoCliente:o.relatoCliente||o.RELATOCLIENTE||'',marca:o.marca||o.MARCA||'',modelo:o.modelo||o.MODELO||'',numSerie:o.numSerie||o.NUMSERIE||'',horimetro:o.horimetro||o.HORIMETRO||'',combustivel:o.combustivel||o.COMBUSTIVEL||'',whatsappCliente:o.whatsappCliente||o.WHATSAPPCLIENTE||'',cnpj:o.cnpj||o.CNPJ||'',cidadeCliente:o.cidadeCliente||o.CIDADECLIENTE||'',endereco:o.endereco||o.ENDERECO||'',tecnico:o.tecnico||o.TECNICO||'MARLIFT',recebedor:o.recebedor||o.RECEBEDOR||'',fotosBase64:function(){try{var f=o.fotosBase64;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),fotoHorimetro:o.fotoHorimetro||null,fotosPendencias:function(){try{var f=o.fotosPendencias;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),assinaturaTecnico:o.assinaturaTecnico||'',assinaturaCliente:o.assinaturaCliente||'',checklistData:function(){try{var c=o.checklistData;if(typeof c==='string')return JSON.parse(c);if(typeof c==='object'&&c!==null&&!Array.isArray(c))return c}catch(e){}return{}}()}});
+          State.osHistory=ov.map(function(o){return{numeroOS:(o.numeroOS||o.NUMEROOS||o.NUMERO_OS||'').trim(),dataOS:normalizeDate(o.dataOS||o.DATAOS||o.DATA_OS||''),cliente:(o.cliente||o.CLIENTE||'').trim(),status:(o.status||o.STATUS||'abertura').toLowerCase().trim(),tipoChamado:(o.tipoChamado||o.TIPOCHAMADO||'normal').toLowerCase().trim(),horasTotais:o.horasTotais||o.HORASTOTAIS||'0h',totalGeral:o.totalGeral||o.TOTALGERAL||'00:00',descricaoServico:o.descricaoServico||o.DESCRICAOSERVICO||'',pecasAplicadas:o.pecasAplicadas||o.PECASAPLICADAS||'',pendencias:o.pendencias||o.PENDENCIAS||'',relatoCliente:o.relatoCliente||o.RELATOCLIENTE||'',marca:o.marca||o.MARCA||'',modelo:o.modelo||o.MODELO||'',numSerie:o.numSerie||o.NUMSERIE||'',horimetro:o.horimetro||o.HORIMETRO||'',combustivel:o.combustivel||o.COMBUSTIVEL||'',whatsappCliente:o.whatsappCliente||o.WHATSAPPCLIENTE||'',cnpj:o.cnpj||o.CNPJ||'',cidadeCliente:o.cidadeCliente||o.CIDADECLIENTE||'',endereco:o.endereco||o.ENDERECO||'',tecnico:o.tecnico||o.TECNICO||'MARLIFT',recebedor:o.recebedor||o.RECEBEDOR||'',fotosBase64:function(){try{var f=o.fotosBase64;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),fotoHorimetro:o.fotoHorimetro||null,fotosPendencias:function(){try{var f=o.fotosPendencias;if(typeof f==='string'){var p=JSON.parse(f);return Array.isArray(p)?p:[]}if(Array.isArray(f))return f}catch(e){}return[]}(),assinaturaTecnico:o.assinaturaTecnico||'',assinaturaCliente:o.assinaturaCliente||'',checklistData:function(){try{var c=o.checklistData;if(typeof c==='string')return JSON.parse(c);if(typeof c==='object'&&c!==null&&!Array.isArray(c))return c}catch(e){}return{}}()}});
           Storage.saveOSHistory();mudancas.push('OS ('+State.osHistory.length+')')
         }else ignoradas.push('OS (numeros vazios)')
       }else ignoradas.push('OS (sem dados)');
-      /* Agendamentos */
+      
+      /* Agendamentos com normalização */
       if(this.hasValidData(data.agendamentos,'cliente')){
         var av=data.agendamentos.filter(function(a){return(a.cliente||a.CLIENTE||'').trim()!==''});
         if(av.length>0){
-          State.agendamentos=av.map(function(a){return{id:a.id||Date.now(),cliente:(a.cliente||a.CLIENTE||'').trim(),equipamento:(a.equipamento||a.EQUIPAMENTO||'').trim(),data:a.data||a.DATA||'',horario:a.horario||a.HORARIO||'',tecnico:(a.tecnico||a.TECNICO||'').trim(),descricao:(a.descricao||a.DESCRICAO||'').trim(),status:(a.status||a.STATUS||'pendente').toLowerCase().trim()}});
+          State.agendamentos=av.map(function(a){
+            var rawData = a.data || a.DATA || '';
+            var rawHorario = a.horario || a.HORARIO || '';
+            var dataStr = normalizeDate(rawData);
+            var horarioStr = extractTimeFromDate(rawHorario);
+            if (!horarioStr && rawHorario && typeof rawHorario === 'string' && rawHorario.includes(':')) {
+              var parts = rawHorario.split(':');
+              if (parts.length >= 2) horarioStr = parts[0].padStart(2,'0') + ':' + parts[1].padStart(2,'0');
+            }
+            if (!horarioStr && rawData && typeof rawData === 'string' && rawData.includes('T')) {
+              horarioStr = extractTimeFromDate(rawData);
+            }
+            return {
+              id:a.id||Date.now(),
+              cliente:(a.cliente||a.CLIENTE||'').trim(),
+              equipamento:(a.equipamento||a.EQUIPAMENTO||'').trim(),
+              data:dataStr,
+              horario:horarioStr,
+              tecnico:(a.tecnico||a.TECNICO||'').trim(),
+              descricao:(a.descricao||a.DESCRICAO||'').trim(),
+              status:(a.status||a.STATUS||'pendente').toLowerCase().trim()
+            };
+          });
           Storage.saveAgendamentos();mudancas.push('Agendamentos ('+State.agendamentos.length+')')
         }else ignoradas.push('Agendamentos (vazios)')
       }else ignoradas.push('Agendamentos (sem dados)');
+      
       /* Permissoes */
       if(this.hasValidPermissions(data.permissoes)){localStorage.setItem('marlift_permissoes_tecnico',JSON.stringify(data.permissoes));mudancas.push('Permissoes')}else ignoradas.push('Permissoes (sem dados)');
       /* Usuarios */
@@ -492,6 +550,7 @@ var GoogleSheetsSync = {
         var uv=data.usuarios.filter(function(u){return(u.login||u.LOGIN||'').trim()!==''});
         if(uv.length>0){Auth.saveUsers(uv);mudancas.push('Usuarios ('+uv.length+')')}else ignoradas.push('Usuarios (logins vazios)')
       }else ignoradas.push('Usuarios (sem dados)');
+      
       /* Atualizar UI */
       if(mudancas.length>0){Clientes.renderTable();Clientes.updateStats();Historico.render();Historico.updateStats();Agendamentos.atualizarLista();Agendamentos.atualizarSelectTecnicos();if(Permissoes.carregarNaInterface)Permissoes.carregarNaInterface();UserManager.render()}
       var msg='';
@@ -608,7 +667,7 @@ var Checklist={total:0,checked:0,
 var Clientes={
   load:function(){State.clients=Storage.loadClients();this.renderTable();this.updateStats()},
   updateStats:function(){var tc=State.clients.length,tm=0;State.clients.forEach(function(c){tm+=(c.equipamentos||[]).length});var cc=new Set(),to=0,oa=0,op=0;State.osHistory.forEach(function(o){if(o.cliente){cc.add(o.cliente);to++}if(o.status==='abertura'||o.status==='execucao'||o.status==='finalizacao')oa++;if(o.status==='aprovada')op++});$('statTotalClientes').innerText=tc;$('statTotalMarcas').innerText=tm;$('statClientesComOS').innerText=cc.size;$('statTotalOSClientes').innerText=to;$('statOSAbertasCliente').innerText=oa;$('statOSAprovadasCliente').innerText=op},
-  renderTable:function(){var tb=$('cad_tableBody');if(!tb)return;tb.innerHTML='';if(!State.clients.length){tb.innerHTML='<tr><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>';return}State.clients.forEach(function(c){var r=tb.insertRow();var ml=(c.equipamentos||[]).map(function(e){return e.marca}).join(', ');r.innerHTML='<td class="p-2 font-medium">'+(c.nome||'-')+'</td><td class="p-2">'+(c.cidade||'-')+'</td><td class="p-2">'+(ml||'-')+'</td><td class="p-2"><button onclick="Clientes.select('+c.id+')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit('+c.id+')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete('+c.id+')"></i></td>'})},
+  renderTable:function(){var tb=$('cad_tableBody');if(!tb)return;tb.innerHTML='';if(!State.clients.length){tb.innerHTML='</td><td colspan="4" class="text-center p-4 text-[var(--muted)]">Nenhum cliente cadastrado</td></tr>';return}State.clients.forEach(function(c){var r=tb.insertRow();var ml=(c.equipamentos||[]).map(function(e){return e.marca}).join(', ');r.innerHTML='<td class="p-2 font-medium">'+(c.nome||'-')+'</td><td class="p-2">'+(c.cidade||'-')+'</td><td class="p-2">'+(ml||'-')+'</td><td class="p-2"><button onclick="Clientes.select('+c.id+')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.edit('+c.id+')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.delete('+c.id+')"></i></td>'})},
   addEquipField:function(m,mo,s,q,co){adicionarCampoEquipamento(m,mo,s,q,co)},
   save:async function(){var nm=Utils.getVal('cad_nome').trim();if(!nm){showToast('Nome obrigatorio',true);return}var eq=[];var ct=$('equipamentosList');if(ct)ct.querySelectorAll('.equip-item').forEach(function(it){var ms=it.querySelector('.equip-marca').value,oi=it.querySelector('.outra-marca'),mk=ms==='OUTRA'?(oi?oi.value.toUpperCase():''):ms;if(mk)eq.push({marca:mk,modelo:it.querySelector('.equip-modelo').value||'',serie:it.querySelector('.equip-serie').value||'',qtd:parseInt(it.querySelector('.equip-qtd').value)||1,combustivel:it.querySelector('.equip-combustivel').value||''})});var cl={id:State.editingClientId||Date.now(),nome:nm,cnpj:Utils.getVal('cad_cnpj'),endereco:Utils.getVal('cad_endereco'),cidade:Utils.getVal('cad_cidade'),telefone:Utils.getVal('cad_telefone'),whatsapp:Utils.getVal('cad_whatsapp'),email:Utils.getVal('cad_email'),responsavel_nome:Utils.getVal('cad_responsavel_nome'),responsavel_telefone:Utils.getVal('cad_responsavel_telefone'),equipamentos:eq};if(State.editingClientId){var idx=State.clients.findIndex(function(c){return c.id===State.editingClientId});if(idx>=0)State.clients[idx]=cl;State.editingClientId=null;var cb=$('cad_btnCancelar');if(cb)cb.style.display='none'}else State.clients.push(cl);Storage.saveClients();this.renderTable();this.clearForm();this.updateStats();showToast('Cliente salvo');try{await GoogleSheetsSync.syncSingleCliente(cl);}catch(e){SyncQueue.add('upsert','cliente',cl);showToast('Salvo localmente, pendente sincronização',true);}},
   select:function(id){var c=State.clients.find(function(c){return c.id===id});if(!c)return;if(c.equipamentos&&c.equipamentos.length>0){App.mostrarModalEquipamentos(c)}else{Utils.setVal('cliente',c.nome);Utils.setVal('cnpj',c.cnpj);Utils.setVal('cidadeCliente',c.cidade);Utils.setVal('endereco',c.endereco);Utils.setVal('whatsappCliente',c.whatsapp);showToast('Cliente carregado');var tb=document.querySelector('.tab-button[data-tab="tab-os"]');if(tb)tb.click()}},
@@ -658,8 +717,7 @@ var Agendamentos = {
   carregar:function(){State.agendamentos=Storage.loadAgendamentos();this.atualizarLista();this.atualizarSelectTecnicos();this.atualizarDatalistClientes()},
   atualizarSelectTecnicos:function(){var s=document.getElementById('ag_tecnico');if(!s)return;var u=Auth.getUsers().filter(function(u){return u.nivel==='tecnico'});s.innerHTML='<option value="">Selecione</option>';u.forEach(function(t){s.innerHTML+='<option value="'+t.login+'">'+t.nome+'</option>'})},
   atualizarDatalistClientes:function(){var dl=document.getElementById('clientesList');if(!dl)return;dl.innerHTML='';State.clients.forEach(function(c){var o=document.createElement('option');o.value=c.nome;dl.appendChild(o)})},
-  salvar:async function(){if(!Auth.isAdmin()){showToast('Apenas administrador',true);return}var cl=document.getElementById('ag_cliente').value.trim(),eq=document.getElementById('ag_equipamento').value.trim(),dt=document.getElementById('ag_data').value,hr=document.getElementById('ag_horario').value,tc=document.getElementById('ag_tecnico').value,ds=document.getElementById('ag_descricao').value,editId=document.getElementById('ag_editId').value;if(!cl||!dt||!tc){showToast('Cliente, data e tecnico obrigatorios',true);return}if(!dt || !hr){showToast('Data e horário obrigatórios',true);return}var agendamento;if(editId){var idx=State.agendamentos.findIndex(function(a){return a.id==editId});if(idx!==-1){State.agendamentos[idx]={id:parseInt(editId),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};agendamento=State.agendamentos[idx];showToast('Agendamento atualizado')}}else{agendamento={id:Date.now(),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};State.agendamentos.push(agendamento);showToast('Agendamento salvo')}Storage.saveAgendamentos();this.limparForm();this.atualizarLista();// Sincronização obrigatória com a planilha
-try{var ok=await GoogleSheetsSync.syncSingleAgendamento(agendamento);if(ok)console.log('Agendamento sincronizado com Google');else throw new Error('Falha na sincronização');}catch(e){SyncQueue.add('upsert','agendamento',agendamento);showToast('Salvo localmente, pendente sincronização',true);}},
+  salvar:async function(){if(!Auth.isAdmin()){showToast('Apenas administrador',true);return}var cl=document.getElementById('ag_cliente').value.trim(),eq=document.getElementById('ag_equipamento').value.trim(),dt=document.getElementById('ag_data').value,hr=document.getElementById('ag_horario').value,tc=document.getElementById('ag_tecnico').value,ds=document.getElementById('ag_descricao').value,editId=document.getElementById('ag_editId').value;if(!cl||!dt||!tc){showToast('Cliente, data e tecnico obrigatorios',true);return}if(!dt || !hr){showToast('Data e horário obrigatórios',true);return}var agendamento;if(editId){var idx=State.agendamentos.findIndex(function(a){return a.id==editId});if(idx!==-1){State.agendamentos[idx]={id:parseInt(editId),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};agendamento=State.agendamentos[idx];showToast('Agendamento atualizado')}}else{agendamento={id:Date.now(),cliente:cl,equipamento:eq,data:dt,horario:hr,tecnico:tc,descricao:ds,status:'pendente'};State.agendamentos.push(agendamento);showToast('Agendamento salvo')}Storage.saveAgendamentos();this.limparForm();this.atualizarLista();try{var ok=await GoogleSheetsSync.syncSingleAgendamento(agendamento);if(ok)console.log('Agendamento sincronizado com Google');else throw new Error('Falha na sincronização');}catch(e){SyncQueue.add('upsert','agendamento',agendamento);showToast('Salvo localmente, pendente sincronização',true);}},
   limparForm:function(){['ag_cliente','ag_equipamento','ag_data','ag_horario','ag_descricao'].forEach(function(id){document.getElementById(id).value=''});document.getElementById('ag_tecnico').value='';document.getElementById('ag_editId').value=''},
   atualizarLista:function(){var c=document.getElementById('agendamentosLista');if(!c)return;var p=State.agendamentos.filter(function(a){return a.status!=='concluido'}).sort(function(a,b){return(a.data+''+a.horario).localeCompare(b.data+''+b.horario)});if(!p.length){c.innerHTML='<div class="text-center p-4 text-[var(--muted)]">Nenhum agendamento pendente</div>';return}var h='';p.forEach(function(a){h+='<div class="schedule-card"><div class="flex justify-between items-start flex-wrap"><div><strong>'+a.cliente+'</strong> - '+(a.equipamento||'Nao informado')+'<br><small><i class="fas fa-calendar"></i> '+a.data+' '+a.horario+' | <i class="fas fa-user-cog"></i> '+a.tecnico+'</small><br><small>'+(a.descricao||'')+'</small></div><div><button onclick="Agendamentos.concluir('+a.id+')" class="btn btn-success text-xs py-1 px-2"><i class="fas fa-check"></i></button> <button onclick="Agendamentos.editar('+a.id+')" class="btn btn-info text-xs py-1 px-2"><i class="fas fa-edit"></i></button> <button onclick="Agendamentos.excluir('+a.id+')" class="btn btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button></div></div></div>'});c.innerHTML=h},
   editar:function(id){var a=State.agendamentos.find(function(a){return a.id===id});if(!a)return;document.getElementById('ag_cliente').value=a.cliente;document.getElementById('ag_equipamento').value=a.equipamento||'';document.getElementById('ag_data').value=a.data;document.getElementById('ag_horario').value=a.horario;document.getElementById('ag_tecnico').value=a.tecnico;document.getElementById('ag_descricao').value=a.descricao||'';document.getElementById('ag_editId').value=a.id;showToast('Editando agendamento')},
@@ -745,7 +803,7 @@ function adicionarCampoEquipamento(marca,modelo,serie,qtd,combustivel){
 
 /* ==================== INIT ==================== */
 document.addEventListener('DOMContentLoaded',function(){
-  // Sincroniza usuarios e dados da planilha ASSINCRONO antes de mostrar o login (melhoria)
+  // Sincroniza dados da planilha antes de mostrar o login
   GoogleSheetsSync.fetchFromSheet().catch(e=>console.log('Sync inicial falhou, modo offline',e));
   if(!Auth.checkSession()){document.getElementById('loginScreen').style.display='flex';document.getElementById('appContainer').style.display='none'}else{App.init()}
 });
