@@ -88,7 +88,6 @@
     .journey-step{background:var(--bg-secondary);border-radius:16px;padding:20px;margin-bottom:20px;border-left:4px solid var(--accent)}
     .journey-step.completed{border-left-color:var(--success);opacity:.8}
     .journey-step h3{color:var(--accent);margin-bottom:15px;display:flex;align-items:center;gap:10px}
-    .location-btn{background:var(--info);color:#fff;border:none;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
     .schedule-card{background:var(--bg-secondary);border-radius:12px;padding:15px;margin-bottom:15px;border:1px solid var(--border)}
     .user-table{width:100%;border-collapse:collapse}
     .user-table th,.user-table td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
@@ -107,151 +106,116 @@
     <h1 class="font-display text-3xl text-center text-[var(--accent)] mb-2">MARLIFT</h1>
     <p class="text-center text-[var(--muted)] text-sm mb-6">Sistema de Ordem de Servico</p>
     <div class="space-y-4">
-      <div><label class="block text-xs text-[var(--muted)] mb-1">Usuario</label><input type="text" id="loginUsername" class="form-input" placeholder="admin ou tecnico" autocomplete="off" autofocus></div>
-      <div><label class="block text-xs text-[var(--muted)] mb-1">Senha</label><input type="password" id="loginPassword" class="form-input" placeholder="admin123 ou 123456" onkeypress="if(event.key==='Enter')Auth.login()"></div>
+      <div><label class="block text-xs text-[var(--muted)] mb-1">Usuario</label><input type="text" id="loginUsername" class="form-input" placeholder="admin" autocomplete="off" autofocus></div>
+      <div><label class="block text-xs text-[var(--muted)] mb-1">Senha</label><input type="password" id="loginPassword" class="form-input" placeholder="admin123" onkeypress="if(event.key==='Enter')Auth.login()"></div>
       <button onclick="Auth.login()" class="btn btn-primary w-full"><i class="fas fa-sign-in-alt"></i> Entrar</button>
-      <button onclick="Auth.recoverPassword()" class="btn btn-secondary w-full text-sm"><i class="fas fa-key"></i> Esqueceu a senha?</button>
       <div id="loginErrorMessage" class="login-error"></div>
     </div>
-    <div class="mt-6 text-center text-xs text-[var(--muted)]"><p>Site: <strong class="text-[var(--accent)]">www.MARLIFT.com.br</strong></p><p class="mt-1">Suporte Tecnico <strong>(98)98824-8877</strong></p></div>
+    <div class="mt-6 text-center text-xs text-[var(--muted)]"><p>MARLIFT EMPILHADEIRAS</p><p class="mt-1">Suporte: (98)98824-8877</p></div>
   </div>
 </div>
 
-<!-- MODAL EQUIPAMENTOS -->
-<div id="equipModal" class="modal"><div class="modal-content"><div class="modal-title"><i class="fas fa-forklift"></i> Selecione o Equipamento</div><div id="equipList"></div><button onclick="App.fecharModalEquip()" class="btn btn-secondary w-full mt-3">Cancelar</button></div></div>
-
 <!-- SISTEMA PRINCIPAL -->
 <div id="appContainer" style="display:none">
-  <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 backdrop-blur-sm sticky top-0 z-50">
+  <header class="no-print border-b border-[var(--border)] bg-[var(--bg)]/95 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-3">
       <div class="top-bar">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 md:w-12 md:h-12 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-light)] rounded-xl flex items-center justify-center shadow-lg"><svg class="w-5 h-5 md:w-7 md:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
-          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S - v10.0</p></div>
+          <div><h1 class="font-display text-xl md:text-2xl tracking-wide text-[var(--accent)]">MARLIFT EMPILHADEIRAS</h1><p class="text-xs text-[var(--muted)]">Sistema de O.S</p></div>
         </div>
-        <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName">Carregando...</span><div class="w-px h-5 bg-[var(--border)]"></div><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] transition-colors"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
+        <div class="user-area"><i class="fas fa-user-circle text-[var(--accent)] text-lg"></i><span class="font-medium text-sm" id="currentUserName"></span><button onclick="Auth.logout()" class="text-xs text-[var(--muted)] hover:text-[var(--danger)] ml-3"><i class="fas fa-sign-out-alt"></i> Sair</button></div>
       </div>
       <div class="toolbar">
-        <button onclick="App.gerarPreviaPDF()" id="btnPreviaPDF" class="btn btn-primary text-sm" disabled><i class="fas fa-file-pdf"></i> PDF</button>
-        <button onclick="App.enviarEmailComResumo()" id="btnEnviarEmail" class="btn btn-secondary text-sm" disabled><i class="fas fa-envelope"></i> E-mail</button>
-        <button onclick="App.sendWhatsAppMessage()" id="btnWhatsApp" class="btn btn-secondary text-sm"><i class="fab fa-whatsapp text-green-500"></i> WhatsApp</button>
-        <button onclick="App.novaOS()" id="btnNovaOS" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button>
-        <button onclick="SyncQueue.forceSync()" id="btnSync" class="btn btn-secondary text-sm"><i class="fas fa-cloud-upload-alt"></i> Sincronizar</button>
-        <button onclick="GoogleSheetsSync.fetchFromSheet()" id="btnDownload" class="btn btn-secondary text-sm"><i class="fas fa-cloud-download-alt"></i> Baixar</button>
+        <button onclick="App.novaOS()" class="btn btn-yellow text-sm"><i class="fas fa-plus"></i> Nova O.S</button>
+        <button onclick="App.salvarOSManual()" class="btn btn-primary text-sm"><i class="fas fa-save"></i> Salvar</button>
       </div>
     </div>
   </header>
 
   <main class="max-w-7xl mx-auto px-4 py-6">
+    <!-- Step Indicator -->
     <div class="step-indicator no-print mb-6">
-      <div class="step" data-step="abertura">Abertura</div>
-      <div class="step" data-step="execucao">Execucao</div>
-      <div class="step" data-step="finalizacao">Finalizando</div>
-      <div class="step" data-step="fechada">Fechada</div>
-      <div class="step" data-step="aprovada">Aprovada</div>
+      <div class="step" data-step="abertura">1. ABERTURA</div>
+      <div class="step" data-step="execucao">2. EXECUCAO</div>
+      <div class="step" data-step="finalizacao">3. FINALIZANDO</div>
+      <div class="step" data-step="fechada">4. FECHADA</div>
+      <div class="step" data-step="aprovada">5. APROVADA</div>
     </div>
 
+    <!-- Tabs -->
     <div id="tabsContainer" class="flex border-b border-[var(--border)] mb-6 no-print overflow-x-auto">
       <button class="tab-button active" data-tab="tab-os">O.S</button>
       <button class="tab-button" data-tab="tab-checklist">Checklist</button>
       <button class="tab-button" data-tab="tab-clientes">Clientes</button>
       <button class="tab-button" data-tab="tab-historico">Historico</button>
-      <button class="tab-button" data-tab="tab-agendamentos" id="tabAgendamentosBtn">Agendamentos</button>
-      <button class="tab-button" data-tab="tab-jornada" id="tabJornadaBtn">Minha Jornada</button>
-      <button class="tab-button" data-tab="tab-permissoes" id="tabPermissoesBtn">Permissoes</button>
-      <button class="tab-button" data-tab="tab-usuarios" id="tabUsuariosBtn">Usuarios</button>
+      <button class="tab-button" data-tab="tab-agendamentos">Agendamentos</button>
+      <button class="tab-button" data-tab="tab-usuarios">Usuarios</button>
     </div>
 
     <!-- TAB O.S -->
     <div id="tab-os" class="tab-content active">
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <div class="flex flex-wrap justify-between items-center gap-3 mb-4"><h2 class="font-display text-xl">Informacoes da O.S</h2><div><span class="status-badge" id="statusBadge">EM ABERTURA</span></div></div>
+        <div class="flex justify-between items-center mb-4"><h2 class="font-display text-xl">Informacoes da O.S</h2><span class="status-badge status-abertura" id="statusBadge">EM ABERTURA</span></div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">N° O.S</label><input type="text" id="numeroOS" class="form-input font-mono font-bold text-lg" readonly placeholder="Clique em Nova OS"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">N° O.S</label><input type="text" id="numeroOS" class="form-input font-mono font-bold" readonly placeholder="Clique em Nova OS"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Data</label><input type="date" id="dataOS" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Tipo de Chamado</label><select id="tipoChamado" class="form-input"><option value="normal">Normal</option><option value="emergencial">Emergencial</option><option value="garantia">Garantia</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option><option value="avaliacao">Avaliacao</option><option value="orcamento">Orcamento</option></select></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Tipo</label><select id="tipoChamado" class="form-input"><option value="normal">Normal</option><option value="emergencial">Emergencial</option><option value="preventiva">Preventiva</option><option value="corretiva">Corretiva</option></select></div>
         </div>
-        <div><label class="block text-xs text-[var(--muted)] mb-1">Relato do Cliente</label><textarea id="relatoCliente" class="form-input" rows="2" placeholder="Descreva o problema..."></textarea></div>
-        <div class="action-buttons no-print">
-          <button id="btnAbrirOS" class="btn btn-primary" onclick="App.mudarStatus('abertura')"><i class="fas fa-plus-circle"></i> Abrir O.S</button>
-          <button id="btnIniciarExecucao" class="btn btn-info" onclick="App.iniciarExecucao()"><i class="fas fa-play"></i> Iniciar Execucao</button>
-          <button id="btnFinalizar" class="btn btn-warning" onclick="App.finalizarServico()"><i class="fas fa-stop"></i> Finalizar Servico</button>
-          <button id="btnFecharOS" class="btn btn-danger" onclick="App.fecharOS()"><i class="fas fa-lock"></i> Fechar O.S</button>
-          <button id="btnAprovar" class="btn btn-success" onclick="App.mudarStatus('aprovada')"><i class="fas fa-stamp"></i> Aprovar com Assinatura</button>
+        <div><label class="block text-xs text-[var(--muted)] mb-1">Relato do Cliente</label><textarea id="relatoCliente" class="form-input" rows="2"></textarea></div>
+        <div class="action-buttons mt-4">
+          <button onclick="App.mudarStatus('abertura')" class="btn btn-primary"><i class="fas fa-plus-circle"></i> Abrir O.S</button>
+          <button onclick="App.iniciarExecucao()" id="btnIniciarExecucao" class="btn btn-info"><i class="fas fa-play"></i> Iniciar</button>
+          <button onclick="App.finalizarServico()" id="btnFinalizar" class="btn btn-warning"><i class="fas fa-stop"></i> Finalizar</button>
+          <button onclick="App.fecharOS()" id="btnFecharOS" class="btn btn-danger"><i class="fas fa-lock"></i> Fechar</button>
+          <button onclick="App.mudarStatus('aprovada')" id="btnAprovar" class="btn btn-success"><i class="fas fa-stamp"></i> Aprovar</button>
         </div>
       </div>
 
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Dados do Equipamento</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Marca</label><select id="marcaSelect" class="form-input"></select><div id="marcaOutraDiv" style="display:none" class="mt-1"><input type="text" id="marcaOutra" class="form-input" placeholder="Digite a marca"></div><input type="hidden" id="marca"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Marca</label><select id="marcaSelect" class="form-input"></select><div id="marcaOutraDiv" style="display:none" class="mt-1"><input type="text" id="marcaOutra" class="form-input" placeholder="Digite a marca"></div></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Modelo</label><input type="text" id="modelo" class="form-input"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">N° Serie</label><input type="text" id="numSerie" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Horimetro <span class="text-red-400">*</span></label><input type="text" id="horimetro" class="form-input" placeholder="Ex: 1250h" required></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Combustivel</label><select id="combustivel" class="form-input"><option value="">Selecione</option><option value="eletrico">Eletrico</option><option value="diesel">Diesel</option><option value="gasolina">Gasolina</option><option value="glp">GLP</option></select></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">WhatsApp Cliente</label><input type="text" id="whatsappCliente" class="form-input" placeholder="(00) 00000-0000"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Horimetro</label><input type="text" id="horimetro" class="form-input" placeholder="Ex: 1250h"></div>
         </div>
         <div class="grid md:grid-cols-3 gap-4 mt-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="cliente" class="form-input" required></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="cliente" class="form-input" list="clientesList"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">CNPJ/CPF</label><input type="text" id="cnpj" class="form-input"></div>
           <div><label class="block text-xs text-[var(--muted)] mb-1">Cidade</label><input type="text" id="cidadeCliente" class="form-input"></div>
         </div>
-        <div class="mt-4"><label class="block text-xs text-[var(--muted)] mb-1">Endereco</label><div class="flex gap-2"><input type="text" id="endereco" class="form-input flex-1"><button type="button" onclick="App.abrirMapa()" class="btn btn-secondary"><i class="fas fa-map-marker-alt"></i></button></div></div>
+        <div class="mt-4"><label class="block text-xs text-[var(--muted)] mb-1">Endereco</label><input type="text" id="endereco" class="form-input"></div>
+        <datalist id="clientesList"></datalist>
       </div>
 
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Servico Realizado</h2>
-        <div><label class="block text-xs text-[var(--muted)] mb-1">Diagnostico / Servicos executados</label><textarea id="descricaoServico" class="form-input min-h-24" placeholder="Descreva o diagnostico..."></textarea></div>
-        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pecas / Materiais Aplicados</label><textarea id="pecasAplicadas" class="form-input min-h-20" placeholder="Liste as pecas..."></textarea></div>
-        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pendencias / Itens Criticos</label><textarea id="pendencias" class="form-input min-h-20" placeholder="Pendencias..."></textarea></div>
+        <div><label class="block text-xs text-[var(--muted)] mb-1">Diagnostico</label><textarea id="descricaoServico" class="form-input" rows="3"></textarea></div>
+        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pecas Aplicadas</label><textarea id="pecasAplicadas" class="form-input" rows="2"></textarea></div>
+        <div class="mt-3"><label class="block text-xs text-[var(--muted)] mb-1">Pendencias</label><textarea id="pendencias" class="form-input" rows="2"></textarea></div>
       </div>
 
-      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2"><i class="fas fa-camera"></i> Foto do Horimetro</h2><input type="file" id="fotoHorimetroInput" accept="image/*" class="form-input"><div id="fotoHorimetroPreview" class="photo-preview"></div></div>
-      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2">Fotos do Servico (max. 10)</h2><input type="file" id="fotosServico" multiple accept="image/*" class="form-input"><div id="fotosPreview" class="photo-preview"></div></div>
-      <div class="checklist-card p-4 md:p-5 mb-5"><h2 class="font-display text-xl mb-2"><i class="fas fa-exclamation-triangle"></i> Fotos das Pendencias (max. 10)</h2><input type="file" id="fotosPendenciasInput" multiple accept="image/*" class="form-input"><div id="fotosPendenciasPreview" class="photo-preview"></div></div>
-
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3">Assinaturas Digitais</h2>
+        <h2 class="font-display text-xl mb-3">Assinaturas</h2>
         <div class="grid md:grid-cols-2 gap-6">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><canvas id="sigTecnicoCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button type="button" onclick="Signature.clear('tec')" class="btn btn-secondary text-xs">Limpar</button><button type="button" onclick="Signature.save('tec')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaTecnicoData"><input type="text" id="tecnico" placeholder="Marlift Empilhadeiras" class="form-input mt-2"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente / Recebedor</label><canvas id="sigClienteCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button type="button" onclick="Signature.clear('cli')" class="btn btn-secondary text-xs">Limpar</button><button type="button" onclick="Signature.save('cli')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaClienteData"><input type="text" id="recebedor" placeholder="Nome do recebedor" class="form-input mt-2"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><canvas id="sigTecnicoCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button onclick="Signature.clear('tec')" class="btn btn-secondary text-xs">Limpar</button><button onclick="Signature.save('tec')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaTecnicoData"></div>
+          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><canvas id="sigClienteCanvas" class="signature-canvas" width="400" height="140"></canvas><div class="flex gap-2 mt-2"><button onclick="Signature.clear('cli')" class="btn btn-secondary text-xs">Limpar</button><button onclick="Signature.save('cli')" class="btn btn-primary text-xs">Salvar</button></div><input type="hidden" id="assinaturaClienteData"><input type="text" id="recebedor" placeholder="Nome do recebedor" class="form-input mt-2"></div>
         </div>
       </div>
-
-      <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3">Controle de Horas</h2>
-        <div class="text-center mb-4"><div class="timer-display" id="timerDisplay">00:00:00</div><div class="flex gap-2 justify-center mt-3 flex-wrap"><button type="button" onclick="Timer.control('start')" class="btn btn-success text-sm">Iniciar</button><button type="button" onclick="Timer.control('pause')" class="btn btn-warning text-sm">Pausar</button><button type="button" onclick="Timer.control('stop')" class="btn btn-danger text-sm">Parar</button></div></div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Inicio</label><input type="time" id="horaInicio" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Saida Almoco</label><input type="time" id="horaAlmocoSaida" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Retorno Almoco</label><input type="time" id="horaAlmocoRetorno" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Termino</label><input type="time" id="horaTermino" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Horas Cobradas</label><input type="text" id="horasTotais" class="form-input font-mono font-bold" readonly></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Horas Extras</label><input type="text" id="horasExtras" class="form-input" placeholder="00:00"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Adicional Noturno</label><input type="text" id="adicionalNoturno" class="form-input" placeholder="00:00"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Total Geral</label><input type="text" id="totalGeral" class="form-input font-mono font-bold text-[var(--success)]" readonly></div>
-        </div>
-      </div>
-
-      <div class="flex gap-3 justify-center mb-8 no-print flex-wrap"><button onclick="App.salvarOSManual()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Progresso</button></div>
     </div>
 
     <!-- TAB CHECKLIST -->
     <div id="tab-checklist" class="tab-content">
-      <div class="checklist-card p-4 mb-5"><div class="flex justify-between items-center flex-wrap"><span class="font-semibold">Progresso do Checklist</span><span id="progressText" class="font-mono text-[var(--accent)] text-lg">0%</span></div><div class="progress-bar mt-2"><div id="progressFill" class="progress-fill" style="width:0%"></div></div></div>
+      <div class="checklist-card p-4 mb-5">
+        <div class="flex justify-between items-center"><span>Progresso</span><span id="progressText" class="font-mono text-[var(--accent)]">0%</span></div>
+        <div class="progress-bar mt-2"><div id="progressFill" class="progress-fill" style="width:0%"></div></div>
+      </div>
       <div id="checklistSections"></div>
     </div>
 
     <!-- TAB CLIENTES -->
     <div id="tab-clientes" class="tab-content">
-      <div class="stats-grid no-print">
-        <div class="stat-card"><div class="stat-value" id="statTotalClientes">0</div><div class="stat-label">Total Clientes</div></div>
-        <div class="stat-card"><div class="stat-value" id="statTotalEquipamentos">0</div><div class="stat-label">Total Equipamentos</div></div>
-        <div class="stat-card"><div class="stat-value" id="statClientesComOS">0</div><div class="stat-label">Clientes c/ OS</div></div>
-        <div class="stat-card"><div class="stat-value" id="statTotalOSClientes">0</div><div class="stat-label">Total OS</div></div>
-        <div class="stat-card"><div class="stat-value" id="statOSAbertasCliente">0</div><div class="stat-label">OS em Aberto</div></div>
-        <div class="stat-card"><div class="stat-value" id="statOSAprovadasCliente">0</div><div class="stat-label">OS Aprovadas</div></div>
-      </div>
       <div class="checklist-card p-4 md:p-5 mb-5">
         <h2 class="font-display text-xl mb-3">Cadastro de Cliente</h2>
         <div class="grid md:grid-cols-2 gap-3">
@@ -262,101 +226,57 @@
           <input type="text" id="cad_telefone" placeholder="Telefone" class="form-input">
           <input type="text" id="cad_whatsapp" placeholder="WhatsApp" class="form-input">
           <input type="email" id="cad_email" placeholder="E-mail" class="form-input">
-          <input type="text" id="cad_responsavel_nome" placeholder="Responsavel" class="form-input">
-          <input type="text" id="cad_responsavel_telefone" placeholder="Tel Responsavel" class="form-input">
         </div>
-        <div class="mt-4"><label class="font-semibold text-sm">Equipamentos</label><div id="equipamentosList"></div><button type="button" onclick="Clientes.addEquipField()" class="btn btn-secondary text-sm mt-2"><i class="fas fa-plus"></i> Adicionar</button></div>
-        <div class="flex gap-3 mt-5 flex-wrap">
-          <button class="btn btn-primary" onclick="Clientes.save()"><i class="fas fa-save"></i> Salvar</button>
+        <div class="flex gap-3 mt-5">
+          <button onclick="Clientes.save()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button>
           <button id="cad_btnCancelar" class="btn btn-secondary" style="display:none" onclick="Clientes.cancelEdit()">Cancelar</button>
-          <button class="btn btn-secondary" onclick="Clientes.exportCSV()"><i class="fas fa-file-csv"></i> Exportar</button>
         </div>
       </div>
-      <div class="mt-5">
-        <input type="text" id="cad_searchInput" placeholder="Buscar..." class="form-input w-full md:w-64 mb-3">
-        <div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2 text-left">Nome</th><th class="p-2 text-left">Cidade</th><th class="p-2 text-left">Equipamentos</th><th class="p-2 text-left">Acoes</th></tr></thead><tbody id="cad_tableBody"></tbody></table></div>
-      </div>
+      <div><input type="text" id="cad_searchInput" placeholder="Buscar..." class="form-input w-full md:w-64 mb-3"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-[var(--bg-secondary)]"><tr><th class="p-2">Nome</th><th class="p-2">Cidade</th><th class="p-2">Acoes</th></tr></thead><tbody id="cad_tableBody"></tbody></table></div></div>
     </div>
 
     <!-- TAB HISTORICO -->
     <div id="tab-historico" class="tab-content">
-      <div class="stats-grid no-print">
-        <div class="stat-card"><div class="stat-value" id="statTotalOS">0</div><div class="stat-label">Total OS</div></div>
-        <div class="stat-card"><div class="stat-value text-[#60a5fa]" id="statStatusAbertura">0</div><div class="stat-label">Abertura</div></div>
-        <div class="stat-card"><div class="stat-value text-[#fbbf24]" id="statStatusExecucao">0</div><div class="stat-label">Execucao</div></div>
-        <div class="stat-card"><div class="stat-value text-[#34d399]" id="statStatusFinalizacao">0</div><div class="stat-label">Finalizando</div></div>
-        <div class="stat-card"><div class="stat-value text-[#a78bfa]" id="statStatusFechada">0</div><div class="stat-label">Fechadas</div></div>
-        <div class="stat-card"><div class="stat-value text-[#4ade80]" id="statStatusAprovada">0</div><div class="stat-label">Aprovadas</div></div>
-      </div>
       <div class="checklist-card p-4 md:p-5">
         <h2 class="font-display text-xl mb-3">Historico de O.S</h2>
-        <div class="flex flex-wrap gap-3 mb-4">
-          <input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48">
-          <select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos</option><option value="abertura">Abertura</option><option value="execucao">Execucao</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select>
-          <button onclick="Historico.exportCSV()" class="btn btn-secondary text-sm"><i class="fas fa-file-csv"></i> Exportar</button>
-          <button onclick="Historico.clear()" class="btn btn-secondary text-sm text-red-400"><i class="fas fa-trash"></i> Limpar</button>
-        </div>
-        <div class="overflow-x-auto"><table class="table-os"><thead><tr><th>OS</th><th>Data</th><th>Cliente</th><th>Status</th><th>Horas</th><th>Acoes</th></tr></thead><tbody id="historicoTableBody"></tbody></table></div>
+        <div class="flex gap-3 mb-4"><input type="text" id="historicoSearch" placeholder="Buscar..." class="form-input w-48"><select id="historicoFiltroStatus" class="form-input w-32"><option value="">Todos</option><option value="abertura">Abertura</option><option value="execucao">Execucao</option><option value="finalizacao">Finalizando</option><option value="fechada">Fechada</option><option value="aprovada">Aprovada</option></select><button onclick="Historico.exportCSV()" class="btn btn-secondary text-sm">Exportar</button></div>
+        <div class="overflow-x-auto"><table class="table-os"><thead><tr><th>OS</th><th>Data</th><th>Cliente</th><th>Status</th><th>Acoes</th></tr></thead><tbody id="historicoTableBody"></tbody></table></div>
       </div>
     </div>
 
     <!-- TAB AGENDAMENTOS -->
     <div id="tab-agendamentos" class="tab-content">
       <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3"><i class="fas fa-calendar-alt"></i> Gerenciar Agendamentos</h2>
-        <div class="grid md:grid-cols-2 gap-4 mb-4">
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Cliente</label><input type="text" id="ag_cliente" class="form-input" list="clientesList" placeholder="Selecione ou digite"><datalist id="clientesList"></datalist></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Equipamento</label><input type="text" id="ag_equipamento" class="form-input" placeholder="Marca/Modelo"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Data</label><input type="date" id="ag_data" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Horario</label><input type="time" id="ag_horario" class="form-input"></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Tecnico</label><select id="ag_tecnico" class="form-input"><option value="">Selecione</option><option value="tecnico">Técnico</option></select></div>
-          <div><label class="block text-xs text-[var(--muted)] mb-1">Descricao</label><textarea id="ag_descricao" class="form-input" rows="2" placeholder="Descricao resumida..."></textarea></div>
+        <h2 class="font-display text-xl mb-3">Novo Agendamento</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <input type="text" id="ag_cliente" placeholder="Cliente" class="form-input" list="clientesList">
+          <input type="text" id="ag_equipamento" placeholder="Equipamento" class="form-input">
+          <input type="date" id="ag_data" class="form-input">
+          <input type="time" id="ag_horario" class="form-input">
+          <input type="text" id="ag_descricao" placeholder="Descricao" class="form-input">
         </div>
-        <div class="flex gap-3 flex-wrap"><button onclick="Agendamentos.salvar()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar</button><button onclick="Agendamentos.limparForm()" class="btn btn-secondary">Limpar</button><input type="hidden" id="ag_editId" value=""></div>
+        <div class="mt-4"><button onclick="Agendamentos.salvar()" class="btn btn-primary">Salvar</button></div>
       </div>
-      <div class="checklist-card p-4 md:p-5"><h3 class="font-display text-lg mb-3">Agendamentos</h3><div id="agendamentosLista"></div></div>
-    </div>
-
-    <!-- TAB JORNADA -->
-    <div id="tab-jornada" class="tab-content">
-      <div class="checklist-card p-4 md:p-5 mb-5">
-        <h2 class="font-display text-xl mb-3"><i class="fas fa-truck-moving"></i> Controle de Jornada</h2>
-        <div id="jornadaStatus" class="mb-4 p-3 rounded-lg bg-[var(--bg-secondary)] text-center">Sistema de acompanhamento de jornada</div>
-        <div class="grid md:grid-cols-3 gap-4">
-          <div class="p-3 bg-[var(--bg)] rounded-lg"><i class="fas fa-play-circle text-green-500"></i> Inicio do dia</div>
-          <div class="p-3 bg-[var(--bg)] rounded-lg"><i class="fas fa-flag-checkered text-yellow-500"></i> Chegada ao cliente</div>
-          <div class="p-3 bg-[var(--bg)] rounded-lg"><i class="fas fa-stop-circle text-red-500"></i> Final do dia</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB PERMISSOES -->
-    <div id="tab-permissoes" class="tab-content">
-      <div class="checklist-card p-4 md:p-5">
-        <h2 class="font-display text-xl mb-3"><i class="fas fa-lock"></i> Permissoes dos Usuarios</h2>
-        <div id="permissoesContainer"></div>
-        <div class="flex gap-3 mt-6 flex-wrap"><button onclick="Permissoes.salvar()" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Permissoes</button><button onclick="Permissoes.resetarPadrao()" class="btn btn-secondary"><i class="fas fa-undo"></i> Restaurar Padrao</button></div>
-      </div>
+      <div class="checklist-card p-4"><h3 class="font-display text-lg mb-3">Agendamentos</h3><div id="agendamentosLista"></div></div>
     </div>
 
     <!-- TAB USUARIOS -->
     <div id="tab-usuarios" class="tab-content">
       <div class="checklist-card p-4 md:p-5">
-        <h2 class="font-display text-xl mb-3"><i class="fas fa-users"></i> Gerenciar Usuarios</h2>
-        <div class="grid md:grid-cols-2 gap-4 mb-5">
-          <div><input type="text" id="userNome" placeholder="Nome" class="form-input"></div>
-          <div><input type="text" id="userLogin" placeholder="Login" class="form-input"></div>
-          <div><input type="password" id="userSenha" placeholder="Senha" class="form-input"></div>
-          <div><select id="userNivel" class="form-input"><option value="admin">Admin</option><option value="tecnico">Tecnico</option><option value="visualizador">Visualizador</option></select></div>
+        <h2 class="font-display text-xl mb-3">Usuarios</h2>
+        <div class="grid md:grid-cols-3 gap-3 mb-4">
+          <input type="text" id="userNome" placeholder="Nome" class="form-input">
+          <input type="text" id="userLogin" placeholder="Login" class="form-input">
+          <input type="password" id="userSenha" placeholder="Senha" class="form-input">
         </div>
-        <div class="flex gap-3 mb-5 flex-wrap"><button onclick="UserManager.addUser()" class="btn btn-primary"><i class="fas fa-user-plus"></i> Adicionar</button><button onclick="UserManager.cancelEdit()" id="userCancelBtn" class="btn btn-secondary" style="display:none">Cancelar</button></div>
-        <div class="overflow-x-auto"><table class="user-table"><thead><tr><th>Nome</th><th>Login</th><th>Nivel</th><th>Acoes</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
+        <div class="flex gap-3 mb-5"><button onclick="UserManager.addUser()" class="btn btn-primary">Adicionar</button><button onclick="UserManager.cancelEdit()" id="userCancelBtn" class="btn btn-secondary" style="display:none">Cancelar</button></div>
+        <div class="overflow-x-auto"><table class="user-table"><thead><tr><th>Nome</th><th>Login</th><th>Acoes</th></tr></thead><tbody id="userTableBody"></tbody></table></div>
       </div>
     </div>
   </main>
 
-  <div id="toastCenter" class="toast-center"><i class="fas fa-check-circle text-green-500 text-xl"></i><span id="toastMessage">Operacao realizada</span></div>
-  <div class="sync-status" id="syncStatus"><i class="fas fa-cloud-upload-alt"></i> <span id="syncStatusText">Pronto</span></div>
+  <div id="toastCenter" class="toast-center"><i class="fas fa-check-circle text-green-500"></i><span id="toastMessage"></span></div>
+  <div class="sync-status"><i class="fas fa-cloud"></i> <span id="syncStatusText">Online</span></div>
 </div>
 
 <script>
@@ -365,32 +285,31 @@ function $(id) { return document.getElementById(id); }
 function showToast(msg, isErr) {
   var t = $('toastCenter');
   if (!t) return;
-  var m = $('toastMessage');
-  if (m) m.textContent = msg;
+  $('toastMessage').textContent = msg;
   t.style.borderColor = isErr ? 'var(--danger)' : 'var(--success)';
-  t.classList.remove('show');
-  void t.offsetWidth;
   t.classList.add('show');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.classList.remove('show'); }, 2800);
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 
-// ==================== CONFIGURACOES ====================
+// ==================== CONFIG ====================
 var Config = {
-  marcas: ["TOYOTA","CLARK","BYD","PALETRANS","LINDE","HYSTER","YALE","CATERPILLAR","KOMATSU","MITSUBISHI","NISSAN","STILL","CROWN","JUNGHEINRICH","TCM","HYUNDAI","DOOSAN","HELI","HANGCHA","LONKING","OUTRA"],
+  marcas: ["TOYOTA","CLARK","BYD","LINDE","HYSTER","YALE","CATERPILLAR","KOMATSU","MITSUBISHI","HYUNDAI","HELI","OUTRA"],
   checklist: [
-    {id:'motor',title:'Motor e Componentes',items:[{id:'motor_oleo',label:'Nivel de oleo do motor'},{id:'motor_filtro_oleo',label:'Filtro de oleo'},{id:'motor_filtro_ar',label:'Filtro de ar'},{id:'motor_filtro_comb',label:'Filtro de combustivel'},{id:'motor_correias',label:'Correias'},{id:'motor_radiador',label:'Radiador'}]},
-    {id:'eletrico',title:'Sistema Eletrico',items:[{id:'eletr_bateria',label:'Bateria'},{id:'eletr_terminais',label:'Terminais'},{id:'eletr_alternador',label:'Alternador'},{id:'eletr_partida',label:'Motor de partida'},{id:'eletr_farois',label:'Farois'},{id:'eletr_buzina',label:'Buzina'}]},
-    {id:'hidraulico',title:'Sistema Hidraulico',items:[{id:'hidr_oleo',label:'Nivel oleo hidraulico'},{id:'hidr_bomba',label:'Bomba hidraulica'},{id:'hidr_cilindros',label:'Cilindros'},{id:'hidr_vazamentos',label:'Vazamentos'},{id:'hidr_mangueiras',label:'Mangueiras'}]}
-  ],
-  maxFotos: 10
+    {id:'motor',title:'Motor',items:[{id:'motor_oleo',label:'Nivel de oleo'},{id:'motor_filtro',label:'Filtros'},{id:'motor_correias',label:'Correias'}]},
+    {id:'hidraulico',title:'Hidraulico',items:[{id:'hidr_oleo',label:'Nivel oleo'},{id:'hidr_vazamento',label:'Vazamentos'}]},
+    {id:'eletrico',title:'Eletrico',items:[{id:'eletr_bateria',label:'Bateria'},{id:'eletr_farois',label:'Farois'}]},
+    {id:'seguranca',title:'Seguranca',items:[{id:'seg_cinto',label:'Cinto'},{id:'seg_extintor',label:'Extintor'}]}
+  ]
 };
 
+// ==================== STATE ====================
 var State = {
   currentStatus: 'abertura',
-  fotosServico: [], fotoHorimetro: null, fotosPendencias: [],
-  clients: [], osHistory: [], editingClientId: null,
-  osCounter: 0, agendamentos: []
+  clients: [],
+  osHistory: [],
+  editingClientId: null,
+  osCounter: 0,
+  agendamentos: []
 };
 
 // ==================== STORAGE ====================
@@ -411,40 +330,21 @@ var Auth = {
   getUsers: function() {
     var u = localStorage.getItem('marlift_users');
     if (u) return JSON.parse(u);
-    var d = [
-      {id:1, nome:'Administrador', login:'admin', senha:'admin123', nivel:'admin'},
-      {id:2, nome:'Tecnico Principal', login:'tecnico', senha:'123456', nivel:'tecnico'},
-      {id:3, nome:'Visualizador', login:'visual', senha:'visual123', nivel:'visualizador'}
-    ];
+    var d = [{id:1, nome:'Administrador', login:'admin', senha:'admin123', nivel:'admin'}];
     localStorage.setItem('marlift_users', JSON.stringify(d));
     return d;
   },
-  saveUsers: function(u) { localStorage.setItem('marlift_users', JSON.stringify(u)); },
   login: function() {
     var login = $('loginUsername').value.trim();
     var senha = $('loginPassword').value;
-    var errDiv = $('loginErrorMessage');
-    if (errDiv) { errDiv.style.display = 'none'; errDiv.innerHTML = ''; }
-    if (!login || !senha) {
-      if (errDiv) { errDiv.innerHTML = 'Preencha usuario e senha'; errDiv.style.display = 'block'; }
-      showToast('Preencha usuario e senha', true);
-      return;
-    }
     var users = this.getUsers();
     var user = users.find(function(u) { return u.login === login && u.senha === senha; });
-    if (!user) {
-      if (errDiv) { errDiv.innerHTML = 'Usuario ou senha invalidos!'; errDiv.style.display = 'block'; }
-      showToast('Credenciais invalidas!', true);
-      $('loginPassword').value = '';
-      return;
-    }
+    if (!user) { showToast('Credenciais invalidas!', true); return; }
     this.currentUser = user;
     localStorage.setItem('marlift_current_user', JSON.stringify(user));
     $('loginScreen').style.display = 'none';
     $('appContainer').style.display = 'block';
     $('currentUserName').innerHTML = user.nome;
-    this.updatePermissions();
-    showToast('Bem-vindo, ' + user.nome + '!');
     App.init();
   },
   logout: function() {
@@ -452,15 +352,6 @@ var Auth = {
     localStorage.removeItem('marlift_current_user');
     $('loginScreen').style.display = 'flex';
     $('appContainer').style.display = 'none';
-    if (Timer.interval) clearInterval(Timer.interval);
-  },
-  recoverPassword: function() {
-    var login = prompt('Digite seu login:');
-    if (!login) return;
-    var users = this.getUsers();
-    var user = users.find(function(u) { return u.login === login; });
-    if (!user) { alert('Usuario nao encontrado!'); return; }
-    alert('Sua senha: ' + user.senha);
   },
   checkSession: function() {
     var s = localStorage.getItem('marlift_current_user');
@@ -469,49 +360,10 @@ var Auth = {
       $('loginScreen').style.display = 'none';
       $('appContainer').style.display = 'block';
       $('currentUserName').innerHTML = this.currentUser.nome;
-      this.updatePermissions();
       return true;
     }
     return false;
-  },
-  isAdmin: function() { return this.currentUser && this.currentUser.nivel === 'admin'; },
-  isTecnico: function() { return this.currentUser && this.currentUser.nivel === 'tecnico'; },
-  updatePermissions: function() {
-    var isAdmin = this.isAdmin();
-    var isTecnico = this.isTecnico();
-    
-    // Mostrar/Esconder abas baseado no nivel
-    var agendamentosBtn = $('tabAgendamentosBtn');
-    var jornadaBtn = $('tabJornadaBtn');
-    var permissoesBtn = $('tabPermissoesBtn');
-    var usuariosBtn = $('tabUsuariosBtn');
-    
-    if (agendamentosBtn) agendamentosBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-    if (jornadaBtn) jornadaBtn.style.display = (isAdmin || isTecnico) ? 'inline-flex' : 'none';
-    if (permissoesBtn) permissoesBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-    if (usuariosBtn) usuariosBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-    
-    console.log('Permissoes atualizadas - Admin:', isAdmin, 'Tecnico:', isTecnico);
   }
-};
-
-// ==================== TIMER ====================
-var Timer = {
-  interval: null, seconds: 0, running: false, paused: false,
-  control: function(a) { if (a === 'start') this.start(); else if (a === 'pause') this.pause(); else if (a === 'stop') this.stop(); },
-  start: function() {
-    if (this.running && !this.paused) return;
-    if (this.paused) { this.paused = false; this.running = true; }
-    else { this.running = true; this.paused = false; if (this.seconds === 0) this.reset(); }
-    if (this.interval) clearInterval(this.interval);
-    var self = this;
-    this.interval = setInterval(function() { if (!self.paused && self.running) { self.seconds++; self.updateDisplay(); } }, 1000);
-  },
-  pause: function() { if (!this.running) return; this.paused = true; },
-  stop: function() { if (!this.running) return; clearInterval(this.interval); this.running = false; this.paused = false; },
-  reset: function() { this.seconds = 0; this.updateDisplay(); },
-  updateDisplay: function() { var d = $('timerDisplay'); if (d) { var h = Math.floor(this.seconds / 3600); var m = Math.floor((this.seconds % 3600) / 60); var s = this.seconds % 60; d.textContent = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'); } },
-  cleanup: function() { if (this.interval) { clearInterval(this.interval); this.interval = null; } }
 };
 
 // ==================== SIGNATURE ====================
@@ -520,10 +372,10 @@ var Signature = {
   init: function() {
     this.canvases.tec = $('sigTecnicoCanvas');
     this.canvases.cli = $('sigClienteCanvas');
-    this.setupCanvas('tec');
-    this.setupCanvas('cli');
+    this.setup('tec');
+    this.setup('cli');
   },
-  setupCanvas: function(w) {
+  setup: function(w) {
     var cv = this.canvases[w];
     if (!cv) return;
     cv.width = cv.offsetWidth;
@@ -536,35 +388,13 @@ var Signature = {
     var self = this;
     var getPos = function(e) {
       var rect = cv.getBoundingClientRect();
-      var scaleX = cv.width / rect.width;
-      var scaleY = cv.height / rect.height;
-      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      var clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+      var x = (e.clientX - rect.left) * (cv.width / rect.width);
+      var y = (e.clientY - rect.top) * (cv.height / rect.height);
+      return { x: Math.max(0, Math.min(x, cv.width)), y: Math.max(0, Math.min(y, cv.height)) };
     };
-    var draw = function(e) {
-      if (!self.drawing[w]) return;
-      e.preventDefault();
-      var pos = getPos(e);
-      ctx.lineTo(pos.x, pos.y);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    };
-    var start = function(e) {
-      e.preventDefault();
-      self.drawing[w] = true;
-      var pos = getPos(e);
-      ctx.beginPath();
-      ctx.moveTo(pos.x, pos.y);
-    };
-    var stop = function() { self.drawing[w] = false; ctx.beginPath(); };
-    cv.addEventListener('mousedown', start);
-    cv.addEventListener('mousemove', draw);
-    cv.addEventListener('mouseup', stop);
-    cv.addEventListener('touchstart', start, { passive: false });
-    cv.addEventListener('touchmove', draw, { passive: false });
-    cv.addEventListener('touchend', stop);
+    cv.addEventListener('mousedown', function(e) { self.drawing[w] = true; var p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+    cv.addEventListener('mousemove', function(e) { if (!self.drawing[w]) return; var p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
+    cv.addEventListener('mouseup', function() { self.drawing[w] = false; ctx.beginPath(); });
   },
   clear: function(w) {
     var cv = this.canvases[w];
@@ -591,22 +421,20 @@ var Signature = {
 var Checklist = {
   total: 0, checked: 0,
   render: function() {
-    var c = $('checklistSections');
-    if (!c) return;
-    c.innerHTML = '';
+    var container = $('checklistSections');
+    if (!container) return;
+    container.innerHTML = '';
     this.total = 0;
-    var self = this;
-    Config.checklist.forEach(function(sec) {
-      self.total += sec.items.length;
+    Config.checklist.forEach(function(section) {
+      this.total += section.items.length;
       var div = document.createElement('div');
       div.className = 'checklist-card p-4 mb-4';
-      div.innerHTML = '<h3 class="font-display text-lg mb-2">' + sec.title + '</h3>' +
-        sec.items.map(function(it) {
-          return '<div class="checklist-item"><label><input type="checkbox" id="chk_' + it.id + '" onchange="Checklist.updateProgress()"> <span>' + it.label + '</span></label>' +
-            '<select id="' + it.id + '_status" class="form-input w-24 text-xs"><option value="ok">OK</option><option value="atencao">Atencao</option><option value="critico">Critico</option><option value="na">N/A</option></select></div>';
-        }).join('');
-      c.appendChild(div);
-    });
+      div.innerHTML = '<h3 class="font-display text-lg mb-2">' + section.title + '</h3>';
+      section.items.forEach(function(item) {
+        div.innerHTML += '<div class="checklist-item"><label><input type="checkbox" id="chk_' + item.id + '" onchange="Checklist.updateProgress()"> ' + item.label + '</label><select id="' + item.id + '_status" class="form-input w-24"><option value="ok">OK</option><option value="atencao">Atencao</option><option value="critico">Critico</option></select></div>';
+      });
+      container.appendChild(div);
+    }.bind(this));
     this.updateProgress();
   },
   updateProgress: function() {
@@ -620,30 +448,14 @@ var Checklist = {
 
 // ==================== CLIENTES ====================
 var Clientes = {
-  load: function() { State.clients = Storage.loadClients(); this.renderTable(); this.updateStats(); },
-  updateStats: function() {
-    var totalEquip = State.clients.reduce(function(sum, c) { return sum + (c.equipamentos || []).length; }, 0);
-    var clientesComOS = new Set();
-    State.osHistory.forEach(function(o) { if (o.cliente) clientesComOS.add(o.cliente); });
-    if ($('statTotalClientes')) $('statTotalClientes').innerText = State.clients.length;
-    if ($('statTotalEquipamentos')) $('statTotalEquipamentos').innerText = totalEquip;
-    if ($('statClientesComOS')) $('statClientesComOS').innerText = clientesComOS.size;
-    if ($('statTotalOSClientes')) $('statTotalOSClientes').innerText = State.osHistory.length;
-    var abertas = State.osHistory.filter(function(o) { return o.status === 'abertura' || o.status === 'execucao'; }).length;
-    var aprovadas = State.osHistory.filter(function(o) { return o.status === 'aprovada'; }).length;
-    if ($('statOSAbertasCliente')) $('statOSAbertasCliente').innerText = abertas;
-    if ($('statOSAprovadasCliente')) $('statOSAprovadasCliente').innerText = aprovadas;
-  },
+  load: function() { State.clients = Storage.loadClients(); this.renderTable(); this.updateDatalist(); },
+  updateDatalist: function() { var dl = $('clientesList'); if (dl) { dl.innerHTML = ''; State.clients.forEach(function(c) { var opt = document.createElement('option'); opt.value = c.nome; dl.appendChild(opt); }); } },
   renderTable: function() {
     var tb = $('cad_tableBody');
     if (!tb) return;
     tb.innerHTML = '';
     State.clients.forEach(function(c) {
-      var equipamentos = (c.equipamentos || []).map(function(e) { return e.marca + ' ' + e.modelo; }).join(', ');
-      tb.innerHTML += '<tr><td class="p-2 font-medium">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2">' + (equipamentos || '-') + '</td>' +
-        '<td class="p-2"><button onclick="Clientes.selecionar(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> ' +
-        '<i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.editar(' + c.id + ')"></i> ' +
-        '<i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.excluir(' + c.id + ')"></i></td></tr>';
+      tb.innerHTML += '<tr><td class="p-2">' + (c.nome || '-') + '</td><td class="p-2">' + (c.cidade || '-') + '</td><td class="p-2"><button onclick="Clientes.selecionar(' + c.id + ')" class="btn btn-primary text-xs py-1 px-2">Selecionar</button> <i class="fas fa-edit text-blue-400 cursor-pointer ml-2" onclick="Clientes.editar(' + c.id + ')"></i> <i class="fas fa-trash text-red-400 cursor-pointer ml-2" onclick="Clientes.excluir(' + c.id + ')"></i></td></tr>';
     });
   },
   selecionar: function(id) {
@@ -668,14 +480,7 @@ var Clientes = {
     $('cad_telefone').value = c.telefone || '';
     $('cad_whatsapp').value = c.whatsapp || '';
     $('cad_email').value = c.email || '';
-    $('cad_responsavel_nome').value = c.responsavel_nome || '';
-    $('cad_responsavel_telefone').value = c.responsavel_telefone || '';
-    var eqList = $('equipamentosList');
-    if (eqList) eqList.innerHTML = '';
-    if (c.equipamentos && c.equipamentos.length) {
-      c.equipamentos.forEach(function(eq) { Clientes.addEquipField(eq.marca, eq.modelo, eq.serie, eq.qtd, eq.combustivel); });
-    }
-    if ($('cad_btnCancelar')) $('cad_btnCancelar').style.display = 'inline-flex';
+    $('cad_btnCancelar').style.display = 'inline-flex';
     showToast('Editando cliente');
   },
   excluir: function(id) {
@@ -683,41 +488,17 @@ var Clientes = {
     State.clients = State.clients.filter(function(c) { return c.id !== id; });
     Storage.saveClients();
     this.renderTable();
-    this.updateStats();
+    this.updateDatalist();
     showToast('Cliente excluido');
   },
   cancelEdit: function() {
     State.editingClientId = null;
-    this.limparForm();
-    if ($('cad_btnCancelar')) $('cad_btnCancelar').style.display = 'none';
+    $('cad_nome').value = ''; $('cad_cnpj').value = ''; $('cad_endereco').value = ''; $('cad_cidade').value = ''; $('cad_telefone').value = ''; $('cad_whatsapp').value = ''; $('cad_email').value = '';
+    $('cad_btnCancelar').style.display = 'none';
   },
-  limparForm: function() {
-    ['cad_nome', 'cad_cnpj', 'cad_endereco', 'cad_cidade', 'cad_telefone', 'cad_whatsapp', 'cad_email', 'cad_responsavel_nome', 'cad_responsavel_telefone'].forEach(function(id) {
-      if ($(id)) $(id).value = '';
-    });
-    if ($('equipamentosList')) $('equipamentosList').innerHTML = '';
-  },
-  save: async function() {
+  save: function() {
     var nome = $('cad_nome').value.trim();
     if (!nome) { showToast('Nome obrigatorio', true); return; }
-    var equipamentos = [];
-    var eqList = $('equipamentosList');
-    if (eqList) {
-      eqList.querySelectorAll('.equip-item').forEach(function(item) {
-        var marcaSel = item.querySelector('.equip-marca');
-        var marcaOutra = item.querySelector('.outra-marca');
-        var marca = marcaSel.value === 'OUTRA' ? (marcaOutra ? marcaOutra.value.toUpperCase() : '') : marcaSel.value;
-        if (marca) {
-          equipamentos.push({
-            marca: marca,
-            modelo: item.querySelector('.equip-modelo') ? item.querySelector('.equip-modelo').value : '',
-            serie: item.querySelector('.equip-serie') ? item.querySelector('.equip-serie').value : '',
-            qtd: item.querySelector('.equip-qtd') ? parseInt(item.querySelector('.equip-qtd').value) || 1 : 1,
-            combustivel: item.querySelector('.equip-combustivel') ? item.querySelector('.equip-combustivel').value : ''
-          });
-        }
-      });
-    }
     var cliente = {
       id: State.editingClientId || Date.now(),
       nome: nome,
@@ -727,176 +508,95 @@ var Clientes = {
       telefone: $('cad_telefone').value,
       whatsapp: $('cad_whatsapp').value,
       email: $('cad_email').value,
-      responsavel_nome: $('cad_responsavel_nome').value,
-      responsavel_telefone: $('cad_responsavel_telefone').value,
-      equipamentos: equipamentos
+      equipamentos: []
     };
     if (State.editingClientId) {
       var idx = State.clients.findIndex(function(c) { return c.id === State.editingClientId; });
       if (idx >= 0) State.clients[idx] = cliente;
       State.editingClientId = null;
-      if ($('cad_btnCancelar')) $('cad_btnCancelar').style.display = 'none';
+      $('cad_btnCancelar').style.display = 'none';
     } else {
       State.clients.push(cliente);
     }
     Storage.saveClients();
-    this.limparForm();
+    this.cancelEdit();
     this.renderTable();
-    this.updateStats();
+    this.updateDatalist();
     showToast('Cliente salvo');
-    try { await GoogleSheetsSync.syncSingleCliente(cliente); } catch(e) { console.log('Sync offline'); }
-  },
-  addEquipField: function(marca, modelo, serie, qtd, combustivel) {
-    marca = marca || ''; modelo = modelo || ''; serie = serie || ''; qtd = qtd || 1; combustivel = combustivel || '';
-    var container = $('equipamentosList');
-    if (!container) return;
-    var marcasHtml = '<option value="">Selecione</option>';
-    Config.marcas.forEach(function(m) { marcasHtml += '<option value="' + m + '"' + (marca === m ? ' selected' : '') + '>' + m + '</option>'; });
-    var div = document.createElement('div');
-    div.className = 'equip-item';
-    div.innerHTML = '<select class="form-input w-28 equip-marca">' + marcasHtml + '</select>' +
-      '<div class="outra-marca-container" style="display:' + (marca && !Config.marcas.includes(marca) ? 'block' : 'none') + '">' +
-      '<input type="text" placeholder="Marca" class="form-input w-28 outra-marca" value="' + (!Config.marcas.includes(marca) ? marca : '') + '"></div>' +
-      '<input type="text" placeholder="Modelo" class="form-input w-28 equip-modelo" value="' + modelo + '">' +
-      '<input type="text" placeholder="Serie" class="form-input w-28 equip-serie" value="' + serie + '">' +
-      '<input type="number" placeholder="Qtd" class="form-input w-20 equip-qtd" value="' + qtd + '">' +
-      '<select class="form-input w-28 equip-combustivel"><option value="">Comb.</option><option value="eletrico"' + (combustivel === 'eletrico' ? ' selected' : '') + '>Eletrico</option><option value="diesel"' + (combustivel === 'diesel' ? ' selected' : '') + '>Diesel</option><option value="gasolina"' + (combustivel === 'gasolina' ? ' selected' : '') + '>Gasolina</option><option value="glp"' + (combustivel === 'glp' ? ' selected' : '') + '>GLP</option></select>' +
-      '<button type="button" class="text-red-500" onclick="this.parentElement.remove()"><i class="fas fa-trash"></i></button>';
-    container.appendChild(div);
-    var sel = div.querySelector('.equip-marca');
-    var outDiv = div.querySelector('.outra-marca-container');
-    sel.addEventListener('change', function() { outDiv.style.display = sel.value === 'OUTRA' ? 'block' : 'none'; });
-  },
-  exportCSV: function() {
-    var csv = 'Nome,CNPJ,Endereco,Cidade,Telefone,WhatsApp,Email\n';
-    State.clients.forEach(function(c) { csv += '"' + (c.nome || '') + '","' + (c.cnpj || '') + '","' + (c.endereco || '') + '","' + (c.cidade || '') + '","' + (c.telefone || '') + '","' + (c.whatsapp || '') + '","' + (c.email || '') + '"\n'; });
-    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'clientes.csv';
-    link.click();
-    showToast('Exportado');
   }
 };
 
 // ==================== HISTORICO ====================
 var Historico = {
-  load: function() { State.osHistory = Storage.loadOSHistory(); this.render(); this.updateStats(); },
-  updateStats: function() {
-    var total = State.osHistory.length;
-    var abertura = State.osHistory.filter(function(o) { return o.status === 'abertura'; }).length;
-    var execucao = State.osHistory.filter(function(o) { return o.status === 'execucao'; }).length;
-    var finalizacao = State.osHistory.filter(function(o) { return o.status === 'finalizacao'; }).length;
-    var fechada = State.osHistory.filter(function(o) { return o.status === 'fechada'; }).length;
-    var aprovada = State.osHistory.filter(function(o) { return o.status === 'aprovada'; }).length;
-    if ($('statTotalOS')) $('statTotalOS').innerText = total;
-    if ($('statStatusAbertura')) $('statStatusAbertura').innerText = abertura;
-    if ($('statStatusExecucao')) $('statStatusExecucao').innerText = execucao;
-    if ($('statStatusFinalizacao')) $('statStatusFinalizacao').innerText = finalizacao;
-    if ($('statStatusFechada')) $('statStatusFechada').innerText = fechada;
-    if ($('statStatusAprovada')) $('statStatusAprovada').innerText = aprovada;
-  },
+  load: function() { State.osHistory = Storage.loadOSHistory(); this.render(); },
   render: function() {
     var search = $('historicoSearch') ? $('historicoSearch').value.toLowerCase() : '';
     var statusFilter = $('historicoFiltroStatus') ? $('historicoFiltroStatus').value : '';
     var filtered = State.osHistory.filter(function(o) {
-      var matchSearch = !search || (o.numeroOS && o.numeroOS.toLowerCase().includes(search)) || (o.cliente && o.cliente.toLowerCase().includes(search));
-      var matchStatus = !statusFilter || o.status === statusFilter;
-      return matchSearch && matchStatus;
+      return (!search || (o.numeroOS && o.numeroOS.toLowerCase().includes(search)) || (o.cliente && o.cliente.toLowerCase().includes(search))) &&
+             (!statusFilter || o.status === statusFilter);
     });
     var tb = $('historicoTableBody');
     if (!tb) return;
     tb.innerHTML = '';
     filtered.forEach(function(o) {
-      tb.innerHTML += '<tr><td class="font-mono font-bold">' + (o.numeroOS || '-') + '</td><td>' + (o.dataOS || '-') + '</td><td>' + (o.cliente || '-') + '</td>' +
-        '<td><span class="status-badge status-' + (o.status || 'abertura') + '">' + (o.status || 'ABERTURA').toUpperCase() + '</span></td>' +
-        '<td>' + (o.horasTotais || '0h') + '</td>' +
-        '<td><button onclick="Historico.ver(\'' + o.numeroOS + '\')" class="text-blue-400"><i class="fas fa-eye"></i></button> ' +
-        '<button onclick="Historico.editar(\'' + o.numeroOS + '\')" class="text-orange-400 ml-2"><i class="fas fa-edit"></i></button> ' +
-        '<button onclick="Historico.excluir(\'' + o.numeroOS + '\')" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button></td></tr>';
+      tb.innerHTML += '<tr><td class="font-mono">' + (o.numeroOS || '-') + '</td><td>' + (o.dataOS || '-') + '</td><td>' + (o.cliente || '-') + '</td><td><span class="status-badge status-' + (o.status || 'abertura') + '">' + (o.status || 'ABERTURA').toUpperCase() + '</span></td><td><button onclick="Historico.ver(\'' + o.numeroOS + '\')" class="text-blue-400"><i class="fas fa-eye"></i></button> <button onclick="Historico.excluir(\'' + o.numeroOS + '\')" class="text-red-400 ml-2"><i class="fas fa-trash"></i></button></td></tr>';
     });
   },
   ver: function(num) {
     var os = State.osHistory.find(function(o) { return o.numeroOS === num; });
     if (!os) return;
-    for (var key in os) {
-      if ($(key) && key !== 'fotosBase64' && key !== 'fotoHorimetro' && key !== 'fotosPendencias') {
-        $(key).value = os[key] || '';
-      }
-    }
+    for (var key in os) { if ($(key) && key !== 'fotosBase64') $(key).value = os[key] || ''; }
     State.currentStatus = os.status || 'abertura';
     App.updateUI();
     showToast('OS carregada');
     document.querySelector('.tab-button[data-tab="tab-os"]').click();
   },
-  editar: function(num) { this.ver(num); },
   excluir: function(num) {
-    if (!confirm('Excluir OS ' + num + '?')) return;
+    if (!confirm('Excluir OS?')) return;
     State.osHistory = State.osHistory.filter(function(o) { return o.numeroOS !== num; });
     Storage.saveOSHistory();
     this.render();
-    this.updateStats();
     showToast('OS excluida');
   },
   exportCSV: function() {
-    var csv = 'Numero OS,Data,Cliente,Status,Horas\n';
-    State.osHistory.forEach(function(o) { csv += '"' + (o.numeroOS || '') + '","' + (o.dataOS || '') + '","' + (o.cliente || '') + '","' + (o.status || '') + '","' + (o.horasTotais || '') + '"\n'; });
+    var csv = 'Numero OS,Data,Cliente,Status\n';
+    State.osHistory.forEach(function(o) { csv += '"' + (o.numeroOS || '') + '","' + (o.dataOS || '') + '","' + (o.cliente || '') + '","' + (o.status || '') + '"\n'; });
     var blob = new Blob([csv], { type: 'text/csv' });
     var link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = 'historico_os.csv';
     link.click();
     showToast('Exportado');
-  },
-  clear: function() {
-    if (!confirm('Limpar todo historico?')) return;
-    State.osHistory = [];
-    Storage.saveOSHistory();
-    this.render();
-    this.updateStats();
-    showToast('Historico limpo');
   }
 };
 
 // ==================== AGENDAMENTOS ====================
 var Agendamentos = {
-  carregar: function() { State.agendamentos = Storage.loadAgendamentos(); this.atualizarLista(); this.atualizarDatalist(); },
-  atualizarDatalist: function() {
-    var dl = $('clientesList');
-    if (!dl) return;
-    dl.innerHTML = '';
-    State.clients.forEach(function(c) { var opt = document.createElement('option'); opt.value = c.nome; dl.appendChild(opt); });
-  },
+  carregar: function() { State.agendamentos = Storage.loadAgendamentos(); this.atualizarLista(); },
   atualizarLista: function() {
     var container = $('agendamentosLista');
     if (!container) return;
     if (!State.agendamentos.length) { container.innerHTML = '<div class="text-center p-4 text-[var(--muted)]">Nenhum agendamento</div>'; return; }
     var html = '';
     State.agendamentos.forEach(function(a) {
-      html += '<div class="schedule-card"><div class="flex justify-between items-start flex-wrap">' +
-        '<div><strong>' + a.cliente + '</strong><br><small>' + a.data + ' ' + a.horario + ' - ' + a.tecnico + '</small><br><small>' + (a.descricao || '') + '</small></div>' +
-        '<div><button onclick="Agendamentos.excluir(' + a.id + ')" class="btn btn-danger text-xs py-1 px-2"><i class="fas fa-trash"></i></button></div></div></div>';
+      html += '<div class="schedule-card"><div><strong>' + a.cliente + '</strong><br><small>' + a.data + ' ' + (a.horario || '') + '</small><br><small>' + (a.descricao || '') + '</small></div><div class="mt-2"><button onclick="Agendamentos.excluir(' + a.id + ')" class="btn btn-danger text-xs">Excluir</button></div></div>';
     });
     container.innerHTML = html;
   },
   salvar: function() {
     var cliente = $('ag_cliente').value.trim();
-    var equipamento = $('ag_equipamento').value.trim();
     var data = $('ag_data').value;
-    var horario = $('ag_horario').value;
-    var tecnico = $('ag_tecnico').value;
-    var descricao = $('ag_descricao').value;
-    if (!cliente || !data || !tecnico) { showToast('Preencha dados obrigatorios', true); return; }
-    var agendamento = { id: Date.now(), cliente: cliente, equipamento: equipamento, data: data, horario: horario, tecnico: tecnico, descricao: descricao, status: 'pendente' };
+    if (!cliente || !data) { showToast('Preencha cliente e data', true); return; }
+    var agendamento = { id: Date.now(), cliente: cliente, equipamento: $('ag_equipamento').value, data: data, horario: $('ag_horario').value, descricao: $('ag_descricao').value };
     State.agendamentos.push(agendamento);
     Storage.saveAgendamentos();
-    this.limparForm();
+    $('ag_cliente').value = ''; $('ag_equipamento').value = ''; $('ag_data').value = ''; $('ag_horario').value = ''; $('ag_descricao').value = '';
     this.atualizarLista();
     showToast('Agendamento salvo');
   },
-  limparForm: function() { $('ag_cliente').value = ''; $('ag_equipamento').value = ''; $('ag_data').value = ''; $('ag_horario').value = ''; $('ag_tecnico').value = ''; $('ag_descricao').value = ''; $('ag_editId').value = ''; },
   excluir: function(id) {
-    if (!confirm('Excluir agendamento?')) return;
+    if (!confirm('Excluir?')) return;
     State.agendamentos = State.agendamentos.filter(function(a) { return a.id !== id; });
     Storage.saveAgendamentos();
     this.atualizarLista();
@@ -913,41 +613,35 @@ var UserManager = {
     if (!tb) return;
     tb.innerHTML = '';
     users.forEach(function(u) {
-      var nivelText = u.nivel === 'admin' ? 'Admin' : (u.nivel === 'tecnico' ? 'Tecnico' : 'Visualizador');
-      tb.innerHTML += '<tr><td class="p-2">' + u.nome + '</td><td class="p-2">' + u.login + '</td><td class="p-2">' + nivelText + '</td>' +
-        '<td class="p-2"><i class="fas fa-edit text-blue-400 cursor-pointer mr-2" onclick="UserManager.editar(' + u.id + ')"></i>' +
-        '<i class="fas fa-trash text-red-400 cursor-pointer" onclick="UserManager.excluir(' + u.id + ')"></i></td></tr>';
+      tb.innerHTML += '<tr><td>' + u.nome + '</td><td>' + u.login + '</td><td><i class="fas fa-edit text-blue-400 cursor-pointer mr-2" onclick="UserManager.editar(' + u.id + ')"></i><i class="fas fa-trash text-red-400 cursor-pointer" onclick="UserManager.excluir(' + u.id + ')"></i></td></tr>';
     });
   },
   addUser: function() {
     var nome = $('userNome').value.trim();
     var login = $('userLogin').value.trim();
     var senha = $('userSenha').value;
-    var nivel = $('userNivel').value;
     if (!nome || !login || !senha) { showToast('Preencha todos os campos', true); return; }
     var users = Auth.getUsers();
     if (users.find(function(u) { return u.login === login; })) { showToast('Login ja existe', true); return; }
-    users.push({ id: Date.now(), nome: nome, login: login, senha: senha, nivel: nivel });
+    users.push({ id: Date.now(), nome: nome, login: login, senha: senha, nivel: 'tecnico' });
     Auth.saveUsers(users);
     this.render();
-    this.limparForm();
+    $('userNome').value = ''; $('userLogin').value = ''; $('userSenha').value = '';
     showToast('Usuario adicionado');
   },
   editar: function(id) {
-    var users = Auth.getUsers();
-    var user = users.find(function(u) { return u.id === id; });
+    var user = Auth.getUsers().find(function(u) { return u.id === id; });
     if (!user) return;
     this.editingId = id;
     $('userNome').value = user.nome;
     $('userLogin').value = user.login;
     $('userSenha').value = '';
-    $('userNivel').value = user.nivel;
-    if ($('userCancelBtn')) $('userCancelBtn').style.display = 'inline-flex';
+    $('userCancelBtn').style.display = 'inline-flex';
     showToast('Editando usuario');
   },
   excluir: function(id) {
     if (Auth.currentUser && Auth.currentUser.id === id) { showToast('Nao pode excluir proprio usuario', true); return; }
-    if (!confirm('Excluir usuario?')) return;
+    if (!confirm('Excluir?')) return;
     var users = Auth.getUsers().filter(function(u) { return u.id !== id; });
     Auth.saveUsers(users);
     this.render();
@@ -955,62 +649,12 @@ var UserManager = {
   },
   cancelEdit: function() {
     this.editingId = null;
-    this.limparForm();
-    if ($('userCancelBtn')) $('userCancelBtn').style.display = 'none';
-  },
-  limparForm: function() { $('userNome').value = ''; $('userLogin').value = ''; $('userSenha').value = ''; $('userNivel').value = 'tecnico'; }
-};
-
-// ==================== PERMISSOES ====================
-var Permissoes = {
-  padrao: { criar_os: true, editar_os: true, excluir_os: false, mudar_status: true, salvar_os: true },
-  carregarNaInterface: function() {
-    var container = $('permissoesContainer');
-    if (!container) return;
-    var html = '';
-    for (var k in this.padrao) {
-      html += '<div class="permission-item"><label><input type="checkbox" id="perm_' + k + '"> ' + k.replace(/_/g, ' ').toUpperCase() + '</label></div>';
-    }
-    container.innerHTML = html;
-    // Carregar valores salvos
-    var saved = localStorage.getItem('marlift_permissoes');
-    var valores = saved ? JSON.parse(saved) : this.padrao;
-    for (var k in valores) { var cb = $('perm_' + k); if (cb) cb.checked = valores[k]; }
-  },
-  salvar: function() {
-    var permissoes = {};
-    for (var k in this.padrao) { var cb = $('perm_' + k); if (cb) permissoes[k] = cb.checked; }
-    localStorage.setItem('marlift_permissoes', JSON.stringify(permissoes));
-    showToast('Permissoes salvas');
-  },
-  resetarPadrao: function() {
-    for (var k in this.padrao) { var cb = $('perm_' + k); if (cb) cb.checked = this.padrao[k]; }
-    this.salvar();
+    $('userNome').value = ''; $('userLogin').value = ''; $('userSenha').value = '';
+    $('userCancelBtn').style.display = 'none';
   }
 };
 
-// ==================== GOOGLE SHEETS SYNC ====================
-var GoogleSheetsSync = {
-  webAppUrl: 'https://script.google.com/macros/s/AKfycbw4WzaFFvOa4f81NuEda-068Hgyc2Q_mM-V7MqJDhurxpNcswWaPXC-nPSyGaSC8ZjP7A/exec',
-  setStatus: function(m) { if ($('syncStatusText')) $('syncStatusText').textContent = m; },
-  async syncSingleCliente(c) { console.log('Sync cliente:', c.nome); return true; },
-  async syncSingleOS(o) { console.log('Sync OS:', o.numeroOS); return true; },
-  async fetchFromSheet() {
-    try {
-      this.setStatus('Baixando...');
-      // Simular dados para testes
-      this.setStatus('OK');
-      showToast('Sincronizado (modo offline)');
-    } catch(e) { this.setStatus('Erro'); console.log(e); }
-  }
-};
-
-var SyncQueue = {
-  add: function(a, e, d) { console.log('Queue:', a, e); },
-  forceSync: async function() { await GoogleSheetsSync.fetchFromSheet(); }
-};
-
-// ==================== APP PRINCIPAL ====================
+// ==================== APP ====================
 var App = {
   init: function() {
     Storage.loadCounter();
@@ -1023,12 +667,10 @@ var App = {
     this.setupMarcaSelect();
     this.setupTabs();
     this.setupSearch();
-    if ($('dataOS') && !$('dataOS').value) $('dataOS').value = new Date().toISOString().split('T')[0];
+    if ($('dataOS')) $('dataOS').value = new Date().toISOString().split('T')[0];
     this.updateUI();
     UserManager.render();
-    Permissoes.carregarNaInterface();
-    setTimeout(function() { GoogleSheetsSync.fetchFromSheet(); }, 2000);
-    console.log('App inicializado - Admin:', Auth.isAdmin());
+    showToast('Sistema pronto');
   },
   populateMarcas: function() {
     var sel = $('marcaSelect');
@@ -1041,11 +683,7 @@ var App = {
     var div = $('marcaOutraDiv');
     var input = $('marcaOutra');
     if (sel && div && input) {
-      sel.addEventListener('change', function() {
-        div.style.display = sel.value === 'OUTRA' ? 'block' : 'none';
-        if ($('marca')) $('marca').value = sel.value === 'OUTRA' ? input.value.toUpperCase() : sel.value;
-      });
-      input.addEventListener('input', function() { if ($('marca')) $('marca').value = input.value.toUpperCase(); });
+      sel.addEventListener('change', function() { div.style.display = sel.value === 'OUTRA' ? 'block' : 'none'; });
     }
   },
   setupTabs: function() {
@@ -1069,7 +707,7 @@ var App = {
         var original = State.clients.slice();
         State.clients = original.filter(function(c) { return (c.nome && c.nome.toLowerCase().includes(q)) || (c.cidade && c.cidade.toLowerCase().includes(q)); });
         Clientes.renderTable();
-        setTimeout(function() { State.clients = original; }, 100);
+        setTimeout(function() { State.clients = original; Clientes.renderTable(); }, 100);
       });
     }
     var histSearch = $('historicoSearch');
@@ -1078,70 +716,56 @@ var App = {
     if (statusFilter) statusFilter.addEventListener('change', function() { Historico.render(); });
   },
   updateUI: function() {
-    var status = State.currentStatus;
-    var abertura = status === 'abertura';
-    var execucao = status === 'execucao';
-    var finalizacao = status === 'finalizacao';
-    var fechada = status === 'fechada';
-    var aprovada = status === 'aprovada';
-    if ($('btnIniciarExecucao')) $('btnIniciarExecucao').disabled = !abertura;
-    if ($('btnFinalizar')) $('btnFinalizar').disabled = !execucao;
-    if ($('btnFecharOS')) $('btnFecharOS').disabled = !finalizacao;
-    if ($('btnAprovar')) $('btnAprovar').disabled = !fechada;
-    if ($('btnPreviaPDF')) $('btnPreviaPDF').disabled = !aprovada;
-    if ($('btnEnviarEmail')) $('btnEnviarEmail').disabled = !aprovada;
-    var statusMap = { abertura: { text: 'EM ABERTURA', cls: 'status-abertura' }, execucao: { text: 'EM EXECUCAO', cls: 'status-execucao' }, finalizacao: { text: 'FINALIZANDO', cls: 'status-finalizacao' }, fechada: { text: 'FECHADA', cls: 'status-fechada' }, aprovada: { text: 'APROVADA', cls: 'status-aprovada' } };
-    var cfg = statusMap[status] || statusMap.abertura;
-    if ($('statusBadge')) { $('statusBadge').textContent = cfg.text; $('statusBadge').className = 'status-badge ' + cfg.cls; }
+    var s = State.currentStatus;
+    var statusMap = { abertura: 'status-abertura', execucao: 'status-execucao', finalizacao: 'status-finalizacao', fechada: 'status-fechada', aprovada: 'status-aprovada' };
+    var statusText = { abertura: 'EM ABERTURA', execucao: 'EM EXECUCAO', finalizacao: 'FINALIZANDO', fechada: 'FECHADA', aprovada: 'APROVADA' };
+    if ($('statusBadge')) { $('statusBadge').className = 'status-badge ' + (statusMap[s] || 'status-abertura'); $('statusBadge').textContent = statusText[s] || 'EM ABERTURA'; }
+    var btns = { btnIniciarExecucao: s === 'abertura', btnFinalizar: s === 'execucao', btnFecharOS: s === 'finalizacao', btnAprovar: s === 'fechada' };
+    for (var id in btns) { if ($(id)) $(id).disabled = !btns[id]; }
     var steps = ['abertura', 'execucao', 'finalizacao', 'fechada', 'aprovada'];
     document.querySelectorAll('.step').forEach(function(step, idx) {
       step.classList.remove('active', 'completed');
-      if (steps[idx] === status) step.classList.add('active');
-      else if (steps.indexOf(status) > idx) step.classList.add('completed');
+      if (steps[idx] === s) step.classList.add('active');
+      else if (steps.indexOf(s) > idx) step.classList.add('completed');
     });
   },
-  mudarStatus: async function(novoStatus) {
+  mudarStatus: function(novoStatus) {
     if (novoStatus === 'abertura' && !$('numeroOS').value) { showToast('Clique em Nova OS primeiro', true); return; }
     if (novoStatus === 'aprovada' && !$('assinaturaClienteData').value) { showToast('Cliente deve assinar', true); return; }
     State.currentStatus = novoStatus;
-    await this.salvar();
+    this.salvar();
     this.updateUI();
     Historico.render();
-    showToast('Status atualizado para ' + novoStatus.toUpperCase());
+    showToast('Status: ' + novoStatus.toUpperCase());
   },
-  iniciarExecucao: function() { if (State.currentStatus === 'abertura') { this.mudarStatus('execucao'); Timer.start(); } },
-  finalizarServico: function() { if (State.currentStatus === 'execucao') { Timer.stop(); this.mudarStatus('finalizacao'); } },
-  fecharOS: function() { if (State.currentStatus === 'finalizacao') { this.mudarStatus('fechada'); } },
+  iniciarExecucao: function() { if (State.currentStatus === 'abertura') this.mudarStatus('execucao'); },
+  finalizarServico: function() { if (State.currentStatus === 'execucao') this.mudarStatus('finalizacao'); },
+  fecharOS: function() { if (State.currentStatus === 'finalizacao') this.mudarStatus('fechada'); },
   novaOS: function() {
-    if (State.hasUnsavedChanges && !confirm('Alteracoes nao salvas. Continuar?')) return;
     State.currentStatus = 'abertura';
-    State.hasUnsavedChanges = false;
-    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file' && $(el)) $(el).value = ''; });
+    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file') $(el).value = ''; });
     if ($('dataOS')) $('dataOS').value = new Date().toISOString().split('T')[0];
     document.querySelectorAll('#checklistSections input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
     Checklist.updateProgress();
     Signature.clear('tec');
     Signature.clear('cli');
-    Timer.reset();
-    Timer.running = false;
-    if (Timer.interval) clearInterval(Timer.interval);
-    $('fotosPreview').innerHTML = '';
-    $('fotoHorimetroPreview').innerHTML = '';
-    $('fotosPendenciasPreview').innerHTML = '';
-    State.fotosServico = [];
-    State.fotoHorimetro = null;
-    State.fotosPendencias = [];
-    Utils.generateOSNumber();
+    this.generateOSNumber();
     this.updateUI();
     showToast('Nova OS criada');
   },
-  salvar: async function() {
+  generateOSNumber: function() {
+    State.osCounter = Storage.loadCounter();
+    State.osCounter++;
+    Storage.saveCounter();
+    var d = new Date();
+    var os = 'OS-' + d.getFullYear().toString().slice(-2) + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(State.osCounter).padStart(4, '0');
+    if ($('numeroOS')) $('numeroOS').value = os;
+    return os;
+  },
+  salvar: function() {
     var dados = {};
-    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file' && $(el)) dados[el.id] = $(el).value; });
+    document.querySelectorAll('#tab-os input, #tab-os select, #tab-os textarea').forEach(function(el) { if (el.id && el.type !== 'file') dados[el.id] = $(el).value; });
     dados.status = State.currentStatus;
-    dados.fotosServico = State.fotosServico || [];
-    dados.fotoHorimetro = State.fotoHorimetro;
-    dados.fotosPendencias = State.fotosPendencias || [];
     if (!dados.numeroOS) dados.numeroOS = this.generateOSNumber();
     var marcaSel = $('marcaSelect').value;
     var marcaOutra = $('marcaOutra') ? $('marcaOutra').value : '';
@@ -1151,34 +775,9 @@ var App = {
     else State.osHistory.unshift(dados);
     Storage.saveOSHistory();
     Historico.render();
-    Historico.updateStats();
-    Clientes.updateStats();
     showToast('OS salva');
-    try { await GoogleSheetsSync.syncSingleOS(dados); } catch(e) { console.log('Sync offline'); }
-    return true;
   },
-  salvarOSManual: function() { this.salvar(); },
-  generateOSNumber: function() {
-    State.osCounter = Storage.loadCounter();
-    State.osCounter++;
-    Storage.saveCounter();
-    var d = new Date();
-    var yy = d.getFullYear().toString().slice(-2);
-    var mm = String(d.getMonth() + 1).padStart(2, '0');
-    var os = 'OS-' + yy + mm + '-' + String(State.osCounter).padStart(4, '0');
-    if ($('numeroOS')) $('numeroOS').value = os;
-    return os;
-  },
-  gerarPreviaPDF: function() { alert('PDF - Em desenvolvimento'); },
-  enviarEmailComResumo: function() { alert('Email - Em desenvolvimento'); },
-  sendWhatsAppMessage: function() { alert('WhatsApp - Em desenvolvimento'); },
-  abrirMapa: function() { var e = $('endereco') ? $('endereco').value : ''; if (e) window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(e)); else showToast('Informe o endereco', true); },
-  fecharModalEquip: function() { if ($('equipModal')) $('equipModal').style.display = 'none'; }
-};
-
-// Utils
-var Utils = {
-  generateOSNumber: function() { return App.generateOSNumber(); }
+  salvarOSManual: function() { this.salvar(); }
 };
 
 // Inicializacao
